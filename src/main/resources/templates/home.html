@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <style>
+        .admin-badge {
+            background-color: #6c757d;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .admin-section {
+            background-color: #f8f9fa;
+            border: 2px solid #6c757d;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .admin-section h3 {
+            color: #495057;
+            margin-top: 0;
+        }
+        .admin-link {
+            display: inline-block;
+            background-color: #6c757d;
+            color: white;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 5px;
+        }
+        .admin-link:hover {
+            background-color: #545b62;
+        }
+        .user-link {
+            display: inline-block;
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 5px;
+        }
+        .user-link:hover {
+            background-color: #0056b3;
+        }
+        .logout-link {
+            display: inline-block;
+            background-color: #6c757d;
+            color: white;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 5px;
+        }
+        .logout-link:hover {
+            background-color: #545b62;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome Home!</h1>
+
+    <p>
+        Mr/Mrs: <span th:text="${username}"></span>
+        <span th:if="${isAdmin}" class="admin-badge">ADMIN</span>
+    </p>
+
+    <!-- Admin Section - Only visible to admins -->
+    <div th:if="${isAdmin}" class="admin-section">
+        <h3>🔧 Admin Panel</h3>
+        <p>You are logged in as an <strong>Administrator</strong>. You have access to administrative functions.</p>
+        
+        <a href="/admin/users" class="admin-link">👥 User Management</a>
+        <a href="/admin/generate-code" class="admin-link">🔑 Generate External Codes</a>
+        <a href="/dev/sms" class="admin-link">📱 View SMS Messages</a>
+    </div>
+
+    <!-- Regular User Section -->
+    <div th:unless="${isAdmin}">
+        <a href="/espace-reservation" class="user-link">📅 Espace réservation</a>
+    </div>
+
+    <a href="/logout" class="logout-link">🚪 Logout</a>
+</body>
+</html> 

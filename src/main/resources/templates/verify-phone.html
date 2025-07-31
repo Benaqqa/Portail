@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Phone</title>
+</head>
+<body>
+    <h1>Verify Your Phone Number</h1>
+    <p>A verification code has been sent to: <strong><span th:text="${phoneNumber}"></span></strong></p>
+    <p>Please enter the 6-digit code to continue with your first login setup.</p>
+    
+    <div th:if="${error}" style="color: red;">
+        <p th:text="${error}"></p>
+    </div>
+    
+    <div th:if="${message}" style="color: green;">
+        <p th:text="${message}"></p>
+    </div>
+    
+    <form method="post" action="/verify-phone">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+        <input type="hidden" name="numCin" th:value="${numCin}" />
+        <input type="hidden" name="phoneNumber" th:value="${phoneNumber}" />
+        
+        <label for="verificationCode">Enter verification code:</label>
+        <input type="text" id="verificationCode" name="verificationCode" required maxlength="6"><br><br>
+        
+        <button type="submit">Verify</button>
+    </form>
+    
+    <form method="post" action="/resend-code" style="margin-top: 20px;">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+        <input type="hidden" name="numCin" th:value="${numCin}" />
+        <input type="hidden" name="phoneNumber" th:value="${phoneNumber}" />
+        
+        <button type="submit">Resend Code</button>
+    </form>
+    
+    <p><a href="/login">Back to Login</a></p>
+</body>
+</html> 

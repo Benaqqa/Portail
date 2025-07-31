@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Development - SMS Messages</title>
+    <style>
+        .sms-message {
+            background-color: #f0f0f0;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+        .phone-number {
+            font-weight: bold;
+            color: #007bff;
+        }
+        .message-content {
+            margin-top: 5px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <h1>Development - Latest SMS Messages</h1>
+    <p><em>This page shows the latest SMS messages sent during development.</em></p>
+    
+    <div th:if="${smsMessages.isEmpty()}">
+        <p>No SMS messages have been sent yet.</p>
+    </div>
+    
+    <div th:each="entry : ${smsMessages}" class="sms-message">
+        <div class="phone-number" th:text="'To: ' + ${entry.key}"></div>
+        <div class="message-content" th:text="${entry.value}"></div>
+    </div>
+    
+    <p><a href="/login">Back to Login</a></p>
+    <p><a href="/admin/users">Admin Users</a></p>
+</body>
+</html> 

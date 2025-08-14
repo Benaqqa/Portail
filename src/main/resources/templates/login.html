@@ -2,94 +2,323 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Connexion - COSONE</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header-section {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+        }
+        .header-section h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.5em;
+        }
+        .header-section p {
+            margin: 0;
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        .login-options {
+            text-align: center;
+            margin: 30px 0;
+        }
+        .login-option-btn {
+            display: inline-block;
+            margin: 10px;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            text-decoration: none;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+        }
+        .login-option-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+        }
+        .login-option-btn.active {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+        .login-option-btn.active:hover {
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+        }
         .hidden { display: none; }
-        .login-option-btn { margin: 10px; padding: 10px 20px; }
-        .message { padding: 10px; margin: 10px 0; border-radius: 5px; }
-        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-        .first-login-section { 
-            margin-top: 20px; 
+        .message { 
             padding: 15px; 
-            border: 1px solid #ddd; 
-            border-radius: 5px; 
-            background-color: #f9f9f9; 
+            margin: 20px 0; 
+            border-radius: 8px; 
+            text-align: center;
         }
-        .first-login-btn { 
-            background-color: #28a745; 
-            color: white; 
-            padding: 8px 16px; 
-            border: none; 
-            border-radius: 4px; 
-            cursor: pointer; 
+        .success { 
+            background-color: #d4edda; 
+            color: #155724; 
+            border: 1px solid #c3e6cb; 
         }
-        .first-login-btn:hover { background-color: #218838; }
+        .error { 
+            background-color: #f8d7da; 
+            color: #721c24; 
+            border: 1px solid #f5c6cb; 
+        }
+        .login-form {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 30px;
+            margin: 20px 0;
+        }
+        .login-form h3 {
+            color: #495057;
+            margin-top: 0;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .login-form p {
+            color: #6c757d;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #495057;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+        .submit-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+            width: 100%;
+        }
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+        }
+        .first-login-toggle {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .first-login-toggle-btn {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 10px rgba(108, 117, 125, 0.3);
+        }
+        .first-login-toggle-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(108, 117, 125, 0.4);
+        }
+        .first-login-section {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            color: #856404;
+        }
+        .first-login-section h4 {
+            color: #533f03;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        .first-login-section p {
+            color: #856404;
+            margin-bottom: 20px;
+        }
+        .first-login-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 20px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 10px rgba(40, 167, 69, 0.3);
+            width: 100%;
+        }
+        .first-login-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
+        }
     </style>
-    <script>
-        function showForm(type) {
-            document.getElementById('interne-form').classList.add('hidden');
-            document.getElementById('extern-form').classList.add('hidden');
-            if (type === 'interne') {
-                document.getElementById('interne-form').classList.remove('hidden');
-            } else {
-                document.getElementById('extern-form').classList.remove('hidden');
-            }
-        }
-    </script>
 </head>
 <body>
-    <h1>Login</h1>
-    
-    <div th:if="${message}" class="message success">
-        <p th:text="${message}"></p>
-    </div>
-    
-    <div th:if="${error}" class="message error">
-        <p th:text="${error}"></p>
-    </div>
-    
-    <button class="login-option-btn" onclick="showForm('interne')">Interne</button>
-    <button class="login-option-btn" onclick="showForm('extern')">Extern</button>
-
-    <div id="interne-form" class="hidden">
-        <h3>Regular Login</h3>
-        <p>Already have a password? Login with your Num CIN and password.</p>
-        <form method="post" action="/login/interne">
-            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-            <label for="numCin">Num CIN:</label>
-            <input type="text" id="numCin" name="numCin" required><br><br>
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required><br><br>
-            <button type="submit">Login</button>
-        </form>
+    <div class="container">
+        <div class="header-section">
+            <h1>Connexion COSONE</h1>
+            <p>Choisissez votre méthode de connexion</p>
+        </div>
         
-        <div class="first-login-section">
-            <h3>First Time Login</h3>
-            <p>Don't have a password yet? Use your Num CIN to set up your account.</p>
-            <form method="post" action="/login/interne/first">
-                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                <label for="firstLoginNumCin">Num CIN:</label>
-                <input type="text" id="firstLoginNumCin" name="numCin" required><br><br>
-                <button type="submit" class="first-login-btn">Start First Login</button>
-            </form>
+        <div th:if="${message}" class="message success">
+            <p th:text="${message}"></p>
+        </div>
+        
+        <div th:if="${error}" class="message error">
+            <p th:text="${error}"></p>
+        </div>
+        
+        <div class="login-options">
+            <button class="login-option-btn" onclick="showForm('interne')">Connexion Interne</button>
+            <button class="login-option-btn" onclick="showForm('extern')">Connexion Externe</button>
+        </div>
+
+        <div id="interne-form" class="hidden">
+            <div class="login-form">
+                <h3>Connexion Régulière</h3>
+                <p>Vous avez déjà un mot de passe ? Connectez-vous avec votre Matricule ou Num CIN et mot de passe.</p>
+                <form method="post" action="/login/interne">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <div class="form-group">
+                        <label for="identifier">Matricule ou Num CIN :</label>
+                        <input type="text" id="identifier" name="identifier" required placeholder="Entrez votre matricule ou num CIN">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Mot de passe :</label>
+                        <input type="password" id="password" name="password" required placeholder="Entrez votre mot de passe">
+                    </div>
+                    <button type="submit" class="submit-btn">Se connecter</button>
+                </form>
+                
+                <div class="first-login-toggle">
+                    <button class="first-login-toggle-btn" onclick="toggleFirstLogin()">
+                        <span id="first-login-toggle-text">Première connexion ? Cliquez ici</span>
+                    </button>
+                </div>
+                
+                <div id="first-login-section" class="hidden">
+                    <div class="first-login-section">
+                        <h4>Première Connexion</h4>
+                        <p>Vous n'avez pas encore de mot de passe ? Utilisez votre Matricule ou Num CIN pour configurer votre compte.</p>
+                        <form method="post" action="/login/interne/first">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                            <div class="form-group">
+                                <label for="firstLoginIdentifier">Matricule ou Num CIN :</label>
+                                <input type="text" id="firstLoginIdentifier" name="identifier" required placeholder="Entrez votre matricule ou num CIN">
+                            </div>
+                            <button type="submit" class="first-login-btn">Commencer la première connexion</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="extern-form" class="hidden">
+            <div class="login-form">
+                <h3>Connexion Externe</h3>
+                <p>Utilisez votre code d'authentification à usage unique et vérifiez votre identité.</p>
+                <form method="post" action="/login/extern">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <div class="form-group">
+                        <label for="authCode">Code d'authentification à usage unique :</label>
+                        <input type="text" id="authCode" name="authCode" required placeholder="Entrez votre code d'authentification">
+                    </div>
+                    <div class="form-group">
+                        <label for="prenom">Prénom :</label>
+                        <input type="text" id="prenom" name="prenom" required placeholder="Entrez votre prénom">
+                    </div>
+                    <div class="form-group">
+                        <label for="nom">Nom :</label>
+                        <input type="text" id="nom" name="nom" required placeholder="Entrez votre nom">
+                    </div>
+                    <button type="submit" class="submit-btn">Se connecter</button>
+                </form>
+            </div>
         </div>
     </div>
 
-    <div id="extern-form" class="hidden">
-        <h3>External Login</h3>
-        <p>Use your one-time auth code and verify your identity.</p>
-        <form method="post" action="/login/extern">
-            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-            <label for="authCode">One-Time Auth Code:</label>
-            <input type="text" id="authCode" name="authCode" required><br><br>
-            <label for="prenom">First Name:</label>
-            <input type="text" id="prenom" name="prenom" required><br><br>
-            <label for="nom">Last Name:</label>
-            <input type="text" id="nom" name="nom" required><br><br>
-            <button type="submit">Login</button>
-        </form>
-    </div>
+    <script>
+        function showForm(type) {
+            // Hide all forms
+            document.getElementById('interne-form').classList.add('hidden');
+            document.getElementById('extern-form').classList.add('hidden');
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.login-option-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected form and activate button
+            if (type === 'interne') {
+                document.getElementById('interne-form').classList.remove('hidden');
+                event.target.classList.add('active');
+            } else {
+                document.getElementById('extern-form').classList.remove('hidden');
+                event.target.classList.add('active');
+            }
+            
+            // Hide first login section when switching forms
+            document.getElementById('first-login-section').classList.add('hidden');
+            document.getElementById('first-login-toggle-text').textContent = 'Première connexion ? Cliquez ici';
+        }
+        
+        function toggleFirstLogin() {
+            const firstLoginSection = document.getElementById('first-login-section');
+            const toggleText = document.getElementById('first-login-toggle-text');
+            const isHidden = firstLoginSection.classList.contains('hidden');
+            
+            if (isHidden) {
+                firstLoginSection.classList.remove('hidden');
+                toggleText.textContent = 'Masquer la première connexion';
+            } else {
+                firstLoginSection.classList.add('hidden');
+                toggleText.textContent = 'Première connexion ? Cliquez ici';
+            }
+        }
+    </script>
 </body>
 </html> 

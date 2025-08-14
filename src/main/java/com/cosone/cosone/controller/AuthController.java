@@ -54,7 +54,7 @@ public class AuthController {
     @PostMapping("/register")
     public String registerUser(@ModelAttribute User user, Model model) {
         if (userRepository.findByUsername(user.getUsername()).isPresent()) {
-            model.addAttribute("error", "Username already exists");
+            model.addAttribute("error", "Le nom d'utilisateur existe déjà");
             return "register";
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -62,27 +62,7 @@ public class AuthController {
         return "redirect:/login";
     }
 
-    @GetMapping("/home")
-    public String home(Model model) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println("=== HOME PAGE ACCESS ===");
-        System.out.println("Home page accessed by: " + auth.getName());
-        System.out.println("Authentication: " + auth.isAuthenticated());
-        System.out.println("User authorities: " + auth.getAuthorities());
-        System.out.println("Principal: " + auth.getPrincipal());
-        System.out.println("Credentials: " + auth.getCredentials());
-        System.out.println("Session ID: " + SecurityContextHolder.getContext().getAuthentication());
-        System.out.println("=== END HOME PAGE ACCESS ===");
-        
-        model.addAttribute("username", auth.getName());
-        
-        // Check if user has admin role
-        boolean isAdmin = auth.getAuthorities().stream()
-                .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
-        model.addAttribute("isAdmin", isAdmin);
-        
-        return "home";
-    }
+
 
     @GetMapping("/test-auth")
     public String testAuth() {
@@ -104,10 +84,15 @@ public class AuthController {
     }
 
     @PostMapping("/login/interne/first")
-    public String firstLogin(@RequestParam String numCin, Model model) {
-        var userOpt = userRepository.findByNumCin(numCin);
+    public String firstLogin(@RequestParam String identifier, Model model) {
+        // Try to find user by matricule first, then by numCin
+        var userOpt = userRepository.findByMatricule(identifier);
         if (userOpt.isEmpty()) {
-            model.addAttribute("error", "Num CIN not found");
+            userOpt = userRepository.findByNumCin(identifier);
+        }
+        
+        if (userOpt.isEmpty()) {
+            model.addAttribute("error", "Matricule ou Num CIN introuvable");
             return "login";
         }
         
@@ -115,13 +100,13 @@ public class AuthController {
         
         // Check if user already has a password
         if (user.getPassword() != null && !user.getPassword().isEmpty()) {
-            model.addAttribute("error", "User already has a password. Please use regular login.");
+            model.addAttribute("error", "L'utilisateur a déjà un mot de passe. Veuillez utiliser la connexion régulière.");
             return "login";
         }
         
         String phoneNumber = user.getPhoneNumber();
         if (phoneNumber == null || phoneNumber.isEmpty()) {
-            model.addAttribute("error", "No phone number associated with this Num CIN. Please contact administrator.");
+            model.addAttribute("error", "Aucun numéro de téléphone associé à cet utilisateur. Veuillez contacter l'administrateur.");
             return "login";
         }
         
@@ -131,34 +116,40 @@ public class AuthController {
         code.setPhoneNumber(phoneNumber);
         code.setCode(verificationCode);
         phoneVerificationCodeRepository.save(code);
-        smsService.sendSms(phoneNumber, "Your verification code is: " + verificationCode);
+        smsService.sendSms(phoneNumber, "Votre code de vérification est : " + verificationCode);
         
         model.addAttribute("phoneNumber", phoneNumber);
-        model.addAttribute("numCin", numCin);
+        model.addAttribute("identifier", identifier);
         return "verify-phone";
     }
 
     @PostMapping("/login/interne")
-    public String interneLogin(@RequestParam String numCin, @RequestParam String password, Model model,
+    public String interneLogin(@RequestParam String identifier, @RequestParam String password, Model model,
                              HttpServletRequest request, HttpServletResponse response) {
-        System.out.println("Interne login attempt for Num CIN: " + numCin);
-        var userOpt = userRepository.findByNumCin(numCin);
+        System.out.println("Interne login attempt for identifier: " + identifier);
+        
+        // Try to find user by matricule first, then by numCin
+        var userOpt = userRepository.findByMatricule(identifier);
         if (userOpt.isEmpty()) {
-            System.out.println("User not found for Num CIN: " + numCin);
-            model.addAttribute("error", "Invalid Num CIN");
+            userOpt = userRepository.findByNumCin(identifier);
+        }
+        
+        if (userOpt.isEmpty()) {
+            System.out.println("User not found for identifier: " + identifier);
+            model.addAttribute("error", "Matricule ou Num CIN invalide");
             return "login";
         }
         
         User user = userOpt.get();
         if (user.getPassword() == null || user.getPassword().isEmpty()) {
             System.out.println("No password set for user: " + user.getUsername());
-            model.addAttribute("error", "No password set for this user. Please use First Login.");
+            model.addAttribute("error", "Aucun mot de passe défini pour cet utilisateur. Veuillez utiliser la Première Connexion.");
             return "login";
         }
         
         if (!passwordEncoder.matches(password, user.getPassword())) {
             System.out.println("Invalid password for user: " + user.getUsername());
-            model.addAttribute("error", "Invalid password");
+            model.addAttribute("error", "Mot de passe invalide");
             return "login";
         }
         
@@ -181,48 +172,48 @@ public class AuthController {
         } catch (Exception e) {
             System.err.println("Authentication failed for user: " + user.getUsername() + ", error: " + e.getMessage());
             e.printStackTrace();
-            model.addAttribute("error", "Authentication failed");
+            model.addAttribute("error", "Échec de l'authentification");
             return "login";
         }
     }
 
     @PostMapping("/verify-phone")
-    public String verifyPhone(@RequestParam String numCin, @RequestParam String phoneNumber, 
+    public String verifyPhone(@RequestParam String identifier, @RequestParam String phoneNumber, 
                             @RequestParam String verificationCode, Model model) {
         var codeOpt = phoneVerificationCodeRepository.findByPhoneNumberAndCode(phoneNumber, verificationCode);
         
         if (codeOpt.isEmpty()) {
-            model.addAttribute("error", "Invalid verification code");
+            model.addAttribute("error", "Code de vérification invalide");
             model.addAttribute("phoneNumber", phoneNumber);
-            model.addAttribute("numCin", numCin);
+            model.addAttribute("identifier", identifier);
             return "verify-phone";
         }
         
         PhoneVerificationCode code = codeOpt.get();
         
         if (code.isUsed()) {
-            model.addAttribute("error", "Verification code has already been used");
+            model.addAttribute("error", "Le code de vérification a déjà été utilisé");
             model.addAttribute("phoneNumber", phoneNumber);
-            model.addAttribute("numCin", numCin);
+            model.addAttribute("identifier", identifier);
             return "verify-phone";
         }
         
         if (LocalDateTime.now().isAfter(code.getExpiresAt())) {
-            model.addAttribute("error", "Verification code has expired");
+            model.addAttribute("error", "Le code de vérification a expiré");
             model.addAttribute("phoneNumber", phoneNumber);
-            model.addAttribute("numCin", numCin);
+            model.addAttribute("identifier", identifier);
             return "verify-phone";
         }
         
         // Mark code as used
         code.setUsed(true);
         phoneVerificationCodeRepository.save(code);
-        model.addAttribute("numCin", numCin);
+        model.addAttribute("identifier", identifier);
         return "create-password";
     }
 
     @PostMapping("/resend-code")
-    public String resendCode(@RequestParam String numCin, @RequestParam String phoneNumber, Model model) {
+    public String resendCode(@RequestParam String identifier, @RequestParam String phoneNumber, Model model) {
         // Delete any existing unused codes for this phone number
         var existingCodes = phoneVerificationCodeRepository.findByPhoneNumber(phoneNumber);
         existingCodes.ifPresent(code -> {
@@ -237,31 +228,37 @@ public class AuthController {
         code.setPhoneNumber(phoneNumber);
         code.setCode(verificationCode);
         phoneVerificationCodeRepository.save(code);
-        smsService.sendSms(phoneNumber, "Your new verification code is: " + verificationCode);
+        smsService.sendSms(phoneNumber, "Votre nouveau code de vérification est : " + verificationCode);
         
         model.addAttribute("phoneNumber", phoneNumber);
-        model.addAttribute("numCin", numCin);
-        model.addAttribute("message", "New verification code sent");
+        model.addAttribute("identifier", identifier);
+        model.addAttribute("message", "Nouveau code de vérification envoyé");
         return "verify-phone";
     }
 
     @PostMapping("/create-password")
-    public String createPassword(@RequestParam String numCin, @RequestParam String password, 
+    public String createPassword(@RequestParam String identifier, @RequestParam String password, 
                                @RequestParam String confirmPassword, Model model,
                                HttpServletRequest request, HttpServletResponse response) {
         if (!password.equals(confirmPassword)) {
-            model.addAttribute("error", "Passwords do not match");
-            model.addAttribute("numCin", numCin);
+            model.addAttribute("error", "Les mots de passe ne correspondent pas");
+            model.addAttribute("identifier", identifier);
             return "create-password";
         }
         if (!PasswordValidator.isValidPassword(password)) {
             model.addAttribute("error", PasswordValidator.getPasswordRequirements());
-            model.addAttribute("numCin", numCin);
+            model.addAttribute("identifier", identifier);
             return "create-password";
         }
-        var userOpt = userRepository.findByNumCin(numCin);
+        
+        // Try to find user by matricule first, then by numCin
+        var userOpt = userRepository.findByMatricule(identifier);
         if (userOpt.isEmpty()) {
-            model.addAttribute("error", "User not found");
+            userOpt = userRepository.findByNumCin(identifier);
+        }
+        
+        if (userOpt.isEmpty()) {
+            model.addAttribute("error", "Utilisateur introuvable");
             return "login";
         }
         User user = userOpt.get();
@@ -270,7 +267,7 @@ public class AuthController {
         
         // Password created successfully, redirect to login page
         System.out.println("Password created successfully for user: " + user.getUsername() + ", redirecting to login page");
-        return "redirect:/login?message=Password created successfully! You can now login with your Num CIN and password.";
+        return "redirect:/login?message=Mot de passe créé avec succès ! Vous pouvez maintenant vous connecter avec votre Matricule/Num CIN et mot de passe.";
     }
 
     @PostMapping("/login/extern")
@@ -283,7 +280,7 @@ public class AuthController {
         var codeOpt = externAuthCodeRepository.findByCode(authCode);
         if (codeOpt.isEmpty() || codeOpt.get().isUsed()) {
             System.out.println("Invalid or used extern code: " + authCode);
-            model.addAttribute("error", "Invalid or used code");
+            model.addAttribute("error", "Code invalide ou déjà utilisé");
             return "login";
         }
         
@@ -292,7 +289,7 @@ public class AuthController {
         // Verify the person's name matches
         if (!prenom.equalsIgnoreCase(code.getPrenom()) || !nom.equalsIgnoreCase(code.getNom())) {
             System.out.println("Name mismatch for code: " + authCode + ". Expected: " + code.getPrenom() + " " + code.getNom() + ", Got: " + prenom + " " + nom);
-            model.addAttribute("error", "Invalid code or name mismatch");
+            model.addAttribute("error", "Code invalide ou nom incorrect");
             return "login";
         }
         
@@ -334,7 +331,7 @@ public class AuthController {
                                    @RequestParam String nom, 
                                    Model model) {
         if (externAuthCodeRepository.findByCode(code).isPresent()) {
-            model.addAttribute("error", "Code already exists");
+            model.addAttribute("error", "Le code existe déjà");
             model.addAttribute("existingCodes", externAuthCodeRepository.findAll());
             return "admin-generate-code";
         }
@@ -343,7 +340,7 @@ public class AuthController {
         newCode.setPrenom(prenom);
         newCode.setNom(nom);
         externAuthCodeRepository.save(newCode);
-        model.addAttribute("message", "Code generated: " + code + " for " + prenom + " " + nom);
+        model.addAttribute("message", "Code généré : " + code + " pour " + prenom + " " + nom);
         model.addAttribute("existingCodes", externAuthCodeRepository.findAll());
         return "admin-generate-code";
     }
@@ -353,11 +350,11 @@ public class AuthController {
     public String deleteExternCode(@RequestParam Long codeId, Model model) {
         var codeOpt = externAuthCodeRepository.findById(codeId);
         if (codeOpt.isEmpty()) {
-            model.addAttribute("error", "Code not found");
+            model.addAttribute("error", "Code introuvable");
         } else {
             ExternAuthCode code = codeOpt.get();
             externAuthCodeRepository.delete(code);
-            model.addAttribute("message", "Code deleted: " + code.getCode() + " for " + code.getPrenom() + " " + code.getNom());
+            model.addAttribute("message", "Code supprimé : " + code.getCode() + " pour " + code.getPrenom() + " " + code.getNom());
         }
         model.addAttribute("existingCodes", externAuthCodeRepository.findAll());
         return "admin-generate-code";
@@ -375,13 +372,13 @@ public class AuthController {
     public String addPhoneToUser(@RequestParam Long userId, @RequestParam String phoneNumber, Model model) {
         var userOpt = userRepository.findById(userId);
         if (userOpt.isEmpty()) {
-            model.addAttribute("error", "User not found");
+            model.addAttribute("error", "Utilisateur introuvable");
             return "admin-users";
         }
         User user = userOpt.get();
         user.setPhoneNumber(phoneNumber);
         userRepository.save(user);
-        model.addAttribute("message", "Phone number added successfully");
+        model.addAttribute("message", "Numéro de téléphone ajouté avec succès");
         model.addAttribute("users", userRepository.findAll());
         return "admin-users";
     }
@@ -391,13 +388,13 @@ public class AuthController {
     public String updateUserPhone(@RequestParam Long userId, @RequestParam String phoneNumber, Model model) {
         var userOpt = userRepository.findById(userId);
         if (userOpt.isEmpty()) {
-            model.addAttribute("error", "User not found");
+            model.addAttribute("error", "Utilisateur introuvable");
             return "admin-users";
         }
         User user = userOpt.get();
         user.setPhoneNumber(phoneNumber);
         userRepository.save(user);
-        model.addAttribute("message", "Phone number updated successfully");
+        model.addAttribute("message", "Numéro de téléphone mis à jour avec succès");
         model.addAttribute("users", userRepository.findAll());
         return "admin-users";
     }
@@ -415,7 +412,7 @@ public class AuthController {
     @GetMapping("/logout")
     public String logout() {
         SecurityContextHolder.clearContext();
-        return "redirect:/login?message=You have been logged out successfully.";
+        return "redirect:/login?message=Vous avez été déconnecté avec succès.";
     }
 
     private String generateVerificationCode() {

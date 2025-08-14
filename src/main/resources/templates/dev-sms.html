@@ -2,8 +2,9 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Development - SMS Messages</title>
+    <title>Développement - Messages SMS</title>
     <style>
         .sms-message {
             background-color: #f0f0f0;
@@ -23,19 +24,19 @@
     </style>
 </head>
 <body>
-    <h1>Development - Latest SMS Messages</h1>
-    <p><em>This page shows the latest SMS messages sent during development.</em></p>
+    <h1>Développement - Derniers Messages SMS</h1>
+    <p><em>Cette page affiche les derniers messages SMS envoyés pendant le développement.</em></p>
     
     <div th:if="${smsMessages.isEmpty()}">
-        <p>No SMS messages have been sent yet.</p>
+        <p>Aucun message SMS n'a encore été envoyé.</p>
     </div>
     
     <div th:each="entry : ${smsMessages}" class="sms-message">
-        <div class="phone-number" th:text="'To: ' + ${entry.key}"></div>
+        <div class="phone-number" th:text="'À : ' + ${entry.key}"></div>
         <div class="message-content" th:text="${entry.value}"></div>
     </div>
     
-    <p><a href="/login">Back to Login</a></p>
-    <p><a href="/admin/users">Admin Users</a></p>
+    <p><a href="/login">Retour à la Connexion</a></p>
+    <p><a href="/admin/users">Utilisateurs Admin</a></p>
 </body>
 </html> 

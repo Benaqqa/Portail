@@ -2,41 +2,323 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verify Phone</title>
+    <title>Vérifier le Téléphone</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header-section {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border-radius: 10px;
+        }
+        .header-section h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.2em;
+        }
+        .header-section p {
+            margin: 0;
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        .content-section {
+            margin: 20px 0;
+            border-radius: 10px;
+            border: 1px solid #dee2e6;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .content-section-header {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            padding: 20px;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .content-section-header:hover {
+            background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+        }
+        .content-section-header h3 {
+            margin: 0;
+            font-size: 1.5em;
+            color: white;
+        }
+        .content-section-header .expand-icon {
+            font-size: 1.2em;
+            transition: transform 0.3s ease;
+        }
+        .content-section-header.expanded .expand-icon {
+            transform: rotate(180deg);
+        }
+        .content-section-content {
+            background-color: #f8f9fa;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease, padding 0.3s ease;
+        }
+        .content-section-content.expanded {
+            max-height: 1000px;
+            padding: 25px;
+        }
+        .verification-form {
+            background-color: white;
+            padding: 25px;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #495057;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+        .submit-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+            width: 100%;
+        }
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+        }
+        .resend-section {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 8px;
+        }
+        .resend-btn {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 20px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 10px rgba(108, 117, 125, 0.3);
+            width: 100%;
+        }
+        .resend-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(108, 117, 125, 0.4);
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.2s;
+        }
+        .back-link:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #f5c6cb;
+            margin-bottom: 20px;
+        }
+        .message {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #c3e6cb;
+            margin-bottom: 20px;
+        }
+        .phone-info {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: #856404;
+        }
+        .phone-info strong {
+            color: #533f03;
+        }
+    </style>
 </head>
 <body>
-    <h1>Verify Your Phone Number</h1>
-    <p>A verification code has been sent to: <strong><span th:text="${phoneNumber}"></span></strong></p>
-    <p>Please enter the 6-digit code to continue with your first login setup.</p>
-    
-    <div th:if="${error}" style="color: red;">
-        <p th:text="${error}"></p>
+    <div class="container">
+        <div class="header-section">
+            <h1>Vérifiez Votre Numéro de Téléphone</h1>
+            <p>Un code de vérification a été envoyé pour configurer votre première connexion</p>
+        </div>
+
+        <!-- Error Messages -->
+        <div th:if="${error}" class="error">
+            <p th:text="${error}"></p>
+        </div>
+
+        <!-- Success Messages -->
+        <div th:if="${message}" class="message">
+            <p th:text="${message}"></p>
+        </div>
+
+        <!-- Phone Information Section -->
+        <div class="content-section">
+            <div class="content-section-header" onclick="toggleSection(this)">
+                <h3>📱 Informations de Vérification</h3>
+                <span class="expand-icon">▼</span>
+            </div>
+            <div class="content-section-content">
+                <div class="phone-info">
+                    <p><strong>Numéro de téléphone :</strong> <span th:text="${phoneNumber}"></span></p>
+                    <p>Un code de vérification à 6 chiffres a été envoyé par SMS à ce numéro.</p>
+                    <p>Veuillez saisir le code reçu pour continuer avec la configuration de votre première connexion.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Verification Form Section -->
+        <div class="content-section">
+            <div class="content-section-header" onclick="toggleSection(this)">
+                <h3>🔐 Saisir le Code de Vérification</h3>
+                <span class="expand-icon">▼</span>
+            </div>
+            <div class="content-section-content">
+                <form method="post" action="/verify-phone" class="verification-form">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <input type="hidden" name="identifier" th:value="${identifier}" />
+                    <input type="hidden" name="phoneNumber" th:value="${phoneNumber}" />
+                    
+                    <div class="form-group">
+                        <label for="verificationCode">Code de vérification :</label>
+                        <input type="text" id="verificationCode" name="verificationCode" 
+                               required maxlength="6" placeholder="Ex: 123456"
+                               pattern="[0-9]{6}" title="Veuillez saisir exactement 6 chiffres">
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">Vérifier le Code</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Resend Code Section -->
+        <div class="content-section">
+            <div class="content-section-header" onclick="toggleSection(this)">
+                <h3>🔄 Renvoyer le Code</h3>
+                <span class="expand-icon">▼</span>
+            </div>
+            <div class="content-section-content">
+                <div class="resend-section">
+                    <p>Vous n'avez pas reçu le code ?</p>
+                    <p>Cliquez sur le bouton ci-dessous pour recevoir un nouveau code de vérification.</p>
+                    
+                    <form method="post" action="/resend-code">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        <input type="hidden" name="identifier" th:value="${identifier}" />
+                        <input type="hidden" name="phoneNumber" th:value="${phoneNumber}" />
+                        
+                        <button type="submit" class="resend-btn">Renvoyer le Code</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Help Section -->
+        <div class="content-section">
+            <div class="content-section-header" onclick="toggleSection(this)">
+                <h3>❓ Besoin d'Aide ?</h3>
+                <span class="expand-icon">▼</span>
+            </div>
+            <div class="content-section-content">
+                <div style="padding: 20px; background-color: #f8f9fa; border-radius: 8px;">
+                    <h4>Problèmes courants :</h4>
+                    <ul>
+                        <li><strong>Code non reçu :</strong> Vérifiez que le numéro de téléphone est correct</li>
+                        <li><strong>Code expiré :</strong> Les codes expirent après 10 minutes, utilisez "Renvoyer le Code"</li>
+                        <li><strong>Erreur de saisie :</strong> Assurez-vous de saisir exactement 6 chiffres</li>
+                    </ul>
+                    <p><strong>Contact :</strong> Si le problème persiste, contactez l'administrateur.</p>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="/login" class="back-link">← Retour à la Connexion</a>
+        </div>
     </div>
-    
-    <div th:if="${message}" style="color: green;">
-        <p th:text="${message}"></p>
-    </div>
-    
-    <form method="post" action="/verify-phone">
-        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-        <input type="hidden" name="numCin" th:value="${numCin}" />
-        <input type="hidden" name="phoneNumber" th:value="${phoneNumber}" />
-        
-        <label for="verificationCode">Enter verification code:</label>
-        <input type="text" id="verificationCode" name="verificationCode" required maxlength="6"><br><br>
-        
-        <button type="submit">Verify</button>
-    </form>
-    
-    <form method="post" action="/resend-code" style="margin-top: 20px;">
-        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-        <input type="hidden" name="numCin" th:value="${numCin}" />
-        <input type="hidden" name="phoneNumber" th:value="${phoneNumber}" />
-        
-        <button type="submit">Resend Code</button>
-    </form>
-    
-    <p><a href="/login">Back to Login</a></p>
+
+    <script>
+        // Toggle individual section
+        function toggleSection(header) {
+            const content = header.nextElementSibling;
+            const isExpanded = content.classList.contains('expanded');
+            
+            if (isExpanded) {
+                content.classList.remove('expanded');
+                header.classList.remove('expanded');
+            } else {
+                content.classList.add('expanded');
+                header.classList.add('expanded');
+            }
+        }
+
+        // Auto-expand the first section (phone info) on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const firstSection = document.querySelector('.content-section');
+            const firstHeader = firstSection.querySelector('.content-section-header');
+            const firstContent = firstSection.querySelector('.content-section-content');
+            
+            // Auto-expand the first section
+            firstContent.classList.add('expanded');
+            firstHeader.classList.add('expanded');
+        });
+    </script>
 </body>
 </html> 

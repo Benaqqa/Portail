@@ -24,6 +24,9 @@ public class User {
     private String numCin;
 
     @Column(nullable = false, unique = true)
+    private String matricule;
+
+    @Column(nullable = false, unique = true)
     private String phoneNumber;
 
     @Column(nullable = false)
@@ -38,6 +41,8 @@ public class User {
     public void setPassword(String password) { this.password = password; }
     public String getNumCin() { return numCin; }
     public void setNumCin(String numCin) { this.numCin = numCin; }
+    public String getMatricule() { return matricule; }
+    public void setMatricule(String matricule) { this.matricule = matricule; }
     public String getPhoneNumber() { return phoneNumber; }
     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
     public String getRole() { return role; }

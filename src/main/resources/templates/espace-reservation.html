@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Espace Réservation - Articles</title>
+    <link rel="stylesheet" th:href="@{/css/espace-reservation.css}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Espace Réservation</h1>
+            <p>Découvrez nos articles et actualités</p>
+        </div>
+        
+        <div class="content">
+            <a href="/home" class="back-link">← Retour à l'Accueil</a>
+            
+            <!-- Filter Section -->
+            <div class="filter-section">
+                <h3>Filtrer les Articles</h3>
+                <div class="filter-controls">
+                    <select id="categoryFilter">
+                        <option value="">Toutes les catégories</option>
+                        <option value="actualites" th:selected="${selectedCategory == 'actualites'}">Actualités</option>
+                        <option value="reservation" th:selected="${selectedCategory == 'reservation'}">Réservation</option>
+                        <option value="services" th:selected="${selectedCategory == 'services'}">Services</option>
+                    </select>
+                    <input type="text" id="searchFilter" placeholder="Rechercher un article..." th:value="${searchTerm}">
+                    <button onclick="filterArticles()">Filtrer</button>
+                    <button onclick="clearFilters()">Effacer</button>
+                </div>
+            </div>
+            
+            <!-- Loading State -->
+            <div th:if="${loading}" class="loading">
+                <p>Chargement des articles en cours...</p>
+            </div>
+            
+            <!-- Error State -->
+            <div th:if="${error}" class="error">
+                <p th:text="${error}"></p>
+            </div>
+            
+            <!-- Articles Grid -->
+            <div th:if="${articles != null and !articles.isEmpty()}" class="articles-grid">
+                <div th:each="article : ${articles}" class="article-card">
+                                         <div class="article-image">
+                         <img th:if="${article.featuredImageUrl != null}" th:src="${article.featuredImageUrl}" th:alt="${article.title}">
+                         <span th:unless="${article.featuredImageUrl != null}">Image non disponible</span>
+                     </div>
+                    <div class="article-content">
+                        <h3 class="article-title" th:text="${article.title}">Titre de l'article</h3>
+                        <p class="article-excerpt" th:text="${article.excerpt}">Extrait de l'article...</p>
+                        <div class="article-meta">
+                            <span class="article-date" th:text="${#temporals.format(article.publishedDate, 'dd/MM/yyyy')}">01/01/2024</span>
+                            <a th:href="${article.link}" class="read-more" target="_blank">Lire la suite</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- No Articles State -->
+            <div th:if="${articles != null and articles.isEmpty()}" class="no-articles">
+                <p>Aucun article trouvé.</p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function filterArticles() {
+            const category = document.getElementById('categoryFilter').value;
+            const search = document.getElementById('searchFilter').value;
+            
+            // Reload page with filter parameters
+            const params = new URLSearchParams();
+            if (category) params.append('category', category);
+            if (search) params.append('search', search);
+            
+            const url = '/espace-reservation' + (params.toString() ? '?' + params.toString() : '');
+            window.location.href = url;
+        }
+        
+        function clearFilters() {
+            document.getElementById('categoryFilter').value = '';
+            document.getElementById('searchFilter').value = '';
+            window.location.href = '/espace-reservation';
+        }
+        
+        // Auto-filter on Enter key
+        document.getElementById('searchFilter').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                filterArticles();
+            }
+        });
+    </script>
+</body>
+</html>

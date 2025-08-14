@@ -45,6 +45,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeRequests()
+                .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
+                .requestMatchers("/", "/home").permitAll()
                 .requestMatchers("/login/interne", "/login/interne/first", "/login/extern", 
                                "/verify-phone", "/create-password", "/resend-code", "/dev/sms", "/logout").permitAll()
                 .requestMatchers("/admin/generate-code", "/admin/delete-code", "/admin/users", "/admin/users/add-phone", 
@@ -57,7 +59,7 @@ public class SecurityConfig {
                 .permitAll()
             .and()
             .logout()
-                .logoutSuccessUrl("/login?logout")
+                .logoutSuccessUrl("/home?logout")
                 .permitAll()
             .and()
             .csrf()

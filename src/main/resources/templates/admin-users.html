@@ -2,8 +2,9 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - User Management</title>
+    <title>Admin - Gestion des Utilisateurs</title>
     <style>
         table {
             width: 100%;
@@ -42,7 +43,7 @@
     </style>
 </head>
 <body>
-    <h1>Admin - User Management</h1>
+    <h1>Admin - Gestion des Utilisateurs</h1>
     
     <div th:if="${message}" class="message success">
         <p th:text="${message}"></p>
@@ -54,16 +55,16 @@
     
 
     
-    <h2>All Users</h2>
+    <h2>Tous les Utilisateurs</h2>
     <table>
         <thead>
             <tr>
                 <th>ID</th>
                 <th>Num CIN</th>
-                <th>Username</th>
-                <th>Phone Number</th>
-                <th>Role</th>
-                <th>Has Password</th>
+                <th>Nom d'utilisateur</th>
+                <th>Numéro de Téléphone</th>
+                <th>Rôle</th>
+                <th>A un Mot de Passe</th>
             </tr>
         </thead>
         <tbody>
@@ -71,14 +72,14 @@
                 <td th:text="${user.id}"></td>
                 <td th:text="${user.numCin}"></td>
                 <td th:text="${user.username}"></td>
-                <td th:text="${user.phoneNumber != null ? user.phoneNumber : 'Not set'}"></td>
+                <td th:text="${user.phoneNumber != null ? user.phoneNumber : 'Non défini'}"></td>
                 <td th:text="${user.role}"></td>
-                <td th:text="${user.password != null && !user.password.isEmpty() ? 'Yes' : 'No'}"></td>
+                <td th:text="${user.password != null && !user.password.isEmpty() ? 'Oui' : 'Non'}"></td>
             </tr>
         </tbody>
     </table>
     
-    <p><a href="/admin/generate-code">Generate Extern Codes</a></p>
-    <p><a href="/home">Back to Home</a></p>
+    <p><a href="/admin/generate-code">Générer des Codes Externes</a></p>
+    <p><a href="/home">Retour à l'Accueil</a></p>
 </body>
 </html> 

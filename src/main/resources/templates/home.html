@@ -2,9 +2,154 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>Accueil - COSONE</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .welcome-section {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+        }
+        .welcome-section h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.5em;
+        }
+        .welcome-section p {
+            margin: 0;
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        .login-section {
+            text-align: center;
+            margin: 30px 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border: 2px dashed #dee2e6;
+        }
+        .login-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+        .content-section {
+            margin: 15px 0;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .content-section-header {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            color: white;
+            padding: 15px 20px;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .content-section-header:hover {
+            background: linear-gradient(135deg, #495057 0%, #343a40 100%);
+        }
+        .content-section-header h2 {
+            margin: 0;
+            font-size: 1.4em;
+            color: white;
+        }
+        .content-section-header .expand-icon {
+            font-size: 1.2em;
+            transition: transform 0.3s ease;
+        }
+        .content-section-header.expanded .expand-icon {
+            transform: rotate(180deg);
+        }
+        .content-section-content {
+            background-color: #f8f9fa;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease, padding 0.3s ease;
+        }
+        .content-section-content.expanded {
+            max-height: 800px;
+            padding: 20px;
+        }
+        .content-section-content p {
+            line-height: 1.5;
+            color: #495057;
+            margin-bottom: 12px;
+            font-size: 0.95em;
+        }
+        .content-section-content .placeholder {
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+            border: 2px dashed #ced4da;
+            margin-bottom: 15px;
+        }
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .content-card {
+            background-color: white;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #dee2e6;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .content-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+        }
+        .content-card h3 {
+            color: #495057;
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        .content-card p {
+            margin-bottom: 0;
+            font-size: 0.9em;
+        }
         .admin-badge {
             background-color: #6c757d;
             color: white;
@@ -33,59 +178,270 @@
             text-decoration: none;
             border-radius: 5px;
             margin: 5px;
+            transition: background-color 0.2s;
         }
         .admin-link:hover {
             background-color: #545b62;
+            color: white;
+            text-decoration: none;
         }
         .user-link {
             display: inline-block;
-            background-color: #007bff;
+            background-color: #28a745;
             color: white;
             padding: 10px 15px;
             text-decoration: none;
             border-radius: 5px;
             margin: 5px;
+            transition: background-color 0.2s;
         }
         .user-link:hover {
-            background-color: #0056b3;
+            background-color: #218838;
+            color: white;
+            text-decoration: none;
         }
         .logout-link {
             display: inline-block;
-            background-color: #6c757d;
+            background-color: #dc3545;
             color: white;
             padding: 10px 15px;
             text-decoration: none;
             border-radius: 5px;
             margin: 5px;
+            transition: background-color 0.2s;
         }
         .logout-link:hover {
-            background-color: #545b62;
+            background-color: #c82333;
+            color: white;
+            text-decoration: none;
+        }
+        .message {
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .user-info {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .user-info h3 {
+            margin-top: 0;
+            color: #495057;
+        }
+        .wordpress-note {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            color: #856404;
+        }
+        .wordpress-note strong {
+            color: #533f03;
         }
     </style>
 </head>
 <body>
-    <h1>Welcome Home!</h1>
+    <div class="container">
+        <div class="welcome-section">
+            <h1>Bienvenue sur COSONE</h1>
+            <p>Votre plateforme de gestion et de réservation</p>
+        </div>
 
-    <p>
-        Mr/Mrs: <span th:text="${username}"></span>
-        <span th:if="${isAdmin}" class="admin-badge">ADMIN</span>
-    </p>
+        <!-- Logout Message -->
+        <div th:if="${message}" class="message success">
+            <p th:text="${message}"></p>
+        </div>
 
-    <!-- Admin Section - Only visible to admins -->
-    <div th:if="${isAdmin}" class="admin-section">
-        <h3>🔧 Admin Panel</h3>
-        <p>You are logged in as an <strong>Administrator</strong>. You have access to administrative functions.</p>
-        
-        <a href="/admin/users" class="admin-link">👥 User Management</a>
-        <a href="/admin/generate-code" class="admin-link">🔑 Generate External Codes</a>
-        <a href="/dev/sms" class="admin-link">📱 View SMS Messages</a>
+        <!-- Authenticated User Content -->
+        <div th:if="${isAuthenticated}">
+            <div class="user-info">
+                <h3>Informations de l'utilisateur</h3>
+                <p>
+                    M./Mme : <strong><span th:text="${username}"></span></strong>
+                    <span th:if="${isAdmin}" class="admin-badge">ADMIN</span>
+                </p>
+            </div>
+
+            <!-- Admin Section - Only visible to admins -->
+            <div th:if="${isAdmin}" class="admin-section">
+                <h3>Panneau d'Administration</h3>
+                <p>Vous êtes connecté en tant qu'<strong>Administrateur</strong>. Vous avez accès aux fonctions administratives.</p>
+                
+                <a href="/admin/users" class="admin-link">Gestion des Utilisateurs</a>
+                <a href="/admin/generate-code" class="admin-link">Générer des Codes Externes</a>
+                <a href="/dev/sms" class="admin-link">Voir les Messages SMS</a>
+            </div>
+
+            <!-- Regular User Section -->
+            <div th:unless="${isAdmin}">
+                <a href="/espace-reservation" class="user-link">Espace réservation</a>
+            </div>
+
+            <a href="/logout" class="logout-link">Se déconnecter</a>
+        </div>
+
+        <!-- Unauthenticated User Content -->
+        <div th:unless="${isAuthenticated}" class="login-section">
+            <h3>Accéder à votre compte</h3>
+            <p>Connectez-vous pour accéder à toutes les fonctionnalités de COSONE</p>
+            <a href="/login" class="login-btn">Se connecter</a>
+        </div>
+
+        <!-- WordPress Integration Note -->
+        <div class="wordpress-note">
+            <strong>Note d'intégration WordPress :</strong> Le contenu des sections ci-dessous sera automatiquement synchronisé avec votre site WordPress pour une gestion centralisée.
+        </div>
+
+        <!-- Qui sommes-nous Section -->
+        <div class="content-section">
+            <div class="content-section-header" onclick="toggleSection(this)">
+                <h2>Qui sommes-nous</h2>
+                <span class="expand-icon">▼</span>
+            </div>
+            <div class="content-section-content">
+                <div class="placeholder">
+                    <p><strong>Contenu en cours de chargement depuis WordPress...</strong></p>
+                    <p>Cette section sera automatiquement mise à jour avec le contenu de votre page "Qui sommes-nous" sur WordPress.</p>
+                </div>
+                <div class="content-grid">
+                    <div class="content-card">
+                        <h3>Notre Mission</h3>
+                        <p>Contenu de la mission à venir depuis WordPress...</p>
+                    </div>
+                    <div class="content-card">
+                        <h3>Notre Vision</h3>
+                        <p>Contenu de la vision à venir depuis WordPress...</p>
+                    </div>
+                    <div class="content-card">
+                        <h3>Nos Valeurs</h3>
+                        <p>Contenu des valeurs à venir depuis WordPress...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nos Activités Section -->
+        <div class="content-section">
+            <div class="content-section-header" onclick="toggleSection(this)">
+                <h2>Nos Activités</h2>
+                <span class="expand-icon">▼</span>
+            </div>
+            <div class="content-section-content">
+                <div class="placeholder">
+                    <p><strong>Contenu en cours de chargement depuis WordPress...</strong></p>
+                    <p>Cette section sera automatiquement mise à jour avec le contenu de votre page "Nos Activités" sur WordPress.</p>
+                </div>
+                <div class="content-grid">
+                    <div class="content-card">
+                        <h3>Formation</h3>
+                        <p>Détails des activités de formation à venir depuis WordPress...</p>
+                    </div>
+                    <div class="content-card">
+                        <h3>Consultation</h3>
+                        <p>Détails des services de consultation à venir depuis WordPress...</p>
+                    </div>
+                    <div class="content-card">
+                        <h3>Accompagnement</h3>
+                        <p>Détails des services d'accompagnement à venir depuis WordPress...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nos Centres Section -->
+        <div class="content-section">
+            <div class="content-section-header" onclick="toggleSection(this)">
+                <h2>Nos Centres</h2>
+                <span class="expand-icon">▼</span>
+            </div>
+            <div class="content-section-content">
+                <div class="placeholder">
+                    <p><strong>Contenu en cours de chargement depuis WordPress...</strong></p>
+                    <p>Cette section sera automatiquement mise à jour avec le contenu de votre page "Nos Centres" sur WordPress.</p>
+                </div>
+                <div class="content-grid">
+                    <div class="content-card">
+                        <h3>Centre Principal</h3>
+                        <p>Informations sur le centre principal à venir depuis WordPress...</p>
+                    </div>
+                    <div class="content-card">
+                        <h3>Centres Régionaux</h3>
+                        <p>Informations sur les centres régionaux à venir depuis WordPress...</p>
+                    </div>
+                    <div class="content-card">
+                        <h3>Centres Spécialisés</h3>
+                        <p>Informations sur les centres spécialisés à venir depuis WordPress...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nos Conventions Section -->
+        <div class="content-section">
+            <div class="content-section-header" onclick="toggleSection(this)">
+                <h2>Nos Conventions</h2>
+                <span class="expand-icon">▼</span>
+            </div>
+            <div class="content-section-content">
+                <div class="placeholder">
+                    <p><strong>Contenu en cours de chargement depuis WordPress...</strong></p>
+                    <p>Cette section sera automatiquement mise à jour avec le contenu de votre page "Nos Conventions" sur WordPress.</p>
+                </div>
+                <div class="content-grid">
+                    <div class="content-card">
+                        <h3>Partenariats</h3>
+                        <p>Détails des partenariats à venir depuis WordPress...</p>
+                    </div>
+                    <div class="content-card">
+                        <h3>Accords</h3>
+                        <p>Détails des accords à venir depuis WordPress...</p>
+                    </div>
+                    <div class="content-card">
+                        <h3>Collaborations</h3>
+                        <p>Détails des collaborations à venir depuis WordPress...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Regular User Section -->
-    <div th:unless="${isAdmin}">
-        <a href="/espace-reservation" class="user-link">📅 Espace réservation</a>
-    </div>
+    <script>
+        // Toggle individual section
+        function toggleSection(header) {
+            const content = header.nextElementSibling;
+            const isExpanded = content.classList.contains('expanded');
+            
+            if (isExpanded) {
+                content.classList.remove('expanded');
+                header.classList.remove('expanded');
+            } else {
+                content.classList.add('expanded');
+                header.classList.add('expanded');
+            }
+        }
 
-    <a href="/logout" class="logout-link">🚪 Logout</a>
+        // Add click animation to cards
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.content-card');
+            cards.forEach(card => {
+                card.addEventListener('click', function() {
+                    this.style.transform = 'scale(0.98)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 150);
+                });
+            });
+        });
+    </script>
 </body>
 </html> 

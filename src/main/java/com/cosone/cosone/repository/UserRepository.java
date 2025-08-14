@@ -7,5 +7,6 @@ import com.cosone.cosone.model.User;
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUsername(String username);
     Optional<User> findByNumCin(String numCin);
+    Optional<User> findByMatricule(String matricule);
     Optional<User> findByPhoneNumber(String phoneNumber);
 } 

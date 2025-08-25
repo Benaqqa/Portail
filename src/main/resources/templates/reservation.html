@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centre de Réservation - COSONE</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .reservation-form {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 0;
+        }
+        .form-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        .form-section {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background-color: #f8f9fa;
+        }
+        .form-section h3 {
+            color: #495057;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .required-field::after {
+            content: " *";
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .personne-accompagnement {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .btn-add-personne {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+        }
+        .btn-remove-personne {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+        .btn-submit {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .price-display {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .availability-check {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            display: none;
+        }
+        .alert {
+            border-radius: 10px;
+            border: none;
+        }
+        .alert-success {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            color: #155724;
+        }
+        .alert-danger {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="reservation-form">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="text-center mb-4">
+                        <h1 class="text-white mb-3">
+                            <i class="fas fa-calendar-check"></i> Centre de Réservation COSONE
+                        </h1>
+                        <p class="text-white-50 lead">Réservez votre séjour dans nos centres de vacances</p>
+                    </div>
+
+                    <!-- Messages d'alerte -->
+                    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="fas fa-check-circle"></i>
+                        <span th:text="${success}"></span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    
+                    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span th:text="${error}"></span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+
+                    <form th:action="@{/reservation/creer}" method="post" id="reservationForm">
+                        <!-- Informations personnelles -->
+                        <div class="form-container">
+                            <div class="form-section">
+                                <h3><i class="fas fa-user"></i> Informations Personnelles</h3>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="matricule" class="form-label required-field">Matricule</label>
+                                        <input type="text" class="form-control" id="matricule" name="matricule" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="cin" class="form-label required-field">CIN</label>
+                                        <input type="text" class="form-control" id="cin" name="cin" required>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="telephone" class="form-label required-field">Téléphone</label>
+                                        <input type="tel" class="form-control" id="telephone" name="telephone" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="email" class="form-label required-field">Email</label>
+                                        <input type="email" class="form-control" id="email" name="email" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Séjour -->
+                            <div class="form-section">
+                                <h3><i class="fas fa-calendar-alt"></i> Détails du Séjour (Dates uniquement)</h3>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="dateDebut" class="form-label required-field">Date de début</label>
+                                        <input type="date" class="form-control" id="dateDebut" name="dateDebutStr" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="dateFin" class="form-label required-field">Date de fin</label>
+                                        <input type="date" class="form-control" id="dateFin" name="dateFinStr" required>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="centre" class="form-label required-field">Centre choisi</label>
+                                        <select class="form-select" id="centre" name="centreId" required>
+                                            <option value="">Sélectionnez un centre</option>
+                                            <option th:each="centre : ${centres}" 
+                                                    th:value="${centre.id}" 
+                                                    th:text="${centre.nom + ' - ' + centre.ville}">
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="typeLogement" class="form-label required-field">Type de logement</label>
+                                        <select class="form-select" id="typeLogement" name="typeLogementId" required>
+                                            <option value="">Sélectionnez un type de logement</option>
+                                            <option th:each="type : ${typesLogement}" 
+                                                    th:value="${type.id}" 
+                                                    th:text="${type.nom + ' (Max: ' + type.capaciteMax + ' personnes)'}">
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="nombrePersonnes" class="form-label required-field">Nombre de personnes</label>
+                                        <input type="number" class="form-control" id="nombrePersonnes" name="nombrePersonnes" min="1" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="commentaires" class="form-label">Commentaires (optionnel)</label>
+                                        <textarea class="form-control" id="commentaires" name="commentaires" rows="2"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Personnes d'accompagnement -->
+                            <div class="form-section" id="accompagnementSection" style="display: none;">
+                                <h3><i class="fas fa-users"></i> Personnes d'Accompagnement</h3>
+                                <div id="personnesAccompagnement">
+                                    <!-- Les personnes seront ajoutées dynamiquement -->
+                                </div>
+                                <button type="button" class="btn btn-add-personne" onclick="ajouterPersonne()">
+                                    <i class="fas fa-plus"></i> Ajouter une personne
+                                </button>
+                            </div>
+
+                            <!-- Vérification de disponibilité et prix -->
+                            <div class="availability-check" id="availabilityCheck">
+                                <h5><i class="fas fa-info-circle"></i> Vérification de disponibilité</h5>
+                                <div id="availabilityResult"></div>
+                            </div>
+
+                            <div class="price-display" id="priceDisplay" style="display: none;">
+                                <h4><i class="fas fa-euro-sign"></i> Prix estimé</h4>
+                                <div class="h2" id="prixTotal">0.00 €</div>
+                                <small>Prix par nuit × nombre de nuits</small>
+                            </div>
+
+                            <!-- Bouton de soumission -->
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-submit" id="submitBtn">
+                                    <i class="fas fa-check"></i> Créer la Réservation
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let personneCount = 0;
+
+        // Initialiser le formulaire
+        document.addEventListener('DOMContentLoaded', function() {
+            setupFormValidation();
+            // Initialiser la première personne si nécessaire
+            updateAccompagnementSection();
+        });
+
+        function ajouterPersonne() {
+            personneCount++;
+            const container = document.getElementById('personnesAccompagnement');
+            
+            const personneDiv = document.createElement('div');
+            personneDiv.className = 'personne-accompagnement';
+            personneDiv.innerHTML = `
+                <div class="row">
+                    <div class="col-md-3 mb-2">
+                        <label class="form-label required-field">Nom</label>
+                        <input type="text" class="form-control" name="personnesAccompagnement[${personneCount-1}].nom" required>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <label class="form-label required-field">Prénom</label>
+                        <input type="text" class="form-control" name="personnesAccompagnement[${personneCount-1}].prenom" required>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <label class="form-label required-field">CIN</label>
+                        <input type="text" class="form-control" name="personnesAccompagnement[${personneCount-1}].cin" required>
+                    </div>
+                    <div class="col-md-2 mb-2">
+                        <label class="form-label required-field">Lien de parenté</label>
+                        <select class="form-select" name="personnesAccompagnement[${personneCount-1}].lienParente" required>
+                            <option value="">Sélectionner</option>
+                            <option value="Conjoint(e)">Conjoint(e)</option>
+                            <option value="Enfant">Enfant</option>
+                            <option value="Parent">Parent</option>
+                            <option value="Frère/Sœur">Frère/Sœur</option>
+                            <option value="Autre">Autre</option>
+                        </select>
+                    </div>
+                    <div class="col-md-1 mb-2 d-flex align-items-end">
+                        <button type="button" class="btn btn-remove-personne" onclick="supprimerPersonne(this)">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(personneDiv);
+        }
+
+        function supprimerPersonne(button) {
+            button.closest('.personne-accompagnement').remove();
+            personneCount--;
+            updateAccompagnementSection();
+        }
+
+        function updateAccompagnementSection() {
+            const nombrePersonnes = parseInt(document.getElementById('nombrePersonnes').value) || 0;
+            const accompagnementSection = document.getElementById('accompagnementSection');
+            const personnesAccompagnement = document.getElementById('personnesAccompagnement');
+            
+            if (nombrePersonnes > 1) {
+                accompagnementSection.style.display = 'block';
+                
+                // Ajouter des personnes si nécessaire
+                const personnesNecessaires = nombrePersonnes - 1;
+                while (personneCount < personnesNecessaires) {
+                    ajouterPersonne();
+                }
+                
+                // Supprimer des personnes si nécessaire
+                while (personneCount > personnesNecessaires) {
+                    const lastPersonne = personnesAccompagnement.lastElementChild;
+                    if (lastPersonne) {
+                        lastPersonne.remove();
+                        personneCount--;
+                    }
+                }
+            } else {
+                accompagnementSection.style.display = 'none';
+                // Vider la section
+                personnesAccompagnement.innerHTML = '';
+                personneCount = 0;
+            }
+        }
+
+        function setupFormValidation() {
+            const form = document.getElementById('reservationForm');
+            const dateDebut = document.getElementById('dateDebut');
+            const dateFin = document.getElementById('dateFin');
+            const centre = document.getElementById('centre');
+            const typeLogement = document.getElementById('typeLogement');
+
+            // Validation des dates
+            dateDebut.addEventListener('change', function() {
+                const selectedDate = new Date(this.value + 'T00:00:00');
+                const minDate = new Date();
+                minDate.setDate(minDate.getDate() + 10); // 10 jours minimum
+
+                if (selectedDate < minDate) {
+                    alert('Les réservations doivent être faites au moins 10 jours à l\'avance');
+                    this.value = '';
+                } else {
+                    verifierDisponibilite();
+                    calculerPrix();
+                }
+            });
+
+            dateFin.addEventListener('change', function() {
+                const dateDebutValue = dateDebut.value;
+                if (dateDebutValue) {
+                    const debut = new Date(dateDebutValue + 'T00:00:00');
+                    const fin = new Date(this.value + 'T00:00:00');
+                    
+                    if (fin <= debut) {
+                        alert('La date de fin doit être postérieure à la date de début');
+                        this.value = '';
+                    } else {
+                        verifierDisponibilite();
+                        calculerPrix();
+                    }
+                }
+            });
+
+            // Vérification de disponibilité
+            centre.addEventListener('change', verifierDisponibilite);
+            typeLogement.addEventListener('change', verifierDisponibilite);
+            
+            // Gestion du nombre de personnes
+            const nombrePersonnes = document.getElementById('nombrePersonnes');
+            nombrePersonnes.addEventListener('change', updateAccompagnementSection);
+            nombrePersonnes.addEventListener('input', updateAccompagnementSection);
+        }
+
+        function verifierDisponibilite() {
+            const centreId = document.getElementById('centre').value;
+            const typeLogementId = document.getElementById('typeLogement').value;
+            const dateDebut = document.getElementById('dateDebut').value;
+            const dateFin = document.getElementById('dateFin').value;
+
+            if (centreId && typeLogementId && dateDebut && dateFin) {
+                const formData = new FormData();
+                formData.append('centreId', centreId);
+                formData.append('typeLogementId', typeLogementId);
+                formData.append('dateDebutStr', dateDebut + 'T00:00:00');
+                formData.append('dateFinStr', dateFin + 'T00:00:00');
+
+                fetch('/reservation/verifier-disponibilite', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.text())
+                .then(result => {
+                    const availabilityCheck = document.getElementById('availabilityCheck');
+                    const availabilityResult = document.getElementById('availabilityResult');
+                    
+                    availabilityCheck.style.display = 'block';
+                    
+                    if (result === 'disponible') {
+                        availabilityResult.innerHTML = '<span class="text-success"><i class="fas fa-check-circle"></i> Logement disponible pour cette période</span>';
+                    } else if (result === 'non_disponible') {
+                        availabilityResult.innerHTML = '<span class="text-danger"><i class="fas fa-times-circle"></i> Logement non disponible pour cette période</span>';
+                    } else {
+                        availabilityResult.innerHTML = '<span class="text-warning"><i class="fas fa-exclamation-triangle"></i> Erreur lors de la vérification</span>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                });
+            }
+        }
+
+        function calculerPrix() {
+            const typeLogementId = document.getElementById('typeLogement').value;
+            const dateDebut = document.getElementById('dateDebut').value;
+            const dateFin = document.getElementById('dateFin').value;
+
+            if (typeLogementId && dateDebut && dateFin) {
+                const formData = new FormData();
+                formData.append('typeLogementId', typeLogementId);
+                formData.append('dateDebutStr', dateDebut + 'T00:00:00');
+                formData.append('dateFinStr', dateFin + 'T00:00:00');
+
+                fetch('/reservation/calculer-prix', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.text())
+                .then(prix => {
+                    const priceDisplay = document.getElementById('priceDisplay');
+                    const prixTotal = document.getElementById('prixTotal');
+                    
+                    prixTotal.textContent = prix + ' €';
+                    priceDisplay.style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('Erreur:', error);
+                });
+            }
+        }
+    </script>
+</body>
+</html> 

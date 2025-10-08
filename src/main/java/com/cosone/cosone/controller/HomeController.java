@@ -8,12 +8,19 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import com.cosone.cosone.service.HomeContentService;
+import com.cosone.cosone.service.CentresCsvService;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
 
 @Controller
 public class HomeController {
     
     @Autowired
     private HomeContentService homeContentService;
+    
+    @Autowired
+    private CentresCsvService centresCsvService;
     
     @GetMapping("/")
     public String root() {
@@ -22,33 +29,20 @@ public class HomeController {
     
     @GetMapping("/home")
     public String home(@RequestParam(value = "logout", required = false) String logout, Model model) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        // Temporarily disable CSV loading to test if it's causing the error
+        // List<Map<String, Object>> centres = centresCsvService.loadCentresFromCsv();
+        // model.addAttribute("centres", centres);
         
-        // Check if user is authenticated and not anonymous
-        boolean isAuthenticated = auth != null && auth.isAuthenticated() && 
-                                !"anonymousUser".equals(auth.getName());
+        return "landing";
+    }
+    
+    @GetMapping("/landing")
+    public String landing(Model model) {
+        // Add any necessary data for the landing page
+        // This can be extended later for WordPress integration
+        model.addAttribute("pageTitle", "Landing Page - COSONE");
+        model.addAttribute("isLandingPage", true);
         
-        if (isAuthenticated) {
-            // User is logged in
-            model.addAttribute("username", auth.getName());
-            
-            // Check if user has admin role
-            boolean isAdmin = auth.getAuthorities().stream()
-                    .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
-            model.addAttribute("isAdmin", isAdmin);
-            model.addAttribute("isAuthenticated", true);
-        } else {
-            // User is not logged in
-            model.addAttribute("isAuthenticated", false);
-            if (logout != null) {
-                model.addAttribute("message", "Vous avez été déconnecté avec succès.");
-            }
-        }
-        
-        // Add home content sections for future WordPress integration
-        model.addAttribute("homeContent", homeContentService.getAllHomeContent());
-        model.addAttribute("isWordPressContentAvailable", homeContentService.isWordPressContentAvailable());
-        
-        return "home";
+        return "landing";
     }
 } 

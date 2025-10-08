@@ -1,0 +1,342 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows,positioning}
+
+\geometry{margin=2.5cm}
+
+\lstset{
+    language=SQL,
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{gray!10},
+    frame=single,
+    breaklines=true,
+    showstringspaces=false
+}
+
+\title{\textbf{Schéma de Base de Données - Projet COSONE}}
+\author{Étudiant en Stage}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Vue d'ensemble}
+
+Le projet COSONE utilise une base de données \textbf{PostgreSQL} avec une architecture relationnelle basée sur les entités JPA. Le schéma comprend 7 tables principales pour la gestion des utilisateurs, réservations, centres et authentification.
+
+\section{Diagramme de Base de Données}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[node distance=3.5cm, auto, scale=0.5, transform shape]
+    % Style des nœuds
+    \tikzstyle{table} = [rectangle, draw, fill=blue!20, text width=4cm, text centered, minimum height=1cm, drop shadow]
+    \tikzstyle{arrow} = [thick,->,>=stealth]
+    
+    % Tables principales - Ligne du haut (centrées)
+    \node (users) [table, xshift=-4.5cm] {\textbf{USERS}};
+    \node (centres) [table, right of=users, xshift=3cm] {\textbf{CENTRES}};
+    \node (types) [table, right of=centres, xshift=3cm] {\textbf{TYPES\_LOGEMENT}};
+    
+    % Tables de réservation - Ligne du milieu (centrées)
+    \node (reservations) [table, below of=users, yshift=-1.8cm, xshift=-4.5cm] {\textbf{RESERVATIONS}};
+    \node (personnes) [table, right of=reservations, xshift=3cm] {\textbf{PERSONNES\_ACCOMP.}};
+    \node (extern) [table, right of=personnes, xshift=3cm] {\textbf{EXTERN\_AUTH\_CODES}};
+    
+    % Table de vérification - Ligne du bas (centrée)
+    \node (phone) [table, below of=reservations, yshift=-1.8cm, xshift=-4.5cm] {\textbf{PHONE\_VERIF\_CODES}};
+    
+    % Relations principales
+    \draw [arrow] (reservations) -- node[above, sloped] {centre\_id} (centres);
+    \draw [arrow] (reservations) -- node[above, sloped] {type\_logement\_id} (types);
+    \draw [arrow] (personnes) -- node[above, sloped] {reservation\_id} (reservations);
+    
+    % Légende
+    \node [below of=phone, yshift=-1cm, xshift=-4.5cm, text width=12cm, text centered] {
+        \textbf{Relations :} Reservations $\rightarrow$ Centres, Reservations $\rightarrow$ Types de Logement, Personnes $\rightarrow$ Reservations
+    };
+\end{tikzpicture}
+\caption{Diagramme de base de données COSONE}
+\end{figure}
+
+\section{Description Détaillée des Tables}
+
+\subsection{Table \texttt{users}}
+\textbf{Description} : Stocke les informations des utilisateurs du système
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|p{6cm}|}
+\hline
+\textbf{Colonne} & \textbf{Type} & \textbf{Contraintes} & \textbf{Description} \\
+\hline
+id & BIGSERIAL & PRIMARY KEY & Identifiant unique \\
+\hline
+username & VARCHAR & NOT NULL, UNIQUE & Nom d'utilisateur \\
+\hline
+password & VARCHAR & NULL & Mot de passe (peut être null) \\
+\hline
+num\_cin & VARCHAR & NOT NULL, UNIQUE & Numéro CIN \\
+\hline
+matricule & VARCHAR & NOT NULL, UNIQUE & Matricule employé \\
+\hline
+phone\_number & VARCHAR & NOT NULL, UNIQUE & Numéro de téléphone \\
+\hline
+role & VARCHAR & NOT NULL, DEFAULT 'USER' & Rôle utilisateur (USER/ADMIN) \\
+\hline
+\end{tabular}
+\caption{Structure de la table users}
+\end{table}
+
+\subsection{Table \texttt{centres}}
+\textbf{Description} : Informations sur les centres de vacances
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|p{6cm}|}
+\hline
+\textbf{Colonne} & \textbf{Type} & \textbf{Contraintes} & \textbf{Description} \\
+\hline
+id & BIGSERIAL & PRIMARY KEY & Identifiant unique \\
+\hline
+nom & VARCHAR & NOT NULL, UNIQUE & Nom du centre \\
+\hline
+adresse & VARCHAR & NOT NULL & Adresse du centre \\
+\hline
+ville & VARCHAR & NOT NULL & Ville \\
+\hline
+telephone & VARCHAR & NOT NULL & Téléphone du centre \\
+\hline
+email & VARCHAR & NOT NULL & Email du centre \\
+\hline
+description & TEXT & NULL & Description du centre \\
+\hline
+actif & BOOLEAN & NOT NULL, DEFAULT true & Centre actif/inactif \\
+\hline
+\end{tabular}
+\caption{Structure de la table centres}
+\end{table}
+
+\subsection{Table \texttt{types\_logement}}
+\textbf{Description} : Types de logements disponibles
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|p{6cm}|}
+\hline
+\textbf{Colonne} & \textbf{Type} & \textbf{Contraintes} & \textbf{Description} \\
+\hline
+id & BIGSERIAL & PRIMARY KEY & Identifiant unique \\
+\hline
+nom & VARCHAR & NOT NULL, UNIQUE & Nom du type \\
+\hline
+description & VARCHAR & NOT NULL & Description \\
+\hline
+capacite\_max & INTEGER & NOT NULL & Capacité maximale \\
+\hline
+prix\_par\_nuit & DECIMAL & NOT NULL & Prix par nuit \\
+\hline
+actif & BOOLEAN & NOT NULL, DEFAULT true & Type actif/inactif \\
+\hline
+\end{tabular}
+\caption{Structure de la table types\_logement}
+\end{table}
+
+\subsection{Table \texttt{reservations}}
+\textbf{Description} : Réservations des utilisateurs
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|p{6cm}|}
+\hline
+\textbf{Colonne} & \textbf{Type} & \textbf{Contraintes} & \textbf{Description} \\
+\hline
+id & BIGSERIAL & PRIMARY KEY & Identifiant unique \\
+\hline
+matricule & VARCHAR & NOT NULL & Matricule du réservant \\
+\hline
+cin & VARCHAR & NOT NULL & CIN du réservant \\
+\hline
+telephone & VARCHAR & NOT NULL & Téléphone du réservant \\
+\hline
+email & VARCHAR & NOT NULL & Email du réservant \\
+\hline
+date\_debut & TIMESTAMP & NOT NULL & Date de début \\
+\hline
+date\_fin & TIMESTAMP & NOT NULL & Date de fin \\
+\hline
+centre\_id & BIGINT & NOT NULL, FK & Référence au centre \\
+\hline
+type\_logement\_id & BIGINT & NOT NULL, FK & Référence au type de logement \\
+\hline
+nombre\_personnes & INTEGER & NOT NULL & Nombre de personnes \\
+\hline
+statut & VARCHAR & NOT NULL & Statut de la réservation \\
+\hline
+date\_reservation & TIMESTAMP & NOT NULL & Date de création \\
+\hline
+date\_limite\_paiement & TIMESTAMP & NOT NULL & Date limite de paiement \\
+\hline
+date\_paiement & TIMESTAMP & NULL & Date de paiement \\
+\hline
+methode\_paiement & VARCHAR & NULL & Méthode de paiement \\
+\hline
+reference\_paiement & VARCHAR & NULL & Référence de paiement \\
+\hline
+commentaires & TEXT & NULL & Commentaires \\
+\hline
+\end{tabular}
+\caption{Structure de la table reservations}
+\end{table}
+
+\subsection{Table \texttt{personnes\_accompagnement}}
+\textbf{Description} : Personnes accompagnant les réservations
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|p{6cm}|}
+\hline
+\textbf{Colonne} & \textbf{Type} & \textbf{Contraintes} & \textbf{Description} \\
+\hline
+id & BIGSERIAL & PRIMARY KEY & Identifiant unique \\
+\hline
+reservation\_id & BIGINT & NOT NULL, FK & Référence à la réservation \\
+\hline
+nom & VARCHAR & NOT NULL & Nom de famille \\
+\hline
+prenom & VARCHAR & NOT NULL & Prénom \\
+\hline
+cin & VARCHAR & NOT NULL & Numéro CIN \\
+\hline
+lien\_parente & VARCHAR & NOT NULL & Lien de parenté \\
+\hline
+\end{tabular}
+\caption{Structure de la table personnes\_accompagnement}
+\end{table}
+
+\subsection{Table \texttt{extern\_auth\_codes}}
+\textbf{Description} : Codes d'authentification externe
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|p{6cm}|}
+\hline
+\textbf{Colonne} & \textbf{Type} & \textbf{Contraintes} & \textbf{Description} \\
+\hline
+id & BIGSERIAL & PRIMARY KEY & Identifiant unique \\
+\hline
+code & VARCHAR & NOT NULL, UNIQUE & Code d'authentification \\
+\hline
+used & BOOLEAN & NOT NULL, DEFAULT false & Code utilisé ou non \\
+\hline
+created\_at & TIMESTAMP & NOT NULL & Date de création \\
+\hline
+prenom & VARCHAR & NOT NULL & Prénom associé \\
+\hline
+nom & VARCHAR & NOT NULL & Nom associé \\
+\hline
+\end{tabular}
+\caption{Structure de la table extern\_auth\_codes}
+\end{table}
+
+\subsection{Table \texttt{phone\_verification\_codes}}
+\textbf{Description} : Codes de vérification SMS
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|p{6cm}|}
+\hline
+\textbf{Colonne} & \textbf{Type} & \textbf{Contraintes} & \textbf{Description} \\
+\hline
+id & BIGSERIAL & PRIMARY KEY & Identifiant unique \\
+\hline
+phone\_number & VARCHAR & NOT NULL & Numéro de téléphone \\
+\hline
+code & VARCHAR & NOT NULL & Code de vérification \\
+\hline
+used & BOOLEAN & NOT NULL, DEFAULT false & Code utilisé ou non \\
+\hline
+created\_at & TIMESTAMP & NOT NULL & Date de création \\
+\hline
+expires\_at & TIMESTAMP & NOT NULL & Date d'expiration \\
+\hline
+\end{tabular}
+\caption{Structure de la table phone\_verification\_codes}
+\end{table}
+
+\section{Relations entre Tables}
+
+\subsection{Relations Principales}
+
+\begin{enumerate}
+    \item \textbf{Reservations $\rightarrow$ Centres} (Many-to-One)
+    \begin{itemize}
+        \item \texttt{reservations.centre\_id} $\rightarrow$ \texttt{centres.id}
+        \item Une réservation appartient à un centre
+    \end{itemize}
+    
+    \item \textbf{Reservations $\rightarrow$ Types de Logement} (Many-to-One)
+    \begin{itemize}
+        \item \texttt{reservations.type\_logement\_id} $\rightarrow$ \texttt{types\_logement.id}
+        \item Une réservation concerne un type de logement
+    \end{itemize}
+    
+    \item \textbf{Personnes Accompagnement $\rightarrow$ Reservations} (One-to-Many)
+    \begin{itemize}
+        \item \texttt{personnes\_accompagnement.reservation\_id} $\rightarrow$ \texttt{reservations.id}
+        \item Une réservation peut avoir plusieurs personnes d'accompagnement
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Contraintes d'Intégrité}
+
+\begin{itemize}
+    \item \textbf{Clés étrangères} : Toutes les références sont validées
+    \item \textbf{Unicité} : Username, CIN, matricule, numéro de téléphone uniques
+    \item \textbf{Non-nullité} : Champs obligatoires définis
+    \item \textbf{Cohérence temporelle} : Dates de début < dates de fin
+\end{itemize}
+
+\section{Index Recommandés}
+
+\begin{lstlisting}[caption=Index pour les recherches fréquentes]
+-- Index pour les recherches fréquentes
+CREATE INDEX idx_reservations_matricule ON reservations(matricule);
+CREATE INDEX idx_reservations_dates ON reservations(date_debut, date_fin);
+CREATE INDEX idx_reservations_statut ON reservations(statut);
+CREATE INDEX idx_users_matricule ON users(matricule);
+CREATE INDEX idx_phone_codes_expires ON phone_verification_codes(expires_at);
+\end{lstlisting}
+
+\section{Scripts de Création}
+
+Le schéma est automatiquement généré par Hibernate avec la configuration :
+\begin{lstlisting}[caption=Configuration Hibernate]
+spring.jpa.hibernate.ddl-auto=update
+\end{lstlisting}
+
+Cette configuration permet la mise à jour automatique du schéma lors des modifications des entités JPA.
+
+\section{Sécurité et Performance}
+
+\begin{itemize}
+    \item \textbf{Chiffrement} : Les mots de passe sont chiffrés par Spring Security
+    \item \textbf{Validation} : Contraintes de validation au niveau base et application
+    \item \textbf{Performance} : Index sur les colonnes fréquemment utilisées
+    \item \textbf{Sauvegarde} : Recommandation de sauvegardes régulières PostgreSQL
+\end{itemize}
+
+\end{document}

@@ -1,0 +1,308 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows,positioning,shadows}
+
+\geometry{margin=2.5cm}
+
+\title{\textbf{Diagramme de Cas d'Utilisation - Projet COSONE}}
+\author{Étudiant en Stage}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Vue d'ensemble}
+
+Ce diagramme présente les cas d'utilisation du système COSONE, montrant les interactions entre les acteurs et le système pour la gestion des réservations de centres de vacances.
+
+\section{Diagramme de Cas d'Utilisation}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[node distance=1.5cm, auto]
+    % Style des nœuds
+    \tikzstyle{actor} = [ellipse, draw, fill=blue!20, text width=2.5cm, text centered, minimum height=1cm, drop shadow]
+    \tikzstyle{usecase} = [ellipse, draw, fill=green!20, text width=3cm, text centered, minimum height=0.8cm, drop shadow]
+    \tikzstyle{system} = [rectangle, draw, fill=gray!20, text width=15cm, text centered, minimum height=8cm, drop shadow]
+    \tikzstyle{arrow} = [thick,->,>=stealth]
+    \tikzstyle{include} = [thick,->,>=stealth, dashed, color=red]
+    \tikzstyle{extend} = [thick,->,>=stealth, dashed, color=blue]
+    
+    % Acteurs
+    \node (utilisateur) [actor] {\textbf{Utilisateur}\\\textit{Employé}};
+    \node (admin) [actor, right of=utilisateur, xshift=3cm] {\textbf{Administrateur}\\\textit{Système}};
+    \node (systeme) [actor, right of=admin, xshift=3cm] {\textbf{Système}\\\textit{Externe}};
+    \node (wordpress) [actor, below of=systeme, yshift=-1cm] {\textbf{WordPress}\\\textit{CMS}};
+    
+    % Système
+    \node (systemBox) [system, below of=utilisateur, yshift=-2cm] {};
+    
+    % Cas d'utilisation - Authentification
+    \node (uc1) [usecase, below of=utilisateur, yshift=-3cm, xshift=-2cm] {Inscription avec\\code externe};
+    \node (uc2) [usecase, below of=uc1, yshift=-1cm] {Vérification\\par SMS};
+    \node (uc3) [usecase, below of=uc2, yshift=-1cm] {Connexion};
+    \node (uc4) [usecase, below of=uc3, yshift=-1cm] {Création de\\mot de passe};
+    \node (uc5) [usecase, below of=uc4, yshift=-1cm] {Déconnexion};
+    
+    % Cas d'utilisation - Réservations
+    \node (uc6) [usecase, right of=uc1, xshift=2cm] {Consulter les\\centres disponibles};
+    \node (uc7) [usecase, right of=uc2, xshift=2cm] {Consulter les\\types de logement};
+    \node (uc8) [usecase, right of=uc3, xshift=2cm] {Vérifier la\\disponibilité};
+    \node (uc9) [usecase, right of=uc4, xshift=2cm] {Créer une\\réservation};
+    \node (uc10) [usecase, right of=uc5, xshift=2cm] {Calculer le prix};
+    
+    % Cas d'utilisation - Administration
+    \node (uc18) [usecase, right of=uc6, xshift=2cm] {Gérer les\\utilisateurs};
+    \node (uc19) [usecase, right of=uc7, xshift=2cm] {Générer des codes\\d'authentification};
+    \node (uc20) [usecase, right of=uc8, xshift=2cm] {Gérer les\\centres};
+    \node (uc21) [usecase, right of=uc9, xshift=2cm] {Gérer les types\\de logement};
+    \node (uc22) [usecase, right of=uc10, xshift=2cm] {Consulter les\\statistiques};
+    
+    % Relations Utilisateur
+    \draw [arrow] (utilisateur) -- (uc1);
+    \draw [arrow] (utilisateur) -- (uc2);
+    \draw [arrow] (utilisateur) -- (uc3);
+    \draw [arrow] (utilisateur) -- (uc4);
+    \draw [arrow] (utilisateur) -- (uc5);
+    \draw [arrow] (utilisateur) -- (uc6);
+    \draw [arrow] (utilisateur) -- (uc7);
+    \draw [arrow] (utilisateur) -- (uc8);
+    \draw [arrow] (utilisateur) -- (uc9);
+    \draw [arrow] (utilisateur) -- (uc10);
+    
+    % Relations Administrateur
+    \draw [arrow] (admin) -- (uc3);
+    \draw [arrow] (admin) -- (uc5);
+    \draw [arrow] (admin) -- (uc18);
+    \draw [arrow] (admin) -- (uc19);
+    \draw [arrow] (admin) -- (uc20);
+    \draw [arrow] (admin) -- (uc21);
+    \draw [arrow] (admin) -- (uc22);
+    
+    % Relations d'inclusion
+    \draw [include] (uc9) -- (uc8);
+    \draw [include] (uc9) -- (uc10);
+    
+    % Relations d'extension
+    \draw [extend] (uc2) -- (uc1);
+    \draw [extend] (uc4) -- (uc2);
+    
+    % Légende
+    \node [below of=systemBox, yshift=-1cm] {\textbf{Légende :} \textcolor{red}{---} Inclusion, \textcolor{blue}{---} Extension};
+    
+\end{tikzpicture}
+\caption{Diagramme de cas d'utilisation du système COSONE}
+\end{figure}
+
+\section{Description Détaillée des Cas d'Utilisation}
+
+\subsection{Authentification}
+
+\subsubsection{UC1 - Inscription avec code externe}
+\begin{itemize}
+    \item \textbf{Acteur principal} : Utilisateur
+    \item \textbf{Préconditions} : Avoir un code d'authentification valide
+    \item \textbf{Scénario principal} :
+    \begin{enumerate}
+        \item L'utilisateur saisit son code d'authentification
+        \item Le système vérifie la validité du code
+        \item L'utilisateur saisit ses informations personnelles
+        \item Le système crée le compte utilisateur
+        \item Le système envoie un SMS de vérification
+    \end{enumerate}
+\end{itemize}
+
+\subsubsection{UC2 - Vérification par SMS}
+\begin{itemize}
+    \item \textbf{Acteur principal} : Utilisateur
+    \item \textbf{Préconditions} : Avoir reçu un SMS de vérification
+    \item \textbf{Scénario principal} :
+    \begin{enumerate}
+        \item L'utilisateur reçoit un SMS avec un code
+        \item L'utilisateur saisit le code reçu
+        \item Le système vérifie le code
+        \item Le système valide le numéro de téléphone
+    \end{enumerate}
+\end{itemize}
+
+\subsubsection{UC3 - Connexion}
+\begin{itemize}
+    \item \textbf{Acteur principal} : Utilisateur, Administrateur
+    \item \textbf{Préconditions} : Avoir un compte valide
+    \item \textbf{Scénario principal} :
+    \begin{enumerate}
+        \item L'utilisateur saisit ses identifiants
+        \item Le système vérifie les informations
+        \item Le système authentifie l'utilisateur
+        \item L'utilisateur accède à son espace
+    \end{enumerate}
+\end{itemize}
+
+\subsection{Gestion des Réservations}
+
+\subsubsection{UC6 - Consulter les centres disponibles}
+\begin{itemize}
+    \item \textbf{Acteur principal} : Utilisateur
+    \item \textbf{Scénario principal} :
+    \begin{enumerate}
+        \item L'utilisateur accède à la page des centres
+        \item Le système affiche la liste des centres actifs
+        \item L'utilisateur peut filtrer par ville ou critères
+    \end{enumerate}
+\end{itemize}
+
+\subsubsection{UC9 - Créer une réservation}
+\begin{itemize}
+    \item \textbf{Acteur principal} : Utilisateur
+    \item \textbf{Préconditions} : Être connecté
+    \item \textbf{Scénario principal} :
+    \begin{enumerate}
+        \item L'utilisateur sélectionne un centre et un type de logement
+        \item L'utilisateur choisit les dates de séjour
+        \item Le système vérifie la disponibilité
+        \item L'utilisateur saisit le nombre de personnes
+        \item L'utilisateur ajoute les personnes d'accompagnement
+        \item Le système calcule le prix total
+        \item L'utilisateur confirme la réservation
+        \item Le système crée la réservation avec statut "EN\_ATTENTE\_PAIEMENT"
+    \end{enumerate}
+\end{itemize}
+
+\subsubsection{UC13 - Confirmer le paiement}
+\begin{itemize}
+    \item \textbf{Acteur principal} : Utilisateur
+    \item \textbf{Préconditions} : Avoir une réservation en attente de paiement
+    \item \textbf{Scénario principal} :
+    \begin{enumerate}
+        \item L'utilisateur accède à sa réservation
+        \item L'utilisateur sélectionne la méthode de paiement
+        \item L'utilisateur saisit la référence de paiement
+        \item Le système met à jour le statut de la réservation
+        \item Le système envoie une confirmation par email
+    \end{enumerate}
+\end{itemize}
+
+\subsection{Administration}
+
+\subsubsection{UC18 - Gérer les utilisateurs}
+\begin{itemize}
+    \item \textbf{Acteur principal} : Administrateur
+    \item \textbf{Scénario principal} :
+    \begin{enumerate}
+        \item L'administrateur accède à la liste des utilisateurs
+        \item L'administrateur peut consulter les informations
+        \item L'administrateur peut modifier les rôles
+        \item L'administrateur peut désactiver des comptes
+    \end{enumerate}
+\end{itemize}
+
+\subsubsection{UC19 - Générer des codes d'authentification}
+\begin{itemize}
+    \item \textbf{Acteur principal} : Administrateur
+    \item \textbf{Scénario principal} :
+    \begin{enumerate}
+        \item L'administrateur accède à la génération de codes
+        \item L'administrateur saisit les informations de l'employé
+        \item Le système génère un code unique
+        \item Le système sauvegarde le code en base
+    \end{enumerate}
+\end{itemize}
+
+\section{Relations entre Cas d'Utilisation}
+
+\subsection{Relations d'Inclusion}
+\begin{itemize}
+    \item \textbf{UC9 inclut UC8} : Créer une réservation inclut la vérification de disponibilité
+    \item \textbf{UC9 inclut UC10} : Créer une réservation inclut le calcul du prix
+    \item \textbf{UC9 inclut UC15} : Créer une réservation inclut l'ajout d'accompagnants
+    \item \textbf{UC13 inclut UC10} : Confirmer le paiement inclut le calcul du prix
+\end{itemize}
+
+\subsection{Relations d'Extension}
+\begin{itemize}
+    \item \textbf{UC2 étend UC1} : La vérification SMS étend l'inscription
+    \item \textbf{UC4 étend UC2} : La création de mot de passe étend la vérification SMS
+    \item \textbf{UC12 étend UC11} : Annuler une réservation étend la consultation des réservations
+    \item \textbf{UC14 étend UC11} : Consulter les détails étend la consultation des réservations
+\end{itemize}
+
+\section{Acteurs du Système}
+
+\subsection{Utilisateur (Employé)}
+\begin{itemize}
+    \item \textbf{Description} : Employé de l'entreprise utilisant le système pour réserver des centres de vacances
+    \item \textbf{Responsabilités} : S'inscrire, se connecter, créer des réservations, gérer ses accompagnants
+\end{itemize}
+
+\subsection{Administrateur}
+\begin{itemize}
+    \item \textbf{Description} : Personne responsable de la gestion du système et des utilisateurs
+    \item \textbf{Responsabilités} : Gérer les utilisateurs, générer des codes, administrer les centres
+\end{itemize}
+
+\subsection{Système Externe}
+\begin{itemize}
+    \item \textbf{Description} : Services externes pour l'envoi d'emails et SMS
+    \item \textbf{Responsabilités} : Envoyer des notifications automatiques
+\end{itemize}
+
+\subsection{WordPress CMS}
+\begin{itemize}
+    \item \textbf{Description} : Système de gestion de contenu pour les articles et informations
+    \item \textbf{Responsabilités} : Fournir du contenu dynamique à la page d'accueil
+\end{itemize}
+
+\section{Contraintes et Règles Métier}
+
+\begin{enumerate}
+    \item \textbf{Authentification} : Un code d'authentification ne peut être utilisé qu'une seule fois
+    \item \textbf{Réservations} : Les réservations doivent être effectuées au moins 10 jours à l'avance
+    \item \textbf{Paiement} : Le paiement doit être effectué dans les 24h suivant la création de la réservation
+    \item \textbf{Accompagnants} : Le nombre total de personnes ne peut dépasser la capacité du logement
+    \item \textbf{Disponibilité} : Vérification automatique des conflits de dates
+\end{enumerate}
+
+\section{Tableau Récapitulatif des Cas d'Utilisation}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|p{6cm}|}
+\hline
+\textbf{ID} & \textbf{Nom} & \textbf{Acteur} & \textbf{Description} \\
+\hline
+UC1 & Inscription avec code externe & Utilisateur & Inscription avec validation par code \\
+\hline
+UC2 & Vérification par SMS & Utilisateur & Validation du numéro de téléphone \\
+\hline
+UC3 & Connexion & Utilisateur, Admin & Authentification dans le système \\
+\hline
+UC6 & Consulter les centres & Utilisateur & Visualisation des centres disponibles \\
+\hline
+UC9 & Créer une réservation & Utilisateur & Processus complet de réservation \\
+\hline
+UC13 & Confirmer le paiement & Utilisateur & Validation du paiement \\
+\hline
+UC18 & Gérer les utilisateurs & Administrateur & Administration des comptes \\
+\hline
+UC19 & Générer des codes & Administrateur & Création de codes d'authentification \\
+\hline
+\end{tabular}
+\caption{Récapitulatif des principaux cas d'utilisation}
+\end{table}
+
+Ce diagramme de cas d'utilisation fournit une vue d'ensemble complète des fonctionnalités du système COSONE et des interactions entre les différents acteurs.
+
+\end{document}

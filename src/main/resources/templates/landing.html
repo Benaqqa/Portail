@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Landing Page - COSONE</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/landing.css}">
+</head>
+<body>
+    <!-- Navigation Menu -->
+    <nav class="navigation-menu">
+        <div class="menu-toggle">
+            <i class="fas fa-bars"></i>
+        </div>
+        <ul class="menu-items">
+            <li><a href="#" class="menu-link active" data-section="actualites">
+                <i class="fas fa-newspaper"></i>
+                <span>Actualités</span>
+            </a></li>
+            <li><a href="#" class="menu-link" data-section="qui-sommes-nous">
+                <i class="fas fa-users"></i>
+                <span>Qui sommes-nous</span>
+            </a></li>
+            <li><a href="#" class="menu-link" data-section="nos-activites">
+                <i class="fas fa-tasks"></i>
+                <span>Nos activités</span>
+            </a></li>
+            <li><a href="#" class="menu-link" data-section="nos-centres">
+                <i class="fas fa-building"></i>
+                <span>Nos centres</span>
+            </a></li>
+            <li><a href="#" class="menu-link" data-section="nos-conventions">
+                <i class="fas fa-handshake"></i>
+                <span>Nos conventions</span>
+            </a></li>
+            <li><a href="#" class="menu-link" data-section="espace-galerie">
+                <i class="fas fa-images"></i>
+                <span>Espace galerie et vidéothèque</span>
+            </a></li>
+            <li><a href="#" class="menu-link" data-section="espace-recherche">
+                <i class="fas fa-search"></i>
+                <span>Espace recherche</span>
+            </a></li>
+
+            <li><a href="#" class="menu-link" data-section="page-contact">
+                <i class="fas fa-envelope"></i>
+                <span>Page contact</span>
+            </a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="page-header">
+            <div class="header-content">
+                <div class="header-text">
+                    <h1>Bienvenue sur COSONE</h1>
+                    <p>Votre plateforme de gestion et de réservation</p>
+                </div>
+                <div class="header-actions">
+                    <a href="/login" class="login-header-btn">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Se connecter
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content Sections -->
+        <div class="content-container">
+            <!-- Actualités Section (Default) -->
+            <section id="actualites" class="content-section active">
+                <div class="section-header">
+                    <h2><i class="fas fa-newspaper"></i> Actualités</h2>
+                </div>
+                <div class="section-content">
+                    <div class="news-grid">
+                        <article class="news-card">
+                            <div class="news-image">
+                                <i class="fas fa-image"></i>
+                            </div>
+                            <div class="news-content">
+                                <h3>Nouvelle formation disponible</h3>
+                                <p>Découvrez notre nouvelle formation en gestion de projet qui débutera le mois prochain.</p>
+                                <div class="news-meta">
+                                    <span class="news-date">15 Jan 2024</span>
+                                    <a href="#" class="read-more">Lire plus</a>
+                                </div>
+                            </div>
+                        </article>
+                        <article class="news-card">
+                            <div class="news-image">
+                                <i class="fas fa-image"></i>
+                            </div>
+                            <div class="news-content">
+                                <h3>Ouverture d'un nouveau centre</h3>
+                                <p>Nous sommes fiers d'annoncer l'ouverture de notre nouveau centre à Lyon.</p>
+                                <div class="news-meta">
+                                    <span class="news-date">10 Jan 2024</span>
+                                    <a href="#" class="read-more">Lire plus</a>
+                                </div>
+                            </div>
+                        </article>
+                        <article class="news-card">
+                            <div class="news-image">
+                                <i class="fas fa-image"></i>
+                            </div>
+                            <div class="news-content">
+                                <h3>Partenariat avec l'Université</h3>
+                                <p>Signature d'un nouveau partenariat avec l'Université de Paris pour des formations innovantes.</p>
+                                <div class="news-meta">
+                                    <span class="news-date">5 Jan 2024</span>
+                                    <a href="#" class="read-more">Lire plus</a>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Qui sommes-nous Section -->
+            <section id="qui-sommes-nous" class="content-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-users"></i> Qui sommes-nous</h2>
+                </div>
+                <div class="section-content">
+                    <div class="about-content">
+                        <div class="about-text">
+                            <h3>Notre Mission</h3>
+                            <p>COSONE s'engage à fournir des services de formation et de consultation de qualité, en contribuant au développement professionnel et personnel de nos clients.</p>
+                            
+                            <h3>Notre Vision</h3>
+                            <p>Devenir un partenaire de référence dans le domaine de la formation et du développement des compétences.</p>
+                            
+                            <h3>Nos Valeurs</h3>
+                            <ul>
+                                <li>Excellence dans tous nos services</li>
+                                <li>Innovation et adaptation aux besoins</li>
+                                <li>Intégrité et transparence</li>
+                                <li>Engagement envers nos clients</li>
+                            </ul>
+                        </div>
+                        <div class="about-stats">
+                            <div class="stat-item">
+                                <div class="stat-number">500+</div>
+                                <div class="stat-label">Formations réalisées</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">1000+</div>
+                                <div class="stat-label">Participants formés</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">15+</div>
+                                <div class="stat-label">Années d'expérience</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Nos activités Section -->
+            <section id="nos-activites" class="content-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-tasks"></i> Nos activités</h2>
+                </div>
+                <div class="section-content">
+                    <div class="activities-grid">
+                        <div class="activity-card">
+                            <div class="activity-icon">
+                                <i class="fas fa-graduation-cap"></i>
+                            </div>
+                            <h3>Formation</h3>
+                            <p>Formations professionnelles dans divers domaines : management, informatique, communication, etc.</p>
+                            <ul>
+                                <li>Formations en présentiel</li>
+                                <li>Formations à distance</li>
+                                <li>Formations sur mesure</li>
+                            </ul>
+                        </div>
+                        <div class="activity-card">
+                            <div class="activity-icon">
+                                <i class="fas fa-comments"></i>
+                            </div>
+                            <h3>Consultation</h3>
+                            <p>Services de conseil et d'accompagnement pour les entreprises et organisations.</p>
+                            <ul>
+                                <li>Audit organisationnel</li>
+                                <li>Stratégie d'entreprise</li>
+                                <li>Gestion des ressources humaines</li>
+                            </ul>
+                        </div>
+                        <div class="activity-card">
+                            <div class="activity-icon">
+                                <i class="fas fa-hands-helping"></i>
+                            </div>
+                            <h3>Accompagnement</h3>
+                            <p>Accompagnement personnalisé pour le développement des compétences et la carrière.</p>
+                            <ul>
+                                <li>Coaching individuel</li>
+                                <li>Mentorat</li>
+                                <li>Bilan de compétences</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Nos centres Section -->
+            <section id="nos-centres" class="content-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-building"></i> Nos centres</h2>
+                </div>
+                <div class="section-content">
+                    <div class="centers-grid">
+                        <div th:each="centre : ${centres}" class="center-card">
+                            <div class="center-image">
+                                <i class="fas fa-building"></i>
+                            </div>
+                            <div class="center-info">
+                                <h3 th:text="${centre.nom}">Nom du centre</h3>
+                                <p><i class="fas fa-map-marker-alt"></i> <span th:text="${centre.adresse}">Adresse</span>, <span th:text="${centre.ville}">Ville</span></p>
+                                <p><i class="fas fa-phone"></i> <span th:text="${centre.telephone}">Téléphone</span></p>
+                                <div class="center-description" th:if="${centre.description}">
+                                    <p th:text="${centre.description}">Description du centre</p>
+                                </div>
+                                <div class="center-rating" th:if="${centre.rating}">
+                                    <div class="rating-stars">
+                                        <span th:each="i : ${#numbers.sequence(1, 5)}" 
+                                              th:class="${i <= centre.rating ? 'star filled' : 'star empty'}"
+                                              th:text="'★'">★</span>
+                                    </div>
+                                    <span class="rating-value" th:text="${#numbers.formatDecimal(centre.rating, 1, 1)}">0.0</span>
+                                </div>
+                                <div class="center-website" th:if="${centre.website}">
+                                    <a th:href="${centre.website}" target="_blank" class="website-link">
+                                        <i class="fas fa-external-link-alt"></i>
+                                        Visiter le site web
+                                    </a>
+                                </div>
+                                <div class="center-status">
+                                    <span class="status-badge" th:class="${centre.actif ? 'status-active' : 'status-inactive'}" 
+                                          th:text="${centre.actif ? 'Actif' : 'Inactif'}">Statut</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+
+                    </div>
+                </div>
+            </section>
+
+            <!-- Nos conventions Section -->
+            <section id="nos-conventions" class="content-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-handshake"></i> Nos conventions</h2>
+                </div>
+                <div class="section-content">
+                    <div class="conventions-grid">
+                        <div class="convention-card">
+                            <div class="convention-header">
+                                <h3>Université de Paris</h3>
+                                <span class="convention-type">Partenariat Académique</span>
+                            </div>
+                            <p>Convention de partenariat pour la co-création de programmes de formation et la reconnaissance des certifications.</p>
+                            <div class="convention-details">
+                                <span class="convention-date">Signée le: 15 Mars 2023</span>
+                                <span class="convention-duration">Durée: 5 ans</span>
+                            </div>
+                        </div>
+                        <div class="convention-card">
+                            <div class="convention-header">
+                                <h3>Chambre de Commerce</h3>
+                                <span class="convention-type">Partenariat Institutionnel</span>
+                            </div>
+                            <p>Accord de collaboration pour la formation des entrepreneurs et la promotion de l'innovation.</p>
+                            <div class="convention-details">
+                                <span class="convention-date">Signée le: 22 Juin 2023</span>
+                                <span class="convention-duration">Durée: 3 ans</span>
+                            </div>
+                        </div>
+                        <div class="convention-card">
+                            <div class="convention-header">
+                                <h3>Fédération des Industries</h3>
+                                <span class="convention-type">Partenariat Sectoriel</span>
+                            </div>
+                            <p>Convention pour la formation continue des professionnels du secteur industriel.</p>
+                            <div class="convention-details">
+                                <span class="convention-date">Signée le: 10 Sept 2023</span>
+                                <span class="convention-duration">Durée: 4 ans</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Espace galerie et vidéothèque Section -->
+            <section id="espace-galerie" class="content-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-images"></i> Espace galerie et vidéothèque</h2>
+                </div>
+                <div class="section-content">
+                    <div class="gallery-tabs">
+                        <button class="tab-button active" data-tab="photos">Photos</button>
+                        <button class="tab-button" data-tab="videos">Vidéos</button>
+                    </div>
+                    
+                    <div class="tab-content active" id="photos">
+                        <div class="gallery-grid">
+                            <div class="gallery-item">
+                                <div class="gallery-image">
+                                    <i class="fas fa-image"></i>
+                                </div>
+                                <div class="gallery-caption">Formation en cours</div>
+                            </div>
+                            <div class="gallery-item">
+                                <div class="gallery-image">
+                                    <i class="fas fa-image"></i>
+                                </div>
+                                <div class="gallery-caption">Nos équipes</div>
+                            </div>
+                            <div class="gallery-item">
+                                <div class="gallery-image">
+                                    <i class="fas fa-image"></i>
+                                </div>
+                                <div class="gallery-caption">Événements</div>
+                            </div>
+                            <div class="gallery-item">
+                                <div class="gallery-image">
+                                    <i class="fas fa-image"></i>
+                                </div>
+                                <div class="gallery-caption">Nos centres</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="videos">
+                        <div class="video-grid">
+                            <div class="video-item">
+                                <div class="video-thumbnail">
+                                    <i class="fas fa-play-circle"></i>
+                                </div>
+                                <div class="video-info">
+                                    <h4>Présentation COSONE</h4>
+                                    <p>Découvrez notre organisation et nos services</p>
+                                    <span class="video-duration">3:45</span>
+                                </div>
+                            </div>
+                            <div class="video-item">
+                                <div class="video-thumbnail">
+                                    <i class="fas fa-play-circle"></i>
+                                </div>
+                                <div class="video-info">
+                                    <h4>Témoignages clients</h4>
+                                    <p>Retours d'expérience de nos participants</p>
+                                    <span class="video-duration">5:20</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Espace recherche Section -->
+            <section id="espace-recherche" class="content-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-search"></i> Espace recherche</h2>
+                </div>
+                <div class="section-content">
+                    <div class="search-container">
+                        <div class="search-box">
+                            <input type="text" placeholder="Rechercher dans nos contenus..." class="search-input">
+                            <button class="search-button">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="search-filters">
+                            <h3>Filtres de recherche</h3>
+                            <div class="filter-options">
+                                <label class="filter-option">
+                                    <input type="checkbox" checked> Formations
+                                </label>
+                                <label class="filter-option">
+                                    <input type="checkbox" checked> Articles
+                                </label>
+                                <label class="filter-option">
+                                    <input type="checkbox" checked> Événements
+                                </label>
+                                <label class="filter-option">
+                                    <input type="checkbox" checked> Ressources
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="search-results">
+                            <h3>Résultats de recherche</h3>
+                            <div class="results-placeholder">
+                                <i class="fas fa-search"></i>
+                                <p>Utilisez la barre de recherche ci-dessus pour trouver du contenu</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+
+            <!-- Page contact Section -->
+            <section id="page-contact" class="content-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-envelope"></i> Page contact</h2>
+                </div>
+                <div class="section-content">
+                    <div class="contact-container">
+                        <div class="contact-info">
+                            <h3>Nos coordonnées</h3>
+                            <div class="contact-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <div>
+                                    <strong>Adresse :</strong><br>
+                                    123 Rue de la Formation<br>
+                                    75001 Paris, France
+                                </div>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fas fa-phone"></i>
+                                <div>
+                                    <strong>Téléphone :</strong><br>
+                                    +33 1 23 45 67 89
+                                </div>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fas fa-envelope"></i>
+                                <div>
+                                    <strong>Email :</strong><br>
+                                    contact@cosone.fr
+                                </div>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fas fa-clock"></i>
+                                <div>
+                                    <strong>Horaires :</strong><br>
+                                    Lundi - Vendredi : 9h - 18h<br>
+                                    Samedi : 9h - 12h
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-form">
+                            <h3>Nous contacter</h3>
+                            <form>
+                                <div class="form-group">
+                                    <input type="text" placeholder="Nom complet" required>
+                                </div>
+                                <div class="form-group">
+                                    <input type="email" placeholder="Email" required>
+                                </div>
+                                <div class="form-group">
+                                    <input type="tel" placeholder="Téléphone">
+                                </div>
+                                <div class="form-group">
+                                    <select required>
+                                        <option value="">Sujet de votre message</option>
+                                        <option value="formation">Demande de formation</option>
+                                        <option value="consultation">Demande de consultation</option>
+                                        <option value="information">Demande d'information</option>
+                                        <option value="autre">Autre</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <textarea placeholder="Votre message..." rows="5" required></textarea>
+                                </div>
+                                <button type="submit" class="submit-contact">Envoyer le message</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script th:src="@{/js/landing.js}"></script>
+</body>
+</html>

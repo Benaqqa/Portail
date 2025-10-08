@@ -1,0 +1,14 @@
+flowchart TD
+    Start([Début]) --> A[Administrateur accède à la génération de codes]
+    A --> B[Administrateur saisit le prénom de l'utilisateur externe]
+    B --> C[Administrateur saisit le nom de l'utilisateur externe]
+    C --> D[Générer un code unique aléatoirement]
+    D --> E[Vérifier l'unicité du code en base]
+    E --> F{Code unique ?}
+    F -->|Non| G[Générer un nouveau code]
+    G --> E
+    F -->|Oui| H[Enregistrer le code en base avec prénom/nom]
+    H --> I[Marquer le code comme non utilisé]
+    I --> J[Afficher le code généré à l'administrateur]
+    J --> K[Administrateur communique le code à l'utilisateur externe]
+    K --> End([Fin])

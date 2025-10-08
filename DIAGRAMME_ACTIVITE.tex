@@ -1,0 +1,351 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows,positioning,shadows,decorations.pathmorphing}
+
+\geometry{margin=2.5cm}
+
+\title{\textbf{Diagramme d'Activité - Portail COS'ONE}}
+\author{BENAQQA Moubarak}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Vue d'ensemble}
+
+Ce document présente les diagrammes d'activité du système COSONE, décrivant les flux de processus pour les principales fonctionnalités du système.
+
+\section{Processus d'Inscription Utilisateur et Création de Réservation}
+
+\begin{figure}[h]
+\centering
+\begin{minipage}[t]{0.48\textwidth}
+\centering
+\begin{tikzpicture}[node distance=3cm, auto, scale=0.35, transform shape]
+    % Style des nœuds
+    \tikzstyle{start} = [ellipse, draw, fill=green!20, text width=1.8cm, text centered, minimum height=0.7cm]
+    \tikzstyle{end} = [ellipse, draw, fill=red!20, text width=1.8cm, text centered, minimum height=0.7cm]
+    \tikzstyle{process} = [rectangle, draw, fill=blue!20, text width=2.2cm, text centered, minimum height=0.7cm]
+    \tikzstyle{decision} = [diamond, draw, fill=yellow!20, text width=1.8cm, text centered, minimum height=0.7cm]
+    \tikzstyle{arrow} = [thick,->,>=stealth]
+    
+    % Nœuds
+    \node (start) [start] {Début};
+    \node (a) [process, below of=start, yshift=-0.4cm] {Utilisateur accède à\\la page d'inscription};
+    \node (b) [process, below of=a, yshift=-0.4cm] {Utilisateur saisit le\\code d'authentification};
+    \node (c) [decision, below of=b, yshift=-0.4cm] {Code valide ?};
+    \node (d) [process, left of=c, xshift=-3cm] {Afficher erreur};
+    \node (e) [process, below of=c, yshift=-0.4cm] {Utilisateur saisit ses\\informations personnelles};
+    \node (f) [process, below of=e, yshift=-0.4cm] {Vérifier l'unicité\\des données};
+    \node (g) [decision, below of=f, yshift=-0.4cm] {Données uniques ?};
+    \node (h) [process, left of=g, xshift=-3cm] {Afficher erreur\\de doublon};
+    \node (i) [process, below of=g, yshift=-0.4cm] {Créer le compte\\utilisateur};
+    \node (j) [process, below of=i, yshift=-0.4cm] {Générer un code SMS\\de vérification};
+    \node (k) [process, below of=j, yshift=-0.4cm] {Envoyer SMS\\avec le code};
+    \node (l) [process, below of=k, yshift=-0.4cm] {Rediriger vers la page\\de vérification SMS};
+    \node (m) [process, below of=l, yshift=-0.4cm] {Utilisateur saisit\\le code SMS reçu};
+    \node (n) [decision, below of=m, yshift=-0.4cm] {Code SMS valide ?};
+    \node (o) [process, left of=n, xshift=-3cm] {Afficher erreur};
+    \node (p) [process, below of=n, yshift=-0.4cm] {Marquer le numéro\\comme vérifié};
+    \node (q) [process, below of=p, yshift=-0.4cm] {Rediriger vers la création\\de mot de passe};
+    \node (r) [process, below of=q, yshift=-0.4cm] {Utilisateur crée\\son mot de passe};
+    \node (s) [process, below of=r, yshift=-0.4cm] {Valider la force\\du mot de passe};
+    \node (t) [decision, below of=s, yshift=-0.4cm] {Mot de passe valide ?};
+    \node (u) [process, left of=t, xshift=-3cm] {Afficher erreur\\de validation};
+    \node (v) [process, below of=t, yshift=-0.4cm] {Enregistrer le\\mot de passe};
+    \node (w) [process, below of=v, yshift=-0.4cm] {Inscription terminée\\avec succès};
+    \node (end) [end, below of=w, yshift=-0.4cm] {Fin};
+    
+    % Flèches
+    \draw [arrow] (start) -- (a);
+    \draw [arrow] (a) -- (b);
+    \draw [arrow] (b) -- (c);
+    \draw [arrow] (c) -- node[above, sloped] {Non} (d);
+    \draw [arrow] (d) -- (b);
+    \draw [arrow] (c) -- node[right, yshift=0.2cm] {Oui} (e);
+    \draw [arrow] (e) -- (f);
+    \draw [arrow] (f) -- (g);
+    \draw [arrow] (g) -- node[above, sloped] {Non} (h);
+    \draw [arrow] (h) -- (e);
+    \draw [arrow] (g) -- node[right, yshift=0.2cm] {Oui} (i);
+    \draw [arrow] (i) -- (j);
+    \draw [arrow] (j) -- (k);
+    \draw [arrow] (k) -- (l);
+    \draw [arrow] (l) -- (m);
+    \draw [arrow] (m) -- (n);
+    \draw [arrow] (n) -- node[above, sloped] {Non} (o);
+    \draw [arrow] (o) -- (m);
+    \draw [arrow] (n) -- node[right, yshift=0.2cm] {Oui} (p);
+    \draw [arrow] (p) -- (q);
+    \draw [arrow] (q) -- (r);
+    \draw [arrow] (r) -- (s);
+    \draw [arrow] (s) -- (t);
+    \draw [arrow] (t) -- node[above, sloped] {Non} (u);
+    \draw [arrow] (u) -- (r);
+    \draw [arrow] (t) -- node[right, yshift=0.2cm] {Oui} (v);
+    \draw [arrow] (v) -- (w);
+    \draw [arrow] (w) -- (end);
+    
+\end{tikzpicture}
+\caption{Processus d'inscription utilisateur}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\textwidth}
+\centering
+\begin{tikzpicture}[node distance=2.8cm, auto, scale=0.35, transform shape]
+    % Style des nœuds
+    \tikzstyle{start} = [ellipse, draw, fill=green!20, text width=1.8cm, text centered, minimum height=0.7cm]
+    \tikzstyle{end} = [ellipse, draw, fill=red!20, text width=1.8cm, text centered, minimum height=0.7cm]
+    \tikzstyle{process} = [rectangle, draw, fill=blue!20, text width=2.2cm, text centered, minimum height=0.7cm]
+    \tikzstyle{decision} = [diamond, draw, fill=yellow!20, text width=1.8cm, text centered, minimum height=0.7cm]
+    \tikzstyle{arrow} = [thick,->,>=stealth]
+    
+    % Nœuds
+    \node (start) [start] {Début};
+    \node (a) [process, below of=start, yshift=-0.35cm] {Utilisateur connecté\\accède à la réservation};
+    \node (b) [process, below of=a, yshift=-0.35cm] {Afficher la liste\\des centres disponibles};
+    \node (c) [process, below of=b, yshift=-0.35cm] {Utilisateur sélectionne\\un centre};
+    \node (d) [process, below of=c, yshift=-0.35cm] {Afficher les types\\de logement du centre};
+    \node (e) [process, below of=d, yshift=-0.35cm] {Utilisateur sélectionne\\un type de logement};
+    \node (f) [process, below of=e, yshift=-0.35cm] {Utilisateur choisit\\les dates de séjour};
+    \node (g) [process, below of=f, yshift=-0.35cm] {Vérifier que les dates\\sont valides};
+    \node (h) [decision, below of=g, yshift=-0.35cm] {Dates valides ?};
+    \node (i) [process, left of=h, xshift=-3cm] {Afficher erreur\\de dates};
+    \node (j) [process, below of=h, yshift=-0.35cm] {Vérifier la\\disponibilité};
+    \node (k) [decision, below of=j, yshift=-0.35cm] {Disponible ?};
+    \node (l) [process, left of=k, xshift=-3cm] {Afficher message\\d'indisponibilité};
+    \node (m) [process, below of=k, yshift=-0.35cm] {Utilisateur saisit\\le nombre de personnes};
+    \node (n) [process, below of=m, yshift=-0.35cm] {Vérifier la capacité\\du logement};
+    \node (o) [decision, below of=n, yshift=-0.35cm] {Capacité suffisante ?};
+    \node (p) [process, left of=o, xshift=-3cm] {Afficher erreur\\de capacité};
+    \node (q) [process, below of=o, yshift=-0.35cm] {Calculer le prix total};
+    \node (r) [process, below of=q, yshift=-0.35cm] {Afficher le récapitulatif\\et le prix};
+    \node (s) [process, below of=r, yshift=-0.35cm] {Utilisateur ajoute les\\personnes d'accompagnement};
+    \node (t) [process, below of=s, yshift=-0.35cm] {Utilisateur confirme\\la réservation};
+    \node (u) [process, below of=t, yshift=-0.35cm] {Créer la réservation\\en base};
+    \node (v) [process, below of=u, yshift=-0.35cm] {Générer la date limite\\de paiement};
+    \node (w) [process, below of=v, yshift=-0.35cm] {Envoyer email\\de confirmation};
+    \node (x) [process, below of=w, yshift=-0.35cm] {Afficher la page\\de confirmation};
+    \node (end) [end, below of=x, yshift=-0.35cm] {Fin};
+    
+    % Flèches
+    \draw [arrow] (start) -- (a);
+    \draw [arrow] (a) -- (b);
+    \draw [arrow] (b) -- (c);
+    \draw [arrow] (c) -- (d);
+    \draw [arrow] (d) -- (e);
+    \draw [arrow] (e) -- (f);
+    \draw [arrow] (f) -- (g);
+    \draw [arrow] (g) -- (h);
+    \draw [arrow] (h) -- node[above, sloped] {Non} (i);
+    \draw [arrow] (i) -- (f);
+    \draw [arrow] (h) -- node[right, yshift=0.2cm] {Oui} (j);
+    \draw [arrow] (j) -- (k);
+    \draw [arrow] (k) -- node[above, sloped] {Non} (l);
+    \draw [arrow] (l) -- (f);
+    \draw [arrow] (k) -- node[right, yshift=0.2cm] {Oui} (m);
+    \draw [arrow] (m) -- (n);
+    \draw [arrow] (n) -- (o);
+    \draw [arrow] (o) -- node[above, sloped] {Non} (p);
+    \draw [arrow] (p) -- (m);
+    \draw [arrow] (o) -- node[right, yshift=0.2cm] {Oui} (q);
+    \draw [arrow] (q) -- (r);
+    \draw [arrow] (r) -- (s);
+    \draw [arrow] (s) -- (t);
+    \draw [arrow] (t) -- (u);
+    \draw [arrow] (u) -- (v);
+    \draw [arrow] (v) -- (w);
+    \draw [arrow] (w) -- (x);
+    \draw [arrow] (x) -- (end);
+    
+\end{tikzpicture}
+\caption{Processus de création de réservation}
+\end{minipage}
+\end{figure}
+
+\section{Processus de Paiement et Vérification de Disponibilité}
+
+\begin{figure}[h]
+\centering
+\begin{minipage}[t]{0.48\textwidth}
+\centering
+\begin{tikzpicture}[node distance=3.5cm, auto, scale=0.35, transform shape]
+    % Style des nœuds
+    \tikzstyle{start} = [ellipse, draw, fill=green!20, text width=1.8cm, text centered, minimum height=0.7cm]
+    \tikzstyle{end} = [ellipse, draw, fill=red!20, text width=1.8cm, text centered, minimum height=0.7cm]
+    \tikzstyle{process} = [rectangle, draw, fill=blue!20, text width=2.2cm, text centered, minimum height=0.7cm]
+    \tikzstyle{decision} = [diamond, draw, fill=yellow!20, text width=1.8cm, text centered, minimum height=0.7cm]
+    \tikzstyle{arrow} = [thick,->,>=stealth]
+    
+    % Nœuds - Colonne principale
+    \node (start) [start] {Début};
+    \node (a) [process, below of=start, yshift=-0.5cm] {Utilisateur accède\\à sa réservation};
+    \node (b) [process, below of=a, yshift=-0.5cm] {Vérifier le statut\\de la réservation};
+    \node (c) [decision, below of=b, yshift=-0.5cm] {\small Statut =\\EN\_ATTENTE\_PAIEMENT ?};
+    \node (e) [process, below of=c, yshift=-0.5cm] {Vérifier la date limite\\de paiement};
+    \node (f) [decision, below of=e, yshift=-0.5cm] {Date limite\\dépassée ?};
+    \node (i) [process, below of=f, yshift=-0.5cm] {Afficher les méthodes\\de paiement disponibles};
+    \node (j) [process, below of=i, yshift=-0.5cm] {Utilisateur sélectionne\\une méthode};
+    \node (k) [process, below of=j, yshift=-0.5cm] {Utilisateur saisit\\la référence de paiement};
+    \node (l) [process, below of=k, yshift=-0.5cm] {Valider la référence\\de paiement};
+    \node (m) [decision, below of=l, yshift=-0.5cm] {Référence valide ?};
+    \node (o) [process, below of=m, yshift=-0.5cm] {Enregistrer les informations\\de paiement};
+    \node (p) [process, below of=o, yshift=-0.5cm] {Marquer la réservation\\comme payée};
+    \node (q) [process, below of=p, yshift=-0.5cm] {Envoyer email de\\confirmation de paiement};
+    \node (r) [process, below of=q, yshift=-0.5cm] {Afficher confirmation\\de paiement};
+    \node (end) [end, below of=r, yshift=-0.5cm] {Fin};
+    
+    % Nœuds - Branches latérales
+    \node (d) [process, left of=c, xshift=-3cm] {Afficher message\\d'erreur};
+    \node (g) [process, left of=f, xshift=-3cm] {Marquer la réservation\\comme expirée};
+    \node (h) [process, below of=g] {Afficher message\\d'expiration};
+    \node (n) [process, left of=m, xshift=-3cm] {Afficher erreur\\de référence};
+    
+    % Flèches principales
+    \draw [arrow] (start) -- (a);
+    \draw [arrow] (a) -- (b);
+    \draw [arrow] (b) -- (c);
+    \draw [arrow] (c) -- node[above, sloped] {Non} (d);
+    \draw [arrow] (d) -- (end);
+    \draw [arrow] (c) -- node[right, yshift=0.2cm] {Oui} (e);
+    \draw [arrow] (e) -- (f);
+    \draw [arrow] (f) -- node[above, sloped] {Oui} (g);
+    \draw [arrow] (g) -- (h);
+    \draw [arrow] (h) -- (end);
+    \draw [arrow] (f) -- node[right, yshift=0.2cm] {Non} (i);
+    \draw [arrow] (i) -- (j);
+    \draw [arrow] (j) -- (k);
+    \draw [arrow] (k) -- (l);
+    \draw [arrow] (l) -- (m);
+    \draw [arrow] (m) -- node[above, sloped] {Non} (n);
+    \draw [arrow] (n) -- (k);
+    \draw [arrow] (m) -- node[right, yshift=0.2cm] {Oui} (o);
+    \draw [arrow] (o) -- (p);
+    \draw [arrow] (p) -- (q);
+    \draw [arrow] (q) -- (r);
+    \draw [arrow] (r) -- (end);
+    
+\end{tikzpicture}
+\caption{Processus de paiement}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\textwidth}
+\centering
+\begin{tikzpicture}[node distance=3.5cm, auto, scale=0.35, transform shape]
+    % Style des nœuds
+    \tikzstyle{start} = [ellipse, draw, fill=green!20, text width=1.8cm, text centered, minimum height=0.7cm]
+    \tikzstyle{end} = [ellipse, draw, fill=red!20, text width=1.8cm, text centered, minimum height=0.7cm]
+    \tikzstyle{process} = [rectangle, draw, fill=blue!20, text width=2.2cm, text centered, minimum height=0.7cm]
+    \tikzstyle{decision} = [diamond, draw, fill=yellow!20, text width=1.8cm, text centered, minimum height=0.7cm]
+    \tikzstyle{arrow} = [thick,->,>=stealth]
+    
+    % Nœuds - Colonne principale
+    \node (start) [start] {Début};
+    \node (a) [process, below of=start, yshift=-0.5cm] {Utilisateur sélectionne\\centre et type de logement};
+    \node (b) [process, below of=a, yshift=-0.5cm] {Utilisateur choisit\\les dates};
+    \node (c) [process, below of=b, yshift=-0.5cm] {Récupérer toutes les\\réservations existantes};
+    \node (d) [process, below of=c, yshift=-0.5cm] {Filtrer les réservations\\par centre et type};
+    \node (e) [process, below of=d, yshift=-0.5cm] {Vérifier les conflits\\de dates};
+    \node (f) [decision, below of=e, yshift=-0.5cm] {Conflit détecté ?};
+    \node (g) [process, below of=f, yshift=-0.5cm] {Calculer les créneaux\\disponibles};
+    \node (h) [decision, below of=g, yshift=-0.5cm] {Y a-t-il des\\créneaux libres ?};
+    \node (j) [process, below of=h, yshift=-0.5cm] {Retourner :\\Disponible avec créneaux};
+    
+    % Nœuds - Branches latérales
+    \node (i) [process, left of=h, xshift=-3cm] {Retourner :\\Non disponible};
+    \node (k) [process, right of=f, xshift=3cm] {Retourner :\\Totalement disponible};
+    \node (end) [end, below of=i, yshift=-1cm] {Fin};
+    
+    % Flèches principales
+    \draw [arrow] (start) -- (a);
+    \draw [arrow] (a) -- (b);
+    \draw [arrow] (b) -- (c);
+    \draw [arrow] (c) -- (d);
+    \draw [arrow] (d) -- (e);
+    \draw [arrow] (e) -- (f);
+    \draw [arrow] (f) -- node[right, yshift=0.2cm] {Oui} (g);
+    \draw [arrow] (g) -- (h);
+    \draw [arrow] (h) -- node[above, sloped] {Non} (i);
+    \draw [arrow] (h) -- node[right, yshift=0.2cm] {Oui} (j);
+    \draw [arrow] (f) -- node[above, sloped] {Non} (k);
+    \draw [arrow] (i) -- (end);
+    \draw [arrow] (j) -- (end);
+    \draw [arrow] (k) -- (end);
+    
+\end{tikzpicture}
+\caption{Processus de vérification de disponibilité}
+\end{minipage}
+\end{figure}
+
+\section{Points de Contrôle et Validation}
+
+\subsection{Validations Temporelles}
+\begin{itemize}
+    \item \textbf{Réservations} : Minimum 10 jours à l'avance
+    \item \textbf{Paiement} : Maximum 24h après création
+    \item \textbf{Codes SMS} : Expiration après 10 minutes
+\end{itemize}
+
+\subsection{Validations de Capacité}
+\begin{itemize}
+    \item \textbf{Logements} : Nombre de personnes ≤ capacité maximale
+    \item \textbf{Centres} : Vérification de l'activité du centre
+\end{itemize}
+
+\subsection{Validations de Données}
+\begin{itemize}
+    \item \textbf{Unicité} : CIN, matricule, numéro de téléphone
+    \item \textbf{Format} : Validation des formats de données
+    \item \textbf{Cohérence} : Dates de début < dates de fin
+\end{itemize}
+
+\section{Gestion des Erreurs}
+
+Chaque processus inclut des points de contrôle pour :
+\begin{itemize}
+    \item \textbf{Validation des données} : Vérification avant traitement
+    \item \textbf{Gestion des conflits} : Résolution des conflits de disponibilité
+    \item \textbf{Messages d'erreur} : Information claire à l'utilisateur
+    \item \textbf{Rollback} : Annulation des opérations en cas d'erreur
+\end{itemize}
+
+\section{Tableau des Processus}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|p{8cm}|}
+\hline
+\textbf{Processus} & \textbf{Complexité} & \textbf{Description} \\
+\hline
+Inscription Utilisateur & Élevée & Processus multi-étapes avec validations \\
+\hline
+Création Réservation & Élevée & Vérifications multiples et calculs \\
+\hline
+Paiement & Moyenne & Validation et confirmation \\
+\hline
+Vérification Disponibilité & Moyenne & Calculs de conflits temporels \\
+\hline
+Annulation & Faible & Mise à jour de statut simple \\
+\hline
+Envoi SMS & Faible & Appel API externe \\
+\hline
+\end{tabular}
+\caption{Complexité des processus métier}
+\end{table}
+
+Ces diagrammes d'activité fournissent une vue détaillée des flux de processus du système COSONE, facilitant la compréhension et l'implémentation des fonctionnalités.
+
+\end{document}

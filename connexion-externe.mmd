@@ -1,0 +1,23 @@
+flowchart TD
+    Start([Début]) --> A[Utilisateur externe accède à la page de connexion]
+    A --> B[Utilisateur sélectionne Connexion Externe]
+    B --> C[Utilisateur saisit le code d'authentification externe]
+    C --> D[Utilisateur saisit son prénom]
+    D --> E[Utilisateur saisit son nom]
+    E --> F[Vérifier l'existence du code en base]
+    F --> G{Code trouvé ?}
+    G -->|Non| H[Afficher erreur - Code invalide]
+    H --> C
+    G -->|Oui| I{Code déjà utilisé ?}
+    I -->|Oui| J[Afficher erreur - Code déjà utilisé]
+    J --> C
+    I -->|Non| K[Vérifier la correspondance des noms]
+    K --> L{Noms correspondent ?}
+    L -->|Non| M[Afficher erreur - Code invalide ou nom incorrect]
+    M --> C
+    L -->|Oui| N[Marquer le code comme utilisé]
+    N --> O[Créer une session temporaire pour l'utilisateur externe]
+    O --> P[Assigner le rôle EXTERN]
+    P --> Q[Authentification automatique]
+    Q --> R[Redirection vers l'espace utilisateur externe]
+    R --> End([Fin])

@@ -1,0 +1,21 @@
+    <script th:src="@{/js/landing.js}"></script>
+    <script>
+        // Simple test script
+        console.log('Inline script executed!');
+        alert('Inline script works!');
+        
+        // Test if we can find elements
+        setTimeout(() => {
+            const sections = document.querySelectorAll('.content-section');
+            const menuLinks = document.querySelectorAll('.menu-link');
+            console.log('Inline script found:', sections.length, 'sections and', menuLinks.length, 'menu links');
+            
+            if (sections.length === 0) {
+                alert('NO SECTIONS FOUND in inline script!');
+            }
+            if (menuLinks.length === 0) {
+                alert('NO MENU LINKS FOUND in inline script!');
+            }
+        }, 1000);
+    </script>
+</body>

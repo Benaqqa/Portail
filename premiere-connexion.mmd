@@ -1,0 +1,20 @@
+flowchart TD
+    Start([Début]) --> A[Utilisateur interne accède à la page de connexion]
+    A --> B[Utilisateur sélectionne Connexion Interne]
+    B --> C[Utilisateur clique sur Première connexion]
+    C --> D[Utilisateur saisit son Matricule ou Num CIN]
+    D --> E[Vérifier l'existence de l'utilisateur en base]
+    E --> F{Utilisateur trouvé ?}
+    F -->|Non| G[Afficher erreur - Matricule ou Num CIN introuvable]
+    G --> D
+    F -->|Oui| H{Utilisateur a déjà un mot de passe ?}
+    H -->|Oui| I[Afficher erreur - Utilisateur a déjà un mot de passe]
+    I --> D
+    H -->|Non| J{Numéro de téléphone associé ?}
+    J -->|Non| K[Afficher erreur - Aucun numéro de téléphone associé]
+    K --> D
+    J -->|Oui| L[Générer un code SMS de vérification]
+    L --> M[Enregistrer le code en base avec expiration]
+    M --> N[Envoyer SMS avec le code]
+    N --> O[Rediriger vers la page de vérification SMS]
+    O --> End([Fin - Passe au processus de vérification SMS])

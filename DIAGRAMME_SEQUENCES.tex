@@ -1,0 +1,322 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows,positioning,shadows,decorations.pathmorphing}
+
+\geometry{margin=2.5cm}
+
+\lstset{
+    language=Java,
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{gray!10},
+    frame=single,
+    breaklines=true,
+    showstringspaces=false
+}
+
+\title{\textbf{Diagramme de Séquences - Projet COSONE}}
+\author{Étudiant en Stage}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Vue d'ensemble}
+
+Ce document présente les diagrammes de séquences du système COSONE, décrivant les interactions entre les différents composants pour les principales fonctionnalités.
+
+\section{Séquence d'Inscription Utilisateur}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[node distance=1.5cm, auto]
+    % Style des nœuds
+    \tikzstyle{actor} = [rectangle, draw, fill=blue!20, text width=2cm, text centered, minimum height=1cm, drop shadow]
+    \tikzstyle{component} = [rectangle, draw, fill=green!20, text width=2.5cm, text centered, minimum height=1cm, drop shadow]
+    \tikzstyle{arrow} = [thick,->,>=stealth]
+    \tikzstyle{response} = [thick,<-,>=stealth, dashed]
+    
+    % Acteurs et composants
+    \node (user) [actor] {Utilisateur};
+    \node (browser) [component, right of=user, xshift=1cm] {Web Browser};
+    \node (authController) [component, right of=browser, xshift=1cm] {AuthController};
+    \node (externAuthRepo) [component, right of=authController, xshift=1cm] {ExternAuthCode\\Repository};
+    \node (userRepo) [component, right of=externAuthRepo, xshift=1cm] {UserRepository};
+    \node (smsService) [component, below of=userRepo, yshift=-1cm] {SmsService};
+    \node (phoneVerifRepo) [component, left of=smsService, xshift=-1cm] {PhoneVerification\\Repository};
+    
+    % Interactions
+    \draw [arrow] (user) -- node[above] {1. Accède à la page d'inscription} (browser);
+    \draw [arrow] (browser) -- node[above] {2. GET /register} (authController);
+    \draw [response] (authController) -- node[below] {3. Afficher formulaire} (browser);
+    \draw [arrow] (browser) -- node[above] {4. POST /register (code, infos)} (authController);
+    \draw [arrow] (authController) -- node[above] {5. findByCodeAndUsedFalse(code)} (externAuthRepo);
+    \draw [response] (externAuthRepo) -- node[below] {6. Code trouvé} (authController);
+    \draw [arrow] (authController) -- node[above] {7. marquerCodeCommeUtilise(code)} (externAuthRepo);
+    \draw [arrow] (authController) -- node[above] {8. findByUsername(username)} (userRepo);
+    \draw [response] (userRepo) -- node[below] {9. Utilisateur non trouvé} (authController);
+    \draw [arrow] (authController) -- node[above] {10. save(nouvelUtilisateur)} (userRepo);
+    \draw [response] (userRepo) -- node[below] {11. Utilisateur créé} (authController);
+    \draw [arrow] (authController) -- node[above] {12. genererCodeVerification()} (smsService);
+    \draw [response] (smsService) -- node[below] {13. Code généré} (authController);
+    \draw [arrow] (authController) -- node[above] {14. save(codeVerification)} (phoneVerifRepo);
+    \draw [response] (phoneVerifRepo) -- node[below] {15. Code sauvegardé} (authController);
+    \draw [arrow] (authController) -- node[above] {16. envoyerSms(phone, code)} (smsService);
+    \draw [response] (smsService) -- node[below] {17. SMS envoyé} (authController);
+    \draw [arrow] (authController) -- node[above] {18. Redirection vers vérification SMS} (browser);
+    \draw [response] (browser) -- node[below] {19. Afficher page de vérification} (user);
+    
+\end{tikzpicture}
+\caption{Séquence d'inscription utilisateur}
+\end{figure}
+
+\section{Séquence de Création de Réservation}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[node distance=1.2cm, auto]
+    % Style des nœuds
+    \tikzstyle{actor} = [rectangle, draw, fill=blue!20, text width=2cm, text centered, minimum height=1cm, drop shadow]
+    \tikzstyle{component} = [rectangle, draw, fill=green!20, text width=2.2cm, text centered, minimum height=1cm, drop shadow]
+    \tikzstyle{arrow} = [thick,->,>=stealth]
+    \tikzstyle{response} = [thick,<-,>=stealth, dashed]
+    
+    % Acteurs et composants
+    \node (user) [actor] {Utilisateur};
+    \node (browser) [component, right of=user, xshift=0.8cm] {Web Browser};
+    \node (resController) [component, right of=browser, xshift=0.8cm] {Reservation\\Controller};
+    \node (centreRepo) [component, right of=resController, xshift=0.8cm] {Centre\\Repository};
+    \node (typeRepo) [component, right of=centreRepo, xshift=0.8cm] {TypeLogement\\Repository};
+    \node (resService) [component, below of=resController, yshift=-1cm] {Reservation\\Service};
+    \node (resRepo) [component, right of=resService, xshift=1.5cm] {Reservation\\Repository};
+    
+    % Interactions
+    \draw [arrow] (user) -- node[above] {1. Accède à la page de réservation} (browser);
+    \draw [arrow] (browser) -- node[above] {2. GET /reservation} (resController);
+    \draw [arrow] (resController) -- node[above] {3. findByActifTrueOrderByNom()} (centreRepo);
+    \draw [response] (centreRepo) -- node[below] {4. Liste des centres} (resController);
+    \draw [arrow] (resController) -- node[above] {5. findByActifTrueOrderByNom()} (typeRepo);
+    \draw [response] (typeRepo) -- node[below] {6. Liste des types} (resController);
+    \draw [response] (resController) -- node[below] {7. Afficher formulaire} (browser);
+    \draw [response] (browser) -- node[below] {8. Afficher centres et types} (user);
+    \draw [arrow] (user) -- node[above] {9. Remplit le formulaire} (browser);
+    \draw [arrow] (browser) -- node[above] {10. POST /reservation/creer} (resController);
+    \draw [arrow] (resController) -- node[above] {11. findById(centreId)} (centreRepo);
+    \draw [response] (centreRepo) -- node[below] {12. Centre trouvé} (resController);
+    \draw [arrow] (resController) -- node[above] {13. findById(typeId)} (typeRepo);
+    \draw [response] (typeRepo) -- node[below] {14. Type trouvé} (resController);
+    \draw [arrow] (resController) -- node[above] {15. estDisponible(reservation)} (resService);
+    \draw [arrow] (resService) -- node[above] {16. findByCentreAndType()} (resRepo);
+    \draw [response] (resRepo) -- node[below] {17. Réservations existantes} (resService);
+    \draw [response] (resService) -- node[below] {18. Disponible} (resController);
+    \draw [arrow] (resController) -- node[above] {19. creerReservation()} (resService);
+    \draw [arrow] (resService) -- node[above] {20. save(reservation)} (resRepo);
+    \draw [response] (resRepo) -- node[below] {21. Réservation créée} (resService);
+    \draw [response] (resService) -- node[below] {22. Réservation sauvegardée} (resController);
+    \draw [arrow] (resController) -- node[above] {23. Redirection vers confirmation} (browser);
+    \draw [response] (browser) -- node[below] {24. Afficher page de confirmation} (user);
+    
+\end{tikzpicture}
+\caption{Séquence de création de réservation}
+\end{figure}
+
+\section{Séquence de Confirmation de Paiement}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[node distance=1.2cm, auto]
+    % Style des nœuds
+    \tikzstyle{actor} = [rectangle, draw, fill=blue!20, text width=2cm, text centered, minimum height=1cm, drop shadow]
+    \tikzstyle{component} = [rectangle, draw, fill=green!20, text width=2.5cm, text centered, minimum height=1cm, drop shadow]
+    \tikzstyle{arrow} = [thick,->,>=stealth]
+    \tikzstyle{response} = [thick,<-,>=stealth, dashed]
+    
+    % Acteurs et composants
+    \node (user) [actor] {Utilisateur};
+    \node (browser) [component, right of=user, xshift=1cm] {Web Browser};
+    \node (resController) [component, right of=browser, xshift=1cm] {Reservation\\Controller};
+    \node (resRepo) [component, right of=resController, xshift=1cm] {Reservation\\Repository};
+    \node (resService) [component, below of=resController, yshift=-1cm] {Reservation\\Service};
+    \node (emailService) [component, right of=resService, xshift=1cm] {EmailService};
+    
+    % Interactions
+    \draw [arrow] (user) -- node[above] {1. Accède à la confirmation} (browser);
+    \draw [arrow] (browser) -- node[above] {2. GET /reservation/confirmation/{id}} (resController);
+    \draw [arrow] (resController) -- node[above] {3. findById(id)} (resRepo);
+    \draw [response] (resRepo) -- node[below] {4. Réservation trouvée} (resController);
+    \draw [response] (resController) -- node[below] {5. Afficher détails et options} (browser);
+    \draw [response] (browser) -- node[below] {6. Afficher formulaire de paiement} (user);
+    \draw [arrow] (user) -- node[above] {7. Saisit méthode et référence} (browser);
+    \draw [arrow] (browser) -- node[above] {8. POST /reservation/paiement/{id}} (resController);
+    \draw [arrow] (resController) -- node[above] {9. confirmerPaiement(id, methode, ref)} (resService);
+    \draw [arrow] (resService) -- node[above] {10. findById(id)} (resRepo);
+    \draw [response] (resRepo) -- node[below] {11. Réservation trouvée} (resService);
+    \draw [arrow] (resService) -- node[above] {12. updateStatutEtPaiement()} (resRepo);
+    \draw [response] (resRepo) -- node[below] {13. Réservation mise à jour} (resService);
+    \draw [response] (resService) -- node[below] {14. Paiement confirmé} (resController);
+    \draw [arrow] (resController) -- node[above] {15. envoyerConfirmationPaiement()} (emailService);
+    \draw [response] (emailService) -- node[below] {16. Email envoyé} (resController);
+    \draw [arrow] (resController) -- node[above] {17. Redirection vers confirmation} (browser);
+    \draw [response] (browser) -- node[below] {18. Afficher confirmation de paiement} (user);
+    
+\end{tikzpicture}
+\caption{Séquence de confirmation de paiement}
+\end{figure}
+
+\section{Séquence de Connexion Utilisateur}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[node distance=1.5cm, auto]
+    % Style des nœuds
+    \tikzstyle{actor} = [rectangle, draw, fill=blue!20, text width=2cm, text centered, minimum height=1cm, drop shadow]
+    \tikzstyle{component} = [rectangle, draw, fill=green!20, text width=2.5cm, text centered, minimum height=1cm, drop shadow]
+    \tikzstyle{arrow} = [thick,->,>=stealth]
+    \tikzstyle{response} = [thick,<-,>=stealth, dashed]
+    
+    % Acteurs et composants
+    \node (user) [actor] {Utilisateur};
+    \node (browser) [component, right of=user, xshift=1cm] {Web Browser};
+    \node (authController) [component, right of=browser, xshift=1cm] {AuthController};
+    \node (userRepo) [component, right of=authController, xshift=1cm] {UserRepository};
+    \node (securityContext) [component, right of=userRepo, xshift=1cm] {SecurityContext};
+    
+    % Interactions
+    \draw [arrow] (user) -- node[above] {1. Accède à la page de connexion} (browser);
+    \draw [arrow] (browser) -- node[above] {2. GET /login} (authController);
+    \draw [response] (authController) -- node[below] {3. Afficher formulaire} (browser);
+    \draw [response] (browser) -- node[below] {4. Afficher formulaire} (user);
+    \draw [arrow] (user) -- node[above] {5. Saisit username et password} (browser);
+    \draw [arrow] (browser) -- node[above] {6. POST /login (username, password)} (authController);
+    \draw [arrow] (authController) -- node[above] {7. findByUsername(username)} (userRepo);
+    \draw [response] (userRepo) -- node[below] {8. Utilisateur trouvé} (authController);
+    \draw [arrow] (authController) -- node[above] {9. verifierMotDePasse()} (authController);
+    \draw [arrow] (authController) -- node[above] {10. setAuthentication(utilisateur)} (securityContext);
+    \draw [response] (securityContext) -- node[below] {11. Utilisateur authentifié} (authController);
+    \draw [arrow] (authController) -- node[above] {12. Redirection vers page d'accueil} (browser);
+    \draw [response] (browser) -- node[below] {13. Afficher page d'accueil connecté} (user);
+    
+\end{tikzpicture}
+\caption{Séquence de connexion utilisateur}
+\end{figure}
+
+\section{Séquence d'Envoi de SMS}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[node distance=1.5cm, auto]
+    % Style des nœuds
+    \tikzstyle{component} = [rectangle, draw, fill=green!20, text width=2.5cm, text centered, minimum height=1cm, drop shadow]
+    \tikzstyle{external} = [rectangle, draw, fill=orange!20, text width=2.5cm, text centered, minimum height=1cm, drop shadow]
+    \tikzstyle{arrow} = [thick,->,>=stealth]
+    \tikzstyle{response} = [thick,<-,>=stealth, dashed]
+    
+    % Composants
+    \node (smsService) [component] {SmsService};
+    \node (phoneVerifRepo) [component, right of=smsService, xshift=2cm] {PhoneVerification\\Repository};
+    \node (apiSms) [external, right of=phoneVerifRepo, xshift=2cm] {API SMS\\Externe};
+    
+    % Interactions
+    \draw [arrow] (smsService) -- node[above] {1. genererCodeVerification()} (smsService);
+    \draw [arrow] (smsService) -- node[above] {2. save(codeVerification)} (phoneVerifRepo);
+    \draw [response] (phoneVerifRepo) -- node[below] {3. Code sauvegardé} (smsService);
+    \draw [arrow] (smsService) -- node[above] {4. formaterMessageSMS()} (smsService);
+    \draw [arrow] (smsService) -- node[above] {5. envoyerSMS(phone, message)} (apiSms);
+    \draw [response] (apiSms) -- node[below] {6. Statut envoi} (smsService);
+    \draw [arrow] (smsService) -- node[above] {7. loggerSucces() ou loggerErreur()} (smsService);
+    
+\end{tikzpicture}
+\caption{Séquence d'envoi de SMS}
+\end{figure}
+
+\section{Points Clés des Interactions}
+
+\subsection{Gestion des Erreurs}
+Chaque interaction inclut des vérifications de validité :
+\begin{itemize}
+    \item Les erreurs sont propagées avec des messages explicites
+    \item Les rollbacks sont effectués en cas d'échec
+    \item Validation des données à chaque étape
+\end{itemize}
+
+\subsection{Sécurité}
+\begin{itemize}
+    \item Authentification requise pour les opérations sensibles
+    \item Validation des données à chaque étape
+    \item Gestion des sessions utilisateur
+    \item Protection CSRF activée
+\end{itemize}
+
+\subsection{Performance}
+\begin{itemize}
+    \item Utilisation de repositories pour l'accès aux données
+    \item Mise en cache des données fréquemment utilisées
+    \item Optimisation des requêtes de base de données
+    \item Chargement paresseux des relations
+\end{itemize}
+
+\subsection{Traçabilité}
+\begin{itemize}
+    \item Logging des opérations importantes
+    \item Suivi des modifications d'état
+    \item Historique des actions utilisateur
+    \item Audit trail complet
+\end{itemize}
+
+\section{Tableau des Séquences}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|p{6cm}|}
+\hline
+\textbf{Séquence} & \textbf{Complexité} & \textbf{Composants Impliqués} \\
+\hline
+Inscription Utilisateur & Élevée & AuthController, UserRepository, SmsService \\
+\hline
+Création Réservation & Élevée & ReservationController, ReservationService, Repositories \\
+\hline
+Confirmation Paiement & Moyenne & ReservationController, ReservationService, EmailService \\
+\hline
+Connexion Utilisateur & Faible & AuthController, UserRepository, SecurityContext \\
+\hline
+Envoi SMS & Faible & SmsService, API Externe \\
+\hline
+Vérification Disponibilité & Moyenne & ReservationService, Repositories \\
+\hline
+\end{tabular}
+\caption{Complexité des séquences d'interaction}
+\end{table}
+
+\section{Patterns d'Interaction}
+
+\subsection{Pattern MVC}
+\begin{itemize}
+    \item \textbf{Controller} : Gère les requêtes HTTP
+    \item \textbf{Service} : Contient la logique métier
+    \item \textbf{Repository} : Accède aux données
+\end{itemize}
+
+\subsection{Pattern Repository}
+Abstraction de l'accès aux données avec méthodes de requête personnalisées.
+
+\subsection{Pattern Service Layer}
+Couche de service pour isoler la logique métier des contrôleurs.
+
+\subsection{Pattern Dependency Injection}
+Injection automatique des dépendances par Spring Framework.
+
+Ces diagrammes de séquences fournissent une vue détaillée des interactions entre les composants du système COSONE, facilitant la compréhension du flux de données et des opérations.
+
+\end{document}

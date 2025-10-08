@@ -1,0 +1,16 @@
+flowchart TD
+    Start([Début]) --> A[Utilisateur arrive sur la page de vérification SMS]
+    A --> B[Utilisateur saisit le code SMS reçu]
+    B --> C{Code SMS valide et non expiré ?}
+    C -->|Non| D[Afficher erreur - Code invalide ou expiré]
+    D --> B
+    C -->|Oui| E[Rediriger vers la création de mot de passe]
+    E --> F[Utilisateur crée son mot de passe]
+    F --> G[Valider la force du mot de passe]
+    G --> H{Mot de passe valide ?}
+    H -->|Non| I[Afficher erreur de validation]
+    I --> F
+    H -->|Oui| J[Enregistrer le mot de passe en base]
+    J --> K[Connexion automatique réussie]
+    K --> L[Redirection vers l'espace utilisateur]
+    L --> End([Fin])

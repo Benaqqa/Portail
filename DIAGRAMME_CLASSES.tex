@@ -1,0 +1,317 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows,positioning,shadows}
+
+\geometry{margin=2.5cm}
+
+\lstset{
+    language=Java,
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{gray!10},
+    frame=single,
+    breaklines=true,
+    showstringspaces=false
+}
+
+\title{\textbf{Diagramme de Classes - Projet COSONE}}
+\author{Étudiant en Stage}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Vue d'ensemble}
+
+Ce diagramme présente l'architecture des classes du système COSONE, montrant les entités, contrôleurs, services et repositories avec leurs relations.
+
+\section{Diagramme de Classes UML}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[node distance=1.5cm, auto]
+    % Style des nœuds
+    \tikzstyle{class} = [rectangle, draw, fill=blue!20, text width=4cm, text centered, minimum height=1.5cm, drop shadow]
+    \tikzstyle{enum} = [rectangle, draw, fill=green!20, text width=3cm, text centered, minimum height=1cm, drop shadow]
+    \tikzstyle{controller} = [rectangle, draw, fill=orange!20, text width=3.5cm, text centered, minimum height=1.2cm, drop shadow]
+    \tikzstyle{service} = [rectangle, draw, fill=yellow!20, text width=3cm, text centered, minimum height=1cm, drop shadow]
+    \tikzstyle{repository} = [rectangle, draw, fill=purple!20, text width=3cm, text centered, minimum height=1cm, drop shadow]
+    \tikzstyle{arrow} = [thick,->,>=stealth]
+    \tikzstyle{relation} = [thick,<->,>=stealth]
+    
+    % Entités principales
+    \node (user) [class] {\textbf{User}\\\textit{-id: Long}\\\textit{-username: String}\\\textit{-password: String}\\\textit{-numCin: String}\\\textit{-matricule: String}\\\textit{-phoneNumber: String}\\\textit{-role: String}};
+    
+    \node (reservation) [class, right of=user, xshift=4cm] {\textbf{Reservation}\\\textit{-id: Long}\\\textit{-matricule: String}\\\textit{-cin: String}\\\textit{-telephone: String}\\\textit{-email: String}\\\textit{-dateDebut: LocalDateTime}\\\textit{-dateFin: LocalDateTime}\\\textit{-centre: Centre}\\\textit{-typeLogement: TypeLogement}\\\textit{-nombrePersonnes: Integer}\\\textit{-statut: StatutReservation}};
+    
+    \node (centre) [class, below of=user, yshift=-2cm] {\textbf{Centre}\\\textit{-id: Long}\\\textit{-nom: String}\\\textit{-adresse: String}\\\textit{-ville: String}\\\textit{-telephone: String}\\\textit{-email: String}\\\textit{-description: String}\\\textit{-actif: Boolean}};
+    
+    \node (typeLogement) [class, right of=centre, xshift=4cm] {\textbf{TypeLogement}\\\textit{-id: Long}\\\textit{-nom: String}\\\textit{-description: String}\\\textit{-capaciteMax: Integer}\\\textit{-prixParNuit: Double}\\\textit{-actif: Boolean}};
+    
+    % Enums
+    \node (statut) [enum, below of=reservation, yshift=-2cm] {\textbf{StatutReservation}\\\textit{EN\_ATTENTE\_PAIEMENT}\\\textit{PAYEE}\\\textit{CONFIRMEE}\\\textit{ANNULEE}\\\textit{EXPIREE}};
+    
+    \node (methode) [enum, right of=statut, xshift=3cm] {\textbf{MethodePaiement}\\\textit{CARTE\_BANCAIRE}\\\textit{VIREMENT}\\\textit{ESPECES}\\\textit{CHEQUE}\\\textit{MOBILE\_MONEY}\\\textit{AUTRE}};
+    
+    % Contrôleurs
+    \node (homeController) [controller, below of=centre, yshift=-3cm] {\textbf{HomeController}\\\textit{-homeContentService}\\\textit{-centresCsvService}\\\textit{+root(): String}\\\textit{+home(): String}\\\textit{+landing(): String}};
+    
+    \node (authController) [controller, right of=homeController, xshift=4cm] {\textbf{AuthController}\\\textit{-userRepository}\\\textit{-externAuthCodeRepository}\\\textit{-smsService}\\\textit{+showLogin(): String}\\\textit{+register(): String}\\\textit{+verifyPhone(): String}};
+    
+    \node (reservationController) [controller, below of=homeController, yshift=-2cm] {\textbf{ReservationController}\\\textit{-reservationService}\\\textit{-centreRepository}\\\textit{-typeLogementRepository}\\\textit{+afficherPageReservation(): String}\\\textit{+creerReservation(): String}\\\textit{+confirmerPaiement(): String}};
+    
+    % Services
+    \node (reservationService) [service, right of=reservationController, xshift=4cm] {\textbf{ReservationService}\\\textit{-reservationRepository}\\\textit{-centreRepository}\\\textit{+creerReservation(): Reservation}\\\textit{+confirmerPaiement(): Reservation}\\\textit{+estDisponible(): boolean}};
+    
+    \node (emailService) [service, below of=reservationService, yshift=-1.5cm] {\textbf{EmailService}\\\textit{+envoyerEmail(): void}\\\textit{+envoyerConfirmationReservation(): void}};
+    
+    \node (smsService) [service, left of=emailService, xshift=-3cm] {\textbf{SmsService}\\\textit{+envoyerSms(): void}\\\textit{+genererCodeVerification(): String}};
+    
+    % Repositories
+    \node (userRepository) [repository, below of=homeController, yshift=-4cm] {\textbf{UserRepository}\\\textit{+findByUsername(): Optional<User>}\\\textit{+findByMatricule(): Optional<User>}\\\textit{+findByPhoneNumber(): Optional<User>}};
+    
+    \node (reservationRepository) [repository, right of=userRepository, xshift=3cm] {\textbf{ReservationRepository}\\\textit{+findByMatricule(): List<Reservation>}\\\textit{+findByStatut(): List<Reservation>}\\\textit{+findByDateDebutBetween(): List<Reservation>}};
+    
+    \node (centreRepository) [repository, right of=reservationRepository, xshift=3cm] {\textbf{CentreRepository}\\\textit{+findByActifTrueOrderByNom(): List<Centre>}\\\textit{+findByVille(): List<Centre>}};
+    
+    % Relations
+    \draw [relation] (reservation) -- (centre);
+    \draw [relation] (reservation) -- (typeLogement);
+    \draw [relation] (reservation) -- (statut);
+    \draw [relation] (reservation) -- (methode);
+    
+    \draw [arrow] (homeController) -- (userRepository);
+    \draw [arrow] (authController) -- (userRepository);
+    \draw [arrow] (reservationController) -- (reservationService);
+    \draw [arrow] (reservationService) -- (reservationRepository);
+    \draw [arrow] (reservationService) -- (centreRepository);
+    
+\end{tikzpicture}
+\caption{Diagramme de classes UML du système COSONE}
+\end{figure}
+
+\section{Description des Classes}
+
+\subsection{Entités (Model)}
+
+\subsubsection{User}
+Représente un utilisateur du système avec ses informations d'authentification.
+
+\begin{lstlisting}[caption=Classe User]
+@Entity
+@Table(name = "users")
+public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(nullable = false, unique = true)
+    private String username;
+    
+    @Column(nullable = true)
+    private String password;
+    
+    @Column(nullable = false, unique = true)
+    private String numCin;
+    
+    @Column(nullable = false, unique = true)
+    private String matricule;
+    
+    @Column(nullable = false, unique = true)
+    private String phoneNumber;
+    
+    @Column(nullable = false)
+    private String role = "USER";
+}
+\end{lstlisting}
+
+\subsubsection{Reservation}
+Entité centrale pour les réservations avec logique métier intégrée.
+
+\begin{lstlisting}[caption=Classe Reservation - Méthodes principales]
+public class Reservation {
+    // ... attributs ...
+    
+    public boolean isEnRetardPaiement() {
+        return LocalDateTime.now().isAfter(dateLimitePaiement) 
+               && statut == StatutReservation.EN_ATTENTE_PAIEMENT;
+    }
+    
+    public boolean peutEtreReservee() {
+        return dateDebut.isAfter(LocalDateTime.now().plusDays(10));
+    }
+    
+    public boolean estWeekend() {
+        int dayOfWeek = dateDebut.getDayOfWeek().getValue();
+        return dayOfWeek == 6 || dayOfWeek == 7;
+    }
+}
+\end{lstlisting}
+
+\subsubsection{Centre}
+Informations sur les centres de vacances.
+
+\subsubsection{TypeLogement}
+Types de logements disponibles avec tarification.
+
+\subsubsection{PersonneAccompagnement}
+Personnes accompagnant les réservations.
+
+\subsection{Enums}
+
+\subsubsection{StatutReservation}
+Statuts possibles d'une réservation.
+
+\begin{lstlisting}[caption=Enum StatutReservation]
+public enum StatutReservation {
+    EN_ATTENTE_PAIEMENT("En attente de paiement"),
+    PAYEE("Payée"),
+    CONFIRMEE("Confirmée"),
+    ANNULEE("Annulée"),
+    EXPIREE("Expirée");
+    
+    private final String libelle;
+    
+    public String getLibelle() {
+        return libelle;
+    }
+}
+\end{lstlisting}
+
+\subsubsection{MethodePaiement}
+Méthodes de paiement acceptées.
+
+\subsection{Contrôleurs (Controller)}
+
+\subsubsection{HomeController}
+Gestion de la page d'accueil et landing page.
+
+\subsubsection{AuthController}
+Authentification, inscription et vérification.
+
+\subsubsection{ReservationController}
+Gestion complète des réservations.
+
+\subsubsection{EspaceReservationController}
+Espace personnel des utilisateurs.
+
+\subsection{Services}
+
+\subsubsection{ReservationService}
+Logique métier des réservations.
+
+\begin{lstlisting}[caption=Service ReservationService - Méthodes principales]
+@Service
+public class ReservationService {
+    @Autowired
+    private ReservationRepository reservationRepository;
+    
+    public Reservation creerReservation(Reservation reservation) {
+        // Logique de création
+    }
+    
+    public boolean estDisponible(Reservation reservation) {
+        // Vérification de disponibilité
+    }
+    
+    public Double calculerPrixTotal(Reservation reservation) {
+        // Calcul du prix
+    }
+}
+\end{lstlisting}
+
+\subsubsection{EmailService}
+Envoi d'emails.
+
+\subsubsection{SmsService}
+Envoi de SMS.
+
+\subsubsection{WordPressService}
+Intégration WordPress.
+
+\subsection{Repositories}
+
+Interfaces JPA pour l'accès aux données avec méthodes de requête personnalisées.
+
+\begin{lstlisting}[caption=Repository UserRepository]
+@Repository
+public interface UserRepository extends JpaRepository<User, Long> {
+    Optional<User> findByUsername(String username);
+    Optional<User> findByMatricule(String matricule);
+    Optional<User> findByPhoneNumber(String phoneNumber);
+    Optional<User> findByNumCin(String numCin);
+}
+\end{lstlisting}
+
+\section{Relations entre Classes}
+
+\subsection{Relations d'Association}
+
+\begin{itemize}
+    \item \textbf{Reservation} $\rightarrow$ \textbf{Centre} (Many-to-One)
+    \item \textbf{Reservation} $\rightarrow$ \textbf{TypeLogement} (Many-to-One)
+    \item \textbf{Reservation} $\rightarrow$ \textbf{PersonneAccompagnement} (One-to-Many)
+    \item \textbf{Reservation} $\rightarrow$ \textbf{StatutReservation} (One-to-One)
+    \item \textbf{Reservation} $\rightarrow$ \textbf{MethodePaiement} (One-to-One)
+\end{itemize}
+
+\subsection{Relations de Dépendance}
+
+\begin{itemize}
+    \item \textbf{Controllers} $\rightarrow$ \textbf{Services}
+    \item \textbf{Services} $\rightarrow$ \textbf{Repositories}
+    \item \textbf{Repositories} $\rightarrow$ \textbf{Entities}
+\end{itemize}
+
+\section{Principes de Design}
+
+\subsection{Séparation des Responsabilités}
+Chaque classe a une responsabilité claire et bien définie :
+\begin{itemize}
+    \item \textbf{Entities} : Représentation des données
+    \item \textbf{Controllers} : Gestion des requêtes HTTP
+    \item \textbf{Services} : Logique métier
+    \item \textbf{Repositories} : Accès aux données
+\end{itemize}
+
+\subsection{Inversion de Dépendance}
+Les contrôleurs dépendent des services, pas des repositories directement.
+
+\subsection{Encapsulation}
+Données privées avec accesseurs publics pour contrôler l'accès.
+
+\subsection{Cohésion}
+Classes fortement cohésives avec des méthodes liées.
+
+\subsection{Couplage Faible}
+Dépendances minimisées entre les classes grâce à l'injection de dépendances Spring.
+
+\section{Patterns Utilisés}
+
+\subsection{Model-View-Controller (MVC)}
+Architecture claire séparant la logique métier, la présentation et le contrôle.
+
+\subsection{Repository Pattern}
+Abstraction de l'accès aux données.
+
+\subsection{Dependency Injection}
+Injection automatique des dépendances par Spring.
+
+\subsection{Service Layer Pattern}
+Couche de service pour la logique métier.
+
+Cette architecture respecte les bonnes pratiques de développement et facilite la maintenance et l'évolution du système.
+
+\end{document}

@@ -1,0 +1,202 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{booktabs}
+\usepackage{array}
+
+\geometry{margin=2.5cm}
+
+\lstset{
+    language=properties,
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{gray!10},
+    frame=single,
+    breaklines=true,
+    showstringspaces=false
+}
+
+\title{\textbf{Documentation CMS - Projet COSONE}}
+\author{Étudiant en Stage}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Vue d'ensemble du CMS}
+
+Le projet COSONE utilise \textbf{Spring Boot} comme framework principal avec \textbf{Thymeleaf} comme moteur de template pour la gestion de contenu et l'interface utilisateur.
+
+\section{Architecture du CMS}
+
+\subsection{Framework Principal : Spring Boot 3.5.4}
+
+\textbf{Spring Boot} est utilisé comme CMS backend avec les caractéristiques suivantes :
+\begin{itemize}
+    \item \textbf{Version} : 3.5.4
+    \item \textbf{Java} : Version 17
+    \item \textbf{Architecture} : MVC (Model-View-Controller)
+    \item \textbf{Injection de dépendances} : Automatique via annotations Spring
+\end{itemize}
+
+\subsection{Moteur de Template : Thymeleaf}
+
+\textbf{Thymeleaf} est utilisé pour la génération des pages web :
+\begin{itemize}
+    \item \textbf{Intégration} : \texttt{spring-boot-starter-thymeleaf}
+    \item \textbf{Encodage} : UTF-8
+    \item \textbf{Cache} : Désactivé en développement
+    \item \textbf{Templates} : Stockés dans \texttt{src/main/resources/templates/}
+\end{itemize}
+
+\subsection{Base de Données : PostgreSQL}
+
+\textbf{PostgreSQL} est utilisé comme SGBD :
+\begin{itemize}
+    \item \textbf{Driver} : \texttt{org.postgresql:postgresql}
+    \item \textbf{ORM} : JPA/Hibernate
+    \item \textbf{Configuration} : \texttt{spring.jpa.hibernate.ddl-auto=update}
+\end{itemize}
+
+\subsection{Sécurité : Spring Security}
+
+\textbf{Spring Security} gère l'authentification et l'autorisation :
+\begin{itemize}
+    \item \textbf{Authentification} : Basée sur les utilisateurs en base
+    \item \textbf{Rôles} : USER, ADMIN
+    \item \textbf{Protection} : CSRF activé
+\end{itemize}
+
+\section{Structure du CMS}
+
+\subsection{Modèles de Données (Entités)}
+
+\begin{enumerate}
+    \item \textbf{User} - Gestion des utilisateurs
+    \item \textbf{Reservation} - Gestion des réservations
+    \item \textbf{Centre} - Centres de vacances
+    \item \textbf{TypeLogement} - Types de logements disponibles
+    \item \textbf{PersonneAccompagnement} - Personnes accompagnant les réservations
+    \item \textbf{ExternAuthCode} - Codes d'authentification externe
+    \item \textbf{PhoneVerificationCode} - Codes de vérification SMS
+\end{enumerate}
+
+\subsection{Contrôleurs (Controllers)}
+
+\begin{enumerate}
+    \item \textbf{HomeController} - Page d'accueil et landing page
+    \item \textbf{AuthController} - Authentification et inscription
+    \item \textbf{ReservationController} - Gestion des réservations
+    \item \textbf{EspaceReservationController} - Espace personnel des utilisateurs
+\end{enumerate}
+
+\subsection{Services}
+
+\begin{enumerate}
+    \item \textbf{ReservationService} - Logique métier des réservations
+    \item \textbf{EmailService} - Envoi d'emails
+    \item \textbf{SmsService} - Envoi de SMS
+    \item \textbf{WordPressService} - Intégration WordPress
+    \item \textbf{HomeContentService} - Gestion du contenu de la page d'accueil
+\end{enumerate}
+
+\subsection{Repositories}
+
+Interface avec JPA pour l'accès aux données :
+\begin{itemize}
+    \item \textbf{UserRepository}
+    \item \textbf{ReservationRepository}
+    \item \textbf{CentreRepository}
+    \item \textbf{TypeLogementRepository}
+    \item \textbf{ExternAuthCodeRepository}
+    \item \textbf{PhoneVerificationCodeRepository}
+\end{itemize}
+
+\section{Fonctionnalités du CMS}
+
+\subsection{Gestion des Utilisateurs}
+\begin{itemize}
+    \item Inscription avec code d'authentification externe
+    \item Vérification par SMS
+    \item Gestion des rôles (USER/ADMIN)
+    \item Authentification sécurisée
+\end{itemize}
+
+\subsection{Gestion des Réservations}
+\begin{itemize}
+    \item Création de réservations
+    \item Gestion des statuts (EN\_ATTENTE\_PAIEMENT, PAYEE, CONFIRMEE, etc.)
+    \item Calcul automatique des prix
+    \item Vérification de disponibilité
+\end{itemize}
+
+\subsection{Gestion des Centres}
+\begin{itemize}
+    \item CRUD des centres de vacances
+    \item Import/Export CSV
+    \item Gestion des types de logements
+\end{itemize}
+
+\subsection{Intégration WordPress}
+\begin{itemize}
+    \item Récupération d'articles depuis WordPress
+    \item Affichage dynamique du contenu
+    \item API REST WordPress
+\end{itemize}
+
+\section{Configuration}
+
+\subsection{Fichier application.properties}
+
+\begin{lstlisting}[caption=Configuration de l'application]
+# Base de données
+spring.datasource.url=jdbc:postgresql://localhost:5432/cosone_db
+spring.datasource.username=postgres
+spring.datasource.password=12345678
+
+# JPA/Hibernate
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+
+# Thymeleaf
+spring.thymeleaf.encoding=UTF-8
+spring.thymeleaf.cache=false
+
+# WordPress API
+wordpress.api.url=https://moubarakmimo-barit.wordpress.com/
+wordpress.api.timeout=5000
+\end{lstlisting}
+
+\section{Avantages de cette Architecture}
+
+\begin{enumerate}
+    \item \textbf{Scalabilité} : Spring Boot permet une montée en charge facile
+    \item \textbf{Sécurité} : Spring Security offre une sécurité robuste
+    \item \textbf{Maintenabilité} : Architecture MVC claire et modulaire
+    \item \textbf{Flexibilité} : Thymeleaf permet des templates dynamiques
+    \item \textbf{Performance} : JPA/Hibernate optimise les requêtes
+    \item \textbf{Intégration} : Facile d'intégrer de nouveaux services
+\end{enumerate}
+
+\section{Technologies Utilisées}
+
+\begin{itemize}
+    \item \textbf{Backend} : Spring Boot 3.5.4, Spring Security, Spring Data JPA
+    \item \textbf{Frontend} : Thymeleaf, HTML5, CSS3, JavaScript
+    \item \textbf{Base de données} : PostgreSQL
+    \item \textbf{Build} : Maven
+    \item \textbf{Java} : Version 17
+\end{itemize}
+
+Cette architecture CMS moderne et robuste permet une gestion efficace du système de réservation COSONE avec une interface utilisateur intuitive et une sécurité renforcée.
+
+\end{document}

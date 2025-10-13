@@ -5,6 +5,7 @@ import com.cosone.cosone.service.ReservationService;
 import com.cosone.cosone.repository.CentreRepository;
 import com.cosone.cosone.repository.TypeLogementRepository;
 import com.cosone.cosone.repository.ReservationRepository;
+import com.cosone.cosone.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,6 +17,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/reservation")
@@ -32,6 +34,9 @@ public class ReservationController {
     
     @Autowired
     private ReservationRepository reservationRepository;
+    
+    @Autowired
+    private UserRepository userRepository;
     
     /**
      * Afficher la page principale de réservation
@@ -69,6 +74,22 @@ public class ReservationController {
                                    @RequestParam("typeLogementId") Long typeLogementId,
                                    RedirectAttributes redirectAttributes) {
         try {
+            // Récupérer l'utilisateur connecté
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getName())) {
+                redirectAttributes.addFlashAttribute("error", "Vous devez être connecté pour effectuer une réservation.");
+                return "redirect:/login";
+            }
+
+            String username = auth.getName();
+            Optional<User> userOpt = userRepository.findByUsername(username);
+            if (userOpt.isEmpty()) {
+                redirectAttributes.addFlashAttribute("error", "Utilisateur non trouvé.");
+                return "redirect:/login";
+            }
+
+            User user = userOpt.get();
+            
             // Parser les dates (format date seulement)
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
             LocalDateTime dateDebut = LocalDateTime.parse(dateDebutStr, formatter);
@@ -78,11 +99,23 @@ public class ReservationController {
             Centre centre = centreRepository.findById(centreId).orElseThrow();
             TypeLogement typeLogement = typeLogementRepository.findById(typeLogementId).orElseThrow();
             
-            // Configurer la réservation
+            // Configurer la réservation avec les informations de l'utilisateur
+            reservation.setMatricule(user.getMatricule());
+            reservation.setCin(user.getNumCin());
+            reservation.setTelephone(user.getPhoneNumber());
+            // Si l'email n'est pas fourni dans le formulaire, on peut utiliser un email par défaut
+            if (reservation.getEmail() == null || reservation.getEmail().isEmpty()) {
+                reservation.setEmail(user.getMatricule() + "@cosone.ma");
+            }
             reservation.setDateDebut(dateDebut);
             reservation.setDateFin(dateFin);
             reservation.setCentre(centre);
             reservation.setTypeLogement(typeLogement);
+            
+            // Calculer le prix total
+            long nombreNuits = java.time.temporal.ChronoUnit.DAYS.between(dateDebut, dateFin);
+            double prixTotal = nombreNuits * typeLogement.getPrixParNuit();
+            reservation.setPrixTotal(prixTotal);
             
             // Créer la réservation
             Reservation savedReservation = reservationService.creerReservation(reservation);
@@ -94,6 +127,7 @@ public class ReservationController {
             return "redirect:/reservation/confirmation/" + savedReservation.getId();
             
         } catch (Exception e) {
+            e.printStackTrace();
             redirectAttributes.addFlashAttribute("error", "Erreur lors de la création de la réservation: " + e.getMessage());
             return "redirect:/reservation";
         }

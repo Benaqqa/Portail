@@ -32,14 +32,19 @@
                         <div class="centres-grid">
                             <div th:if="${centres != null and !centres.isEmpty()}" th:each="centre : ${centres}" class="centre-card">
                                 <div class="centre-header">
-                                    <h4 th:text="${centre.nom}">Nom du Centre</h4>
-                                    <span class="centre-ville" th:text="${centre.ville}">Ville</span>
+                                    <h4 th:text="${centre['name']}">Nom du Centre</h4>
+                                    <span class="centre-ville" th:text="${centre['address']}">Ville</span>
                                 </div>
                                 <div class="centre-info">
-                                    <p th:text="${centre.description}">Description du centre</p>
+                                    <p th:text="${centre['description']}">Description du centre</p>
                                     <div class="centre-contact">
-                                        <span th:text="${centre.telephone}">Téléphone</span>
-                                        <span th:text="${centre.email}">Email</span>
+                                        <span th:if="${centre['phone'] != null}" th:text="${centre['phone']}">Téléphone</span>
+                                        <span th:if="${centre['website'] != null}">
+                                            <a th:href="${centre['website']}" target="_blank" th:text="${centre['website']}">Site web</a>
+                                        </span>
+                                    </div>
+                                    <div class="centre-rating" th:if="${centre['rating'] != null and centre['rating'] > 0}">
+                                        <span th:text="${centre['rating']} + '/5'">Rating</span>
                                     </div>
                                 </div>
                             </div>
@@ -63,13 +68,13 @@
                         <div class="logements-grid">
                             <div th:if="${typesLogement != null and !typesLogement.isEmpty()}" th:each="type : ${typesLogement}" class="logement-card">
                                 <div class="logement-header">
-                                    <h4 th:text="${type.nom}">Type de Logement</h4>
-                                    <span class="logement-capacite" th:text="'Max: ' + ${type.capaciteMax} + ' personnes'">Capacité</span>
+                                    <h4 th:text="${type['nom']}">Type de Logement</h4>
+                                    <span class="logement-capacite" th:text="'Max: ' + ${type['capacite']} + ' personnes'">Capacité</span>
                                 </div>
                                 <div class="logement-info">
-                                    <p th:text="${type.description}">Description du logement</p>
+                                    <p th:text="${type['description']}">Description du logement</p>
                                     <div class="logement-prix">
-                                        <span class="prix" th:text="${type.prixParNuit} + ' €/nuit'">Prix</span>
+                                        <span class="prix" th:text="${type['prix']} + ' €/nuit'">Prix</span>
                                     </div>
                                 </div>
                             </div>

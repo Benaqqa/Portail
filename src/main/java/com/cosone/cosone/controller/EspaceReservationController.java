@@ -5,18 +5,16 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import com.cosone.cosone.repository.CentreRepository;
-import com.cosone.cosone.repository.TypeLogementRepository;
+import com.cosone.cosone.service.CentresCsvService;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 public class EspaceReservationController {
 
     @Autowired
-    private CentreRepository centreRepository;
-    
-    @Autowired
-    private TypeLogementRepository typeLogementRepository;
+    private CentresCsvService centresCsvService;
 
     @GetMapping("/espace-reservation")
     public String afficherEspaceReservation(Model model) {
@@ -25,17 +23,41 @@ public class EspaceReservationController {
         System.out.println("=== DEBUG: Méthode afficherEspaceReservation exécutée ===");
         
         try {
-            // Récupérer tous les centres et types de logement
-            var centres = centreRepository.findByActifTrueOrderByNom();
-            var typesLogement = typeLogementRepository.findByActifTrueOrderByNom();
+            // Récupérer les centres depuis le fichier CSV
+            List<Map<String, Object>> centres = centresCsvService.loadCentresFromCsv();
             
             System.out.println("DEBUG: Nombre de centres trouvés: " + (centres != null ? centres.size() : "null"));
-            System.out.println("DEBUG: Nombre de types de logement trouvés: " + (typesLogement != null ? typesLogement.size() : "null"));
             
-            model.addAttribute("centres", centres);
+            model.addAttribute("centres", centres != null ? centres : new ArrayList<>());
+            
+            // Types de logement temporaires (à remplacer par des données réelles plus tard)
+            List<Map<String, String>> typesLogement = new ArrayList<>();
+            Map<String, String> type1 = Map.of(
+                "nom", "Studio",
+                "description", "Studio confortable pour 2 personnes",
+                "capacite", "2",
+                "prix", "150"
+            );
+            Map<String, String> type2 = Map.of(
+                "nom", "Appartement 2 pièces",
+                "description", "Appartement spacieux pour 4 personnes",
+                "capacite", "4",
+                "prix", "250"
+            );
+            Map<String, String> type3 = Map.of(
+                "nom", "Villa",
+                "description", "Villa de luxe pour 6 personnes",
+                "capacite", "6",
+                "prix", "400"
+            );
+            
+            typesLogement.add(type1);
+            typesLogement.add(type2);
+            typesLogement.add(type3);
+            
+            System.out.println("DEBUG: Nombre de types de logement: " + typesLogement.size());
+            
             model.addAttribute("typesLogement", typesLogement);
-            
-
             
         } catch (Exception e) {
             System.err.println("DEBUG: Erreur lors de la récupération des données: " + e.getMessage());

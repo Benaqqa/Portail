@@ -130,21 +130,109 @@ flowchart TD
     I --> J[Afficher le code généré à l'administrateur]
     J --> K[Administrateur communique le code à l'utilisateur externe]
     K --> End([Fin])
+    
+    %% Mixed layout using subgraphs
+    subgraph "Input Phase"
+        direction LR
+        A
+        B  
+        C
+    end
+    
+    subgraph "Processing Phase"
+        direction TB
+        D
+        E
+        F
+        G
+    end
+    
+    subgraph "Output Phase"
+        direction LR
+        H
+        I
+        J
+        K
+    end
 ```
 
 **Description :** Ce processus permet aux administrateurs de générer des codes d'authentification uniques pour les utilisateurs externes. Chaque code est associé à un prénom et nom spécifiques et ne peut être utilisé qu'une seule fois. L'administrateur doit communiquer le code et les informations associées à l'utilisateur externe.
 
-### 1.4 Comparaison des Processus d'Authentification
+### 1.4 Processus Unifié de Connexion - Diagramme de Séquence
 
-| Aspect | Utilisateurs Internes | Utilisateurs Externes |
-|--------|----------------------|----------------------|
-| **Identification** | Matricule ou Num CIN | Code d'authentification externe |
-| **Mot de passe** | Obligatoire (créé lors de la première connexion) | Non requis |
-| **Vérification SMS** | Oui (pour première connexion) | Non |
-| **Persistance** | Session permanente avec mot de passe | Session temporaire |
-| **Rôle système** | USER/ADMIN | EXTERN |
-| **Numéro téléphone** | Obligatoire | Non requis |
-| **Réutilisation** | Connexions multiples | Code à usage unique |
+```mermaid
+%%{init: {'sequence': {'width': 180, 'height': 65, 'messageFontSize': 12}}}%%
+sequenceDiagram
+    participant U as Utilisateur
+    participant S as Système
+    participant DB as Base de Données
+    participant SMS as Service SMS
+    
+    Note over U,SMS: Connexion Utilisateur Interne (Première fois)
+    U->>S: %%{wrap}%% Accède à la page de connexion
+    U->>S: %%{wrap}%% Sélectionne "Connexion Interne"
+    U->>S: %%{wrap}%% Clique "Première connexion"
+    U->>S: %%{wrap}%% Saisit Matricule/CIN
+    S->>DB: %%{wrap}%% Vérifie existence utilisateur
+    DB-->>S: %%{wrap}%% Utilisateur trouvé
+    S->>DB: %%{wrap}%% Vérifie absence de mot de passe
+    DB-->>S: %%{wrap}%% Pas de mot de passe
+    S->>DB: %%{wrap}%% Vérifie présence numéro téléphone
+    DB-->>S: %%{wrap}%% Numéro téléphone présent
+    S->>SMS: %%{wrap}%% Génère et envoie code SMS
+    SMS-->>U: %%{wrap}%% Code reçu par SMS
+    U->>S: %%{wrap}%% Saisit code SMS
+    S->>DB: %%{wrap}%% Valide code SMS
+    DB-->>S: %%{wrap}%% Code valide
+    S->>U: %%{wrap}%% Redirection page création mot de passe
+    U->>S: %%{wrap}%% Crée son mot de passe
+    S->>DB: %%{wrap}%% Enregistre mot de passe
+    S->>U: %%{wrap}%% Connexion automatique réussie
+    
+    Note over U,SMS: Connexion Utilisateur Interne (Régulière)
+    U->>S: %%{wrap}%% Accède à la page de connexion
+    U->>S: %%{wrap}%% Sélectionne "Connexion Interne"
+    U->>S: %%{wrap}%% Saisit Matricule/CIN + mot de passe
+    S->>DB: %%{wrap}%% Vérifie identifiants
+    DB-->>S: %%{wrap}%% Identifiants corrects
+    S->>U: %%{wrap}%% Connexion réussie
+    
+    Note over U,SMS: Connexion Utilisateur Externe
+    U->>S: %%{wrap}%% Accède à la page de connexion
+    U->>S: %%{wrap}%% Sélectionne "Connexion Externe"
+    U->>S: %%{wrap}%% Saisit code d'authentification externe
+    U->>S: %%{wrap}%% Saisit prénom et nom
+    S->>DB: %%{wrap}%% Vérifie code et noms
+    DB-->>S: %%{wrap}%% Code valide, noms correspondent
+    S->>DB: %%{wrap}%% Marque code comme utilisé
+    S->>U: %%{wrap}%% Crée session temporaire EXTERN
+    S->>U: %%{wrap}%% Connexion automatique réussie
+```
+
+### 1.5 Bilan du Processus d'Inscription et d'Authentification
+
+Le système COSONE implémente un processus d'inscription et d'authentification robuste qui distingue clairement deux types d'utilisateurs :
+
+**Utilisateurs Internes (Employés) :**
+- Processus d'inscription en trois étapes : première connexion, vérification SMS, création de mot de passe
+- Authentification permanente via matricule/CIN et mot de passe
+- Vérification SMS obligatoire lors de la première connexion
+- Sessions persistantes avec rôle USER/ADMIN
+- Numéro de téléphone obligatoire pour la vérification
+
+**Utilisateurs Externes :**
+- Authentification via codes d'authentification à usage unique générés par les administrateurs
+- Pas de mot de passe permanent requis
+- Processus simplifié : saisie du code + prénom/nom
+- Sessions temporaires avec rôle EXTERN
+- Codes générés et gérés par les administrateurs
+
+**Points Clés du Système :**
+- Séparation claire des rôles et permissions
+- Sécurité renforcée par la vérification SMS pour les utilisateurs internes
+- Flexibilité pour les utilisateurs externes via les codes temporaires
+- Gestion centralisée des codes externes par les administrateurs
+- Traçabilité complète des processus d'authentification
 | **Gestion** | Par l'employeur (base de données) | Par l'administrateur (codes générés) |
 
 **Règles de validation spécifiques :**
@@ -235,6 +323,81 @@ flowchart TD
 ```
 
 **Description :** Ce processus gère l'annulation des réservations en vérifiant les conditions d'annulation et en libérant les créneaux pour d'autres utilisateurs.
+
+### 2.4 Bilan du Processus de Réservation - Diagramme de Séquence (Version Simplifiée)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant U as Utilisateur
+    participant S as Système
+    participant BD as Base de Données
+    participant Email as Service Email
+
+    Note over U,Email: Phase 1 - Consultation
+    U->>S: Accède à la page de réservation
+    S->>BD: Récupère centres et types actifs
+    BD-->>S: Liste disponible
+    S-->>U: Affiche formulaire
+
+    Note over U,Email: Phase 2 - Sélection et Validation
+    U->>S: Sélectionne centre, type, dates, nb personnes
+    S->>BD: Vérifie disponibilité et capacité
+    BD-->>S: Résultat vérification
+    alt Non disponible
+        S-->>U: Message d'erreur
+    else Disponible
+        S->>S: Calcule prix total
+        S-->>U: Affiche récapitulatif et prix
+    end
+
+    Note over U,Email: Phase 3 - Création Réservation
+    U->>S: Ajoute accompagnants (optionnel)
+    U->>S: Confirme réservation
+    S->>BD: Crée réservation (statut: EN_ATTENTE_PAIEMENT)
+    S->>BD: Enregistre accompagnants
+    S->>BD: Définit date limite paiement (24h)
+    BD-->>S: Réservation créée
+    S->>Email: Envoie confirmation réservation
+    S-->>U: Affiche page confirmation
+
+    Note over U,Email: Phase 4 - Paiement
+    U->>S: Accède au paiement
+    U->>S: Saisit méthode et référence
+    S->>BD: Vérifie statut et date limite
+    alt Délai dépassé
+        S->>BD: Marque réservation EXPIREE
+        S-->>U: Erreur: Délai dépassé
+    else Dans les délais
+        S->>BD: Enregistre paiement (statut: PAYEE)
+        BD-->>S: Paiement confirmé
+        S->>Email: Envoie confirmation paiement
+        S-->>U: Paiement réussi
+    end
+
+    Note over U,Email: Phase 5 - Consultation
+    U->>S: Consulte ses réservations
+    S->>BD: Récupère réservations utilisateur
+    BD-->>S: Liste réservations
+    S-->>U: Affiche tableau de bord
+```
+
+**Description :** Version simplifiée du processus de réservation, regroupant les interactions par composants logiques pour une meilleure lisibilité.
+
+**Phases du Processus :**
+
+1. **Consultation** : Affichage des centres et types de logement disponibles
+2. **Sélection et Validation** : Vérification de disponibilité, capacité et calcul du prix
+3. **Création Réservation** : Enregistrement avec accompagnants, définition de la date limite (24h)
+4. **Paiement** : Validation du délai et confirmation du paiement
+5. **Consultation** : Accès à l'historique des réservations
+
+**Points Clés :**
+- **Statuts** : EN_ATTENTE_PAIEMENT → PAYEE ou EXPIREE
+- **Délai de paiement** : 24 heures maximum
+- **Validations** : Disponibilité, capacité, date limite
+- **Notifications** : Emails de confirmation à chaque étape clé
+- **Accompagnants** : Ajout optionnel avant confirmation
 
 ## 3. Processus de Paiement et Gestion Financière
 

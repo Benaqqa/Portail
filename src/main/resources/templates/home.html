@@ -8,443 +8,363 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
         }
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            background-color: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .welcome-section {
-            text-align: center;
-            margin-bottom: 30px;
             padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 10px;
         }
-        .welcome-section h1 {
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .header h1 {
+            color: #333;
             margin: 0 0 10px 0;
             font-size: 2.5em;
+            font-weight: 700;
         }
-        .welcome-section p {
+        .header p {
+            color: #666;
             margin: 0;
             font-size: 1.2em;
-            opacity: 0.9;
         }
-        .login-section {
-            text-align: center;
-            margin: 30px 0;
-            padding: 20px;
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            border: 2px dashed #dee2e6;
+        .user-welcome {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         }
-        .login-btn {
-            display: inline-block;
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-            color: white;
-            padding: 15px 30px;
-            text-decoration: none;
-            border-radius: 25px;
-            font-size: 1.1em;
-            font-weight: bold;
-            transition: transform 0.2s, box-shadow 0.2s;
-            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
-        }
-        .login-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
-            color: white;
-            text-decoration: none;
-        }
-        .content-section {
-            margin: 15px 0;
-            border-radius: 8px;
-            border: 1px solid #dee2e6;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-        .content-section-header {
-            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
-            color: white;
-            padding: 15px 20px;
-            cursor: pointer;
-            user-select: none;
-            transition: background 0.3s ease;
+        .user-info {
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
         }
-        .content-section-header:hover {
-            background: linear-gradient(135deg, #495057 0%, #343a40 100%);
-        }
-        .content-section-header h2 {
-            margin: 0;
+        .user-details h3 {
+            margin: 0 0 5px 0;
+            color: #333;
             font-size: 1.4em;
-            color: white;
         }
-        .content-section-header .expand-icon {
-            font-size: 1.2em;
+        .user-details p {
+            margin: 0;
+            color: #666;
+        }
+        .admin-badge {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .logout-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        .dashboard-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s ease;
         }
-        .content-section-header.expanded .expand-icon {
-            transform: rotate(180deg);
+        .dashboard-card:hover {
+            transform: translateY(-5px);
         }
-        .content-section-content {
-            background-color: #f8f9fa;
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.5s ease, padding 0.3s ease;
+        .dashboard-card h3 {
+            margin: 0 0 15px 0;
+            color: #333;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        .content-section-content.expanded {
-            max-height: 800px;
-            padding: 20px;
+        .dashboard-card p {
+            color: #666;
+            margin: 0 0 20px 0;
+            line-height: 1.6;
         }
-        .content-section-content p {
-            line-height: 1.5;
-            color: #495057;
-            margin-bottom: 12px;
-            font-size: 0.95em;
+        .dashboard-card a {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
         }
-        .content-section-content .placeholder {
-            background-color: #e9ecef;
-            padding: 15px;
-            border-radius: 6px;
-            text-align: center;
-            color: #6c757d;
-            font-style: italic;
-            border: 2px dashed #ced4da;
-            margin-bottom: 15px;
+        .dashboard-card a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            color: white;
+            text-decoration: none;
         }
-        .content-grid {
+        .admin-section {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        .admin-section h3 {
+            margin: 0 0 15px 0;
+            color: #333;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .admin-links {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 15px;
-            margin-top: 15px;
-        }
-        .content-card {
-            background-color: white;
-            padding: 15px;
-            border-radius: 6px;
-            border: 1px solid #dee2e6;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .content-card:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 3px 8px rgba(0,0,0,0.15);
-        }
-        .content-card h3 {
-            color: #495057;
-            margin-top: 0;
-            margin-bottom: 10px;
-            font-size: 1.1em;
-        }
-        .content-card p {
-            margin-bottom: 0;
-            font-size: 0.9em;
-        }
-        .admin-badge {
-            background-color: #6c757d;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 12px;
-            font-weight: bold;
-            margin-left: 10px;
-        }
-        .admin-section {
-            background-color: #f8f9fa;
-            border: 2px solid #6c757d;
-            border-radius: 8px;
-            padding: 15px;
-            margin: 20px 0;
-        }
-        .admin-section h3 {
-            color: #495057;
-            margin-top: 0;
         }
         .admin-link {
-            display: inline-block;
-            background-color: #6c757d;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
             color: white;
-            padding: 10px 15px;
+            padding: 15px 20px;
+            border-radius: 10px;
             text-decoration: none;
-            border-radius: 5px;
-            margin: 5px;
-            transition: background-color 0.2s;
+            font-weight: bold;
+            transition: all 0.3s ease;
         }
         .admin-link:hover {
-            background-color: #545b62;
-            color: white;
-            text-decoration: none;
-        }
-        .user-link {
-            display: inline-block;
-            background-color: #28a745;
-            color: white;
-            padding: 10px 15px;
-            text-decoration: none;
-            border-radius: 5px;
-            margin: 5px;
-            transition: background-color 0.2s;
-        }
-        .user-link:hover {
-            background-color: #218838;
-            color: white;
-            text-decoration: none;
-        }
-        .logout-link {
-            display: inline-block;
-            background-color: #dc3545;
-            color: white;
-            padding: 10px 15px;
-            text-decoration: none;
-            border-radius: 5px;
-            margin: 5px;
-            transition: background-color 0.2s;
-        }
-        .logout-link:hover {
-            background-color: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
             color: white;
             text-decoration: none;
         }
         .message {
+            background: rgba(40, 167, 69, 0.1);
+            border: 1px solid rgba(40, 167, 69, 0.3);
+            color: #155724;
             padding: 15px;
-            margin: 20px 0;
-            border-radius: 8px;
+            border-radius: 10px;
+            margin-bottom: 20px;
             text-align: center;
         }
-        .success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+        .stats {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
         }
-        .user-info {
-            background-color: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
+        .stats h3 {
+            margin: 0 0 20px 0;
+            color: #333;
+            font-size: 1.3em;
+        }
+        .stat-item {
+            display: inline-block;
+            margin: 10px 20px;
             padding: 15px;
-            margin: 20px 0;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 10px;
+            min-width: 120px;
         }
-        .user-info h3 {
-            margin-top: 0;
-            color: #495057;
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            display: block;
         }
-        .wordpress-note {
-            background-color: #fff3cd;
-            border: 1px solid #ffeaa7;
-            border-radius: 8px;
-            padding: 15px;
-            margin: 20px 0;
-            color: #856404;
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
         }
-        .wordpress-note strong {
-            color: #533f03;
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            .header h1 {
+                font-size: 2em;
+            }
+            .user-info {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            .admin-links {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="welcome-section">
-            <h1>Bienvenue sur COSONE</h1>
-            <p>Votre plateforme de gestion et de réservation</p>
+        <!-- Header -->
+        <div class="header">
+            <h1><i class="fas fa-home"></i> Tableau de bord COSONE</h1>
+            <p>Votre espace personnel de gestion</p>
         </div>
 
         <!-- Logout Message -->
-        <div th:if="${message}" class="message success">
+        <div th:if="${message}" class="message">
             <p th:text="${message}"></p>
         </div>
 
-        <!-- Authenticated User Content -->
-        <div th:if="${isAuthenticated}">
+        <!-- User Welcome Section -->
+        <div class="user-welcome">
             <div class="user-info">
-                <h3>Informations de l'utilisateur</h3>
-                <p>
-                    M./Mme : <strong><span th:text="${username}"></span></strong>
-                    <span th:if="${isAdmin}" class="admin-badge">ADMIN</span>
-                </p>
+                <div class="user-details">
+                    <h3 th:if="${isAuthenticated}">
+                        <i class="fas fa-user"></i>
+                        Bienvenue, <span th:text="${userFullName ?: username}">Utilisateur</span>
+                        <span th:if="${isAdmin}" class="admin-badge">ADMIN</span>
+                    </h3>
+                    <p th:if="${isAuthenticated}">
+                        <i class="fas fa-clock"></i>
+                        Dernière connexion : <span th:text="${#dates.format(#dates.createNow(), 'dd/MM/yyyy à HH:mm')}">Aujourd'hui</span>
+                    </p>
+                </div>
+                <a href="/logout" class="logout-btn" th:if="${isAuthenticated}">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Se déconnecter
+                </a>
             </div>
+        </div>
 
-            <!-- Admin Section - Only visible to admins -->
-            <div th:if="${isAdmin}" class="admin-section">
-                <h3>Panneau d'Administration</h3>
-                <p>Vous êtes connecté en tant qu'<strong>Administrateur</strong>. Vous avez accès aux fonctions administratives.</p>
+        <!-- Dashboard for Regular Users -->
+        <div th:if="${isAuthenticated and not isAdmin}">
+            <div class="dashboard">
+                <div class="dashboard-card">
+                    <h3><i class="fas fa-calendar-check"></i> Espace Réservation</h3>
+                    <p>Gérez vos réservations, consultez votre planning et réservez de nouveaux créneaux.</p>
+                    <a href="/espace-reservation">
+                        <i class="fas fa-arrow-right"></i>
+                        Accéder à mes réservations
+                    </a>
+                </div>
                 
-                <a href="/admin/users" class="admin-link">Gestion des Utilisateurs</a>
-                <a href="/admin/generate-code" class="admin-link">Générer des Codes Externes</a>
-                <a href="/dev/sms" class="admin-link">Voir les Messages SMS</a>
+                <div class="dashboard-card">
+                    <h3><i class="fas fa-user-circle"></i> Mon Profil</h3>
+                    <p>Consultez et modifiez vos informations personnelles et vos préférences.</p>
+                    <a href="/profile">
+                        <i class="fas fa-arrow-right"></i>
+                        Gérer mon profil
+                    </a>
+                </div>
+                
+                <div class="dashboard-card">
+                    <h3><i class="fas fa-history"></i> Historique</h3>
+                    <p>Consultez l'historique de vos activités et de vos réservations passées.</p>
+                    <a href="/historique">
+                        <i class="fas fa-arrow-right"></i>
+                        Voir l'historique
+                    </a>
+                </div>
             </div>
+        </div>
 
-            <!-- Regular User Section -->
-            <div th:unless="${isAdmin}">
-                <a href="/espace-reservation" class="user-link">Espace réservation</a>
+        <!-- Admin Section -->
+        <div th:if="${isAuthenticated and isAdmin}">
+            <div class="admin-section">
+                <h3><i class="fas fa-crown"></i> Panneau d'Administration</h3>
+                <p>En tant qu'administrateur, vous avez accès à toutes les fonctions de gestion de la plateforme COSONE.</p>
+                
+                <div class="admin-links">
+                    <a href="/admin/users">
+                        <i class="fas fa-users"></i>
+                        Gestion des Utilisateurs
+                    </a>
+                    <a href="/admin/generate-code">
+                        <i class="fas fa-key"></i>
+                        Générer des Codes Externes
+                    </a>
+                    <a href="/dev/sms">
+                        <i class="fas fa-sms"></i>
+                        Voir les Messages SMS
+                    </a>
+                    <a href="/admin/centres">
+                        <i class="fas fa-building"></i>
+                        Gestion des Centres
+                    </a>
+                    <a href="/admin/reservations">
+                        <i class="fas fa-calendar-alt"></i>
+                        Gestion des Réservations
+                    </a>
+                    <a href="/admin/reports">
+                        <i class="fas fa-chart-bar"></i>
+                        Rapports et Statistiques
+                    </a>
+                </div>
             </div>
+        </div>
 
-            <a href="/logout" class="logout-link">Se déconnecter</a>
+        <!-- Statistics Section -->
+        <div class="stats" th:if="${isAuthenticated}">
+            <h3><i class="fas fa-chart-pie"></i> Statistiques</h3>
+            <div class="stat-item">
+                <span class="stat-number" th:text="${centres != null ? centres.size() : 0}">69</span>
+                <span class="stat-label">Centres disponibles</span>
+            </div>
+            <div class="stat-item" th:if="${isAdmin}">
+                <span class="stat-number">-</span>
+                <span class="stat-label">Utilisateurs actifs</span>
+            </div>
+            <div class="stat-item" th:if="${isAdmin}">
+                <span class="stat-number">-</span>
+                <span class="stat-label">Réservations aujourd'hui</span>
+            </div>
         </div>
 
         <!-- Unauthenticated User Content -->
-        <div th:unless="${isAuthenticated}" class="login-section">
-            <h3>Accéder à votre compte</h3>
-            <p>Connectez-vous pour accéder à toutes les fonctionnalités de COSONE</p>
-            <div class="text-center">
-                <a href="/login" class="login-btn">Se connecter</a>
-            </div>
-        </div>
-
-        <!-- WordPress Integration Note -->
-        <div class="wordpress-note">
-            <strong>Note d'intégration WordPress :</strong> Le contenu des sections ci-dessous sera automatiquement synchronisé avec votre site WordPress pour une gestion centralisée.
-        </div>
-
-        <!-- Qui sommes-nous Section -->
-        <div class="content-section">
-            <div class="content-section-header" onclick="toggleSection(this)">
-                <h2>Qui sommes-nous</h2>
-                <span class="expand-icon">▼</span>
-            </div>
-            <div class="content-section-content">
-                <div class="placeholder">
-                    <p><strong>Contenu en cours de chargement depuis WordPress...</strong></p>
-                    <p>Cette section sera automatiquement mise à jour avec le contenu de votre page "Qui sommes-nous" sur WordPress.</p>
-                </div>
-                <div class="content-grid">
-                    <div class="content-card">
-                        <h3>Notre Mission</h3>
-                        <p>Contenu de la mission à venir depuis WordPress...</p>
-                    </div>
-                    <div class="content-card">
-                        <h3>Notre Vision</h3>
-                        <p>Contenu de la vision à venir depuis WordPress...</p>
-                    </div>
-                    <div class="content-card">
-                        <h3>Nos Valeurs</h3>
-                        <p>Contenu des valeurs à venir depuis WordPress...</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Nos Activités Section -->
-        <div class="content-section">
-            <div class="content-section-header" onclick="toggleSection(this)">
-                <h2>Nos Activités</h2>
-                <span class="expand-icon">▼</span>
-            </div>
-            <div class="content-section-content">
-                <div class="placeholder">
-                    <p><strong>Contenu en cours de chargement depuis WordPress...</strong></p>
-                    <p>Cette section sera automatiquement mise à jour avec le contenu de votre page "Nos Activités" sur WordPress.</p>
-                </div>
-                <div class="content-grid">
-                    <div class="content-card">
-                        <h3>Formation</h3>
-                        <p>Détails des activités de formation à venir depuis WordPress...</p>
-                    </div>
-                    <div class="content-card">
-                        <h3>Consultation</h3>
-                        <p>Détails des services de consultation à venir depuis WordPress...</p>
-                    </div>
-                    <div class="content-card">
-                        <h3>Accompagnement</h3>
-                        <p>Détails des services d'accompagnement à venir depuis WordPress...</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Nos Centres Section -->
-        <div class="content-section">
-            <div class="content-section-header" onclick="toggleSection(this)">
-                <h2>Nos Centres</h2>
-                <span class="expand-icon">▼</span>
-            </div>
-            <div class="content-section-content">
-                <div class="placeholder">
-                    <p><strong>Contenu en cours de chargement depuis WordPress...</strong></p>
-                    <p>Cette section sera automatiquement mise à jour avec le contenu de votre page "Nos Centres" sur WordPress.</p>
-                </div>
-                <div class="content-grid">
-                    <div class="content-card">
-                        <h3>Centre Principal</h3>
-                        <p>Informations sur le centre principal à venir depuis WordPress...</p>
-                    </div>
-                    <div class="content-card">
-                        <h3>Centres Régionaux</h3>
-                        <p>Informations sur les centres régionaux à venir depuis WordPress...</p>
-                    </div>
-                    <div class="content-card">
-                        <h3>Centres Spécialisés</h3>
-                        <p>Informations sur les centres spécialisés à venir depuis WordPress...</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Nos Conventions Section -->
-        <div class="content-section">
-            <div class="content-section-header" onclick="toggleSection(this)">
-                <h2>Nos Conventions</h2>
-                <span class="expand-icon">▼</span>
-            </div>
-            <div class="content-section-content">
-                <div class="placeholder">
-                    <p><strong>Contenu en cours de chargement depuis WordPress...</strong></p>
-                    <p>Cette section sera automatiquement mise à jour avec le contenu de votre page "Nos Conventions" sur WordPress.</p>
-                </div>
-                <div class="content-grid">
-                    <div class="content-card">
-                        <h3>Partenariats</h3>
-                        <p>Détails des partenariats à venir depuis WordPress...</p>
-                    </div>
-                    <div class="content-card">
-                        <h3>Accords</h3>
-                        <p>Détails des accords à venir depuis WordPress...</p>
-                    </div>
-                    <div class="content-card">
-                        <h3>Collaborations</h3>
-                        <p>Détails des collaborations à venir depuis WordPress...</p>
-                    </div>
-                </div>
+        <div th:unless="${isAuthenticated}" class="user-welcome">
+            <h3><i class="fas fa-lock"></i> Accès non autorisé</h3>
+            <p>Vous devez être connecté pour accéder à cette page.</p>
+            <div style="text-align: center; margin-top: 20px;">
+                <a href="/login" class="logout-btn" style="background: linear-gradient(135deg, #667eea, #764ba2);">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Se connecter
+                </a>
+                <a href="/landing" style="display: inline-block; margin-left: 15px; color: #667eea; text-decoration: none;">
+                    <i class="fas fa-home"></i>
+                    Retour à l'accueil
+                </a>
             </div>
         </div>
     </div>
-
-    <script>
-        // Toggle individual section
-        function toggleSection(header) {
-            const content = header.nextElementSibling;
-            const isExpanded = content.classList.contains('expanded');
-            
-            if (isExpanded) {
-                content.classList.remove('expanded');
-                header.classList.remove('expanded');
-            } else {
-                content.classList.add('expanded');
-                header.classList.add('expanded');
-            }
-        }
-
-        // Add click animation to cards
-        document.addEventListener('DOMContentLoaded', function() {
-            const cards = document.querySelectorAll('.content-card');
-            cards.forEach(card => {
-                card.addEventListener('click', function() {
-                    this.style.transform = 'scale(0.98)';
-                    setTimeout(() => {
-                        this.style.transform = '';
-                    }, 150);
-                });
-            });
-        });
-    </script>
 </body>
-</html> 
+</html>

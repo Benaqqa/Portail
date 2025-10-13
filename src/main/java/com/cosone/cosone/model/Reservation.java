@@ -66,6 +66,9 @@ public class Reservation {
     @Column
     private String commentaires;
 
+    @Column
+    private Double prixTotal;
+
     // Constructeurs
     public Reservation() {
         this.dateReservation = LocalDateTime.now();
@@ -128,6 +131,9 @@ public class Reservation {
 
     public String getCommentaires() { return commentaires; }
     public void setCommentaires(String commentaires) { this.commentaires = commentaires; }
+
+    public Double getPrixTotal() { return prixTotal; }
+    public void setPrixTotal(Double prixTotal) { this.prixTotal = prixTotal; }
 
     // Méthodes utilitaires
     public boolean isEnRetardPaiement() {

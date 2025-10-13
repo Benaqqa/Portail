@@ -5,15 +5,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+
 import com.cosone.cosone.service.UserDetailsServiceImpl;
 
 @Configuration
@@ -45,7 +43,25 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(authz -> authz
-                .anyRequest().permitAll() // Temporarily allow all requests for testing
+                // Public pages
+                .requestMatchers("/", "/landing", "/login", "/register", "/login/**", "/register/**", 
+                                "/create-password", "/verify-phone", "/resend-code",
+                                "/css/**", "/js/**", "/images/**", "/static/**").permitAll()
+                // Admin pages require ADMIN role
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                // Other pages require authentication
+                .requestMatchers("/home", "/espace-reservation", "/reservation/**").authenticated()
+                .anyRequest().authenticated()
+            )
+            .formLogin(form -> form
+                .loginPage("/login")
+                .permitAll()
+                .defaultSuccessUrl("/home", true)
+            )
+            .logout(logout -> logout
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/login?message=Vous avez été déconnecté avec succès.")
+                .permitAll()
             )
             .csrf(csrf -> csrf.disable());
         return http.build();

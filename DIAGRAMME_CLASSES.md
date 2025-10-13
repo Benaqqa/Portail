@@ -8,7 +8,7 @@ Ce diagramme présente l'architecture des classes du système COSONE, montrant l
 
 ```mermaid
 classDiagram
-    %% Entités principales
+    %% Entites principales
     class User {
         -Long id
         -String username
@@ -17,54 +17,29 @@ classDiagram
         -String matricule
         -String phoneNumber
         -String role
-        +getId() Long
-        +setId(Long) void
         +getUsername() String
-        +setUsername(String) void
-        +getPassword() String
-        +setPassword(String) void
-        +getNumCin() String
-        +setNumCin(String) void
         +getMatricule() String
-        +setMatricule(String) void
-        +getPhoneNumber() String
-        +setPhoneNumber(String) void
         +getRole() String
-        +setRole(String) void
     }
 
     class Reservation {
         -Long id
         -String matricule
-        -String cin
-        -String telephone
-        -String email
-        -LocalDateTime dateDebut
-        -LocalDateTime dateFin
-        -Centre centre
-        -TypeLogement typeLogement
+        -LocalDate dateDebut
+        -LocalDate dateFin
         -Integer nombrePersonnes
-        -List~PersonneAccompagnement~ personnesAccompagnement
-        -StatutReservation statut
-        -LocalDateTime dateReservation
-        -LocalDateTime dateLimitePaiement
-        -LocalDateTime datePaiement
-        -MethodePaiement methodePaiement
-        -String referencePaiement
-        -String commentaires
-        +isEnRetardPaiement() boolean
-        +peutEtreReservee() boolean
-        +estWeekend() boolean
+        -Double prixTotal
+        -String statut
+        -String methodePaiement
+        +calculerPrix() Double
+        +verifierDisponibilite() boolean
     }
 
     class Centre {
         -Long id
         -String nom
-        -String adresse
         -String ville
-        -String telephone
-        -String email
-        -String description
+        -String adresse
         -Boolean actif
         +toString() String
     }
@@ -72,282 +47,179 @@ classDiagram
     class TypeLogement {
         -Long id
         -String nom
-        -String description
         -Integer capaciteMax
         -Double prixParNuit
         -Boolean actif
         +toString() String
     }
 
-    class PersonneAccompagnement {
+    class PersonneAccomp {
         -Long id
-        -Reservation reservation
         -String nom
         -String prenom
         -String cin
         -String lienParente
-        +toString() String
     }
 
     class ExternAuthCode {
         -Long id
         -String code
         -boolean used
-        -LocalDateTime createdAt
         -String prenom
         -String nom
     }
 
-    class PhoneVerificationCode {
-        -Long id
-        -String phoneNumber
-        -String code
-        -boolean used
-        -LocalDateTime createdAt
-        -LocalDateTime expiresAt
-    }
-
-    class WordPressArticle {
-        -Long id
-        -String title
-        -String excerpt
-        -String content
-        -String link
-        -String featuredImageUrl
-        -LocalDateTime publishedDate
-        -LocalDateTime modifiedDate
-        -String author
-        -List~String~ categories
-        -List~String~ tags
-        -String status
-        -String slug
-    }
-
-    %% Enums
-    class StatutReservation {
-        <<enumeration>>
-        EN_ATTENTE_PAIEMENT
-        PAYEE
-        CONFIRMEE
-        ANNULEE
-        EXPIREE
-        +getLibelle() String
-        +toString() String
-    }
-
-    class MethodePaiement {
-        <<enumeration>>
-        CARTE_BANCAIRE
-        VIREMENT
-        ESPECES
-        CHEQUE
-        MOBILE_MONEY
-        AUTRE
-        +getLibelle() String
-        +toString() String
-    }
-
-    %% Contrôleurs
-    class HomeController {
-        -HomeContentService homeContentService
-        -CentresCsvService centresCsvService
-        +root() String
-        +home(String, Model) String
-        +landing(Model) String
-    }
-
+    %% Controllers
     class AuthController {
-        -UserRepository userRepository
-        -ExternAuthCodeRepository externAuthCodeRepository
-        -PhoneVerificationCodeRepository phoneVerificationCodeRepository
-        -SmsService smsService
-        +showLogin(Model) String
-        +showRegister(Model) String
-        +login(String, String, Model) String
-        +register(RegisterRequest, Model) String
-        +verifyPhone(String, String, Model) String
-        +createPassword(String, String, Model) String
+        +showLogin() String
+        +register() String
+        +verifyPhone() String
     }
 
     class ReservationController {
-        -ReservationService reservationService
-        -CentreRepository centreRepository
-        -TypeLogementRepository typeLogementRepository
-        -ReservationRepository reservationRepository
-        +afficherPageReservation(Model) String
-        +creerReservation(Reservation, String, String, Long, Long, RedirectAttributes) String
-        +afficherConfirmation(Long, Model) String
-        +confirmerPaiement(Long, MethodePaiement, String, RedirectAttributes) String
-        +annulerReservation(Long, RedirectAttributes) String
-        +afficherDetails(Long, Model) String
-        +verifierDisponibilite(Long, Long, String, String) String
-        +calculerPrix(Long, String, String) String
-    }
-
-    class EspaceReservationController {
-        -ReservationService reservationService
-        -UserRepository userRepository
-        +espaceReservation(Model) String
-        +afficherReservations(Model) String
-        +annulerReservation(Long, RedirectAttributes) String
+        +creerReservation() String
+        +confirmerPaiement() String
+        +annulerReservation() String
     }
 
     %% Services
     class ReservationService {
-        -ReservationRepository reservationRepository
-        -CentreRepository centreRepository
-        -TypeLogementRepository typeLogementRepository
-        +creerReservation(Reservation) Reservation
-        +trouverReservationsUtilisateur(String) List~Reservation~
-        +confirmerPaiement(Long, MethodePaiement, String) Reservation
-        +annulerReservation(Long) void
-        +estDisponible(Reservation) boolean
-        +calculerPrixTotal(Reservation) Double
-    }
-
-    class EmailService {
-        +envoyerEmail(String, String, String) void
-        +envoyerConfirmationReservation(Reservation) void
+        +creerReservation() Reservation
+        +estDisponible() boolean
+        +calculerPrixTotal() Double
     }
 
     class SmsService {
-        +envoyerSms(String, String) void
+        +envoyerSms() void
         +genererCodeVerification() String
-    }
-
-    class WordPressService {
-        +recupererArticles() List~WordPressArticle~
-        +recupererArticle(Long) WordPressArticle
-    }
-
-    class HomeContentService {
-        -WordPressService wordPressService
-        +getHomeContent() Map~String, Object~
-    }
-
-    class CentresCsvService {
-        +loadCentresFromCsv() List~Map~String, Object~~
-        +exportCentresToCsv(List~Centre~) void
     }
 
     %% Repositories
     class UserRepository {
         <<interface>>
-        +findByUsername(String) Optional~User~
-        +findByMatricule(String) Optional~User~
-        +findByPhoneNumber(String) Optional~User~
-        +findByNumCin(String) Optional~User~
+        +findByUsername() User
+        +findByMatricule() User
     }
 
     class ReservationRepository {
         <<interface>>
-        +findByMatricule(String) List~Reservation~
-        +findByStatut(StatutReservation) List~Reservation~
-        +findByDateDebutBetween(LocalDateTime, LocalDateTime) List~Reservation~
+        +findByMatricule() List
+        +findByStatut() List
     }
 
     class CentreRepository {
         <<interface>>
-        +findByActifTrueOrderByNom() List~Centre~
-        +findByVille(String) List~Centre~
+        +findByActifTrue() List
     }
 
     class TypeLogementRepository {
         <<interface>>
-        +findByActifTrueOrderByNom() List~TypeLogement~
-        +findByCapaciteMaxGreaterThanEqual(Integer) List~TypeLogement~
+        +findByActifTrue() List
     }
 
-    class ExternAuthCodeRepository {
-        <<interface>>
-        +findByCodeAndUsedFalse(String) Optional~ExternAuthCode~
-        +findByUsedFalse() List~ExternAuthCode~
-    }
+    %% Relations entites
+    User "1" --> "0..*" Reservation : effectue
+    Centre "1" --> "0..*" Reservation : heberge
+    TypeLogement "1" --> "0..*" Reservation : propose
+    Reservation "1" --> "0..*" PersonneAccomp : contient
 
-    class PhoneVerificationCodeRepository {
-        <<interface>>
-        +findByPhoneNumberAndUsedFalse(String) Optional~PhoneVerificationCode~
-        +findByExpiresAtBefore(LocalDateTime) List~PhoneVerificationCode~
-    }
+    %% Relations controllers-services
+    AuthController --> UserRepository
+    AuthController --> SmsService
+    ReservationController --> ReservationService
+    ReservationController --> ReservationRepository
 
-    %% Relations entre entités
-    Reservation ||--o{ PersonneAccompagnement : "contient"
-    Reservation }o--|| Centre : "appartient à"
-    Reservation }o--|| TypeLogement : "utilise"
-    Reservation ||--|| StatutReservation : "a un statut"
-    Reservation ||--|| MethodePaiement : "méthode de paiement"
+    %% Relations services-repositories
+    ReservationService --> ReservationRepository
+    ReservationService --> CentreRepository
+    ReservationService --> TypeLogementRepository
 
-    %% Relations avec les contrôleurs
-    HomeController --> HomeContentService : "utilise"
-    HomeController --> CentresCsvService : "utilise"
-    AuthController --> UserRepository : "utilise"
-    AuthController --> ExternAuthCodeRepository : "utilise"
-    AuthController --> PhoneVerificationCodeRepository : "utilise"
-    AuthController --> SmsService : "utilise"
-    ReservationController --> ReservationService : "utilise"
-    ReservationController --> CentreRepository : "utilise"
-    ReservationController --> TypeLogementRepository : "utilise"
-    ReservationController --> ReservationRepository : "utilise"
-    EspaceReservationController --> ReservationService : "utilise"
-    EspaceReservationController --> UserRepository : "utilise"
-
-    %% Relations avec les services
-    ReservationService --> ReservationRepository : "utilise"
-    ReservationService --> CentreRepository : "utilise"
-    ReservationService --> TypeLogementRepository : "utilise"
-    HomeContentService --> WordPressService : "utilise"
-
-    %% Relations avec les repositories
-    UserRepository --> User : "gère"
-    ReservationRepository --> Reservation : "gère"
-    CentreRepository --> Centre : "gère"
-    TypeLogementRepository --> TypeLogement : "gère"
-    ExternAuthCodeRepository --> ExternAuthCode : "gère"
-    PhoneVerificationCodeRepository --> PhoneVerificationCode : "gère"
+    %% Relations repositories-entites
+    UserRepository ..> User
+    ReservationRepository ..> Reservation
+    CentreRepository ..> Centre
+    TypeLogementRepository ..> TypeLogement
 ```
 
 ## Description des Classes
 
-### Entités (Model)
+### Entités (Domain Model)
 
-1. **User** : Représente un utilisateur du système avec ses informations d'authentification
-2. **Reservation** : Entité centrale pour les réservations avec logique métier intégrée
-3. **Centre** : Informations sur les centres de vacances
-4. **TypeLogement** : Types de logements disponibles avec tarification
-5. **PersonneAccompagnement** : Personnes accompagnant les réservations
-6. **ExternAuthCode** : Codes d'authentification externe pour l'inscription
-7. **PhoneVerificationCode** : Codes de vérification SMS
-8. **WordPressArticle** : Articles récupérés depuis WordPress
+1. **User** : Représente un utilisateur du système (employé, admin, externe)
+   - Gère l'authentification et les rôles
+   - Identifiants : username, matricule, CIN, téléphone
 
-### Enums
+2. **Reservation** : Entité centrale pour les réservations
+   - Contient les dates, nombre de personnes, prix
+   - Statuts : EN_ATTENTE_PAIEMENT, PAYEE, ANNULEE, EXPIREE
+   - Méthodes métier : calculerPrix(), verifierDisponibilite()
 
-1. **StatutReservation** : Statuts possibles d'une réservation
-2. **MethodePaiement** : Méthodes de paiement acceptées
+3. **Centre** : Centres de vacances disponibles
+   - Informations de localisation (ville, adresse)
+   - Statut actif/inactif pour gestion du catalogue
 
-### Contrôleurs (Controller)
+4. **TypeLogement** : Types d'hébergement (Studio, F2, Villa, etc.)
+   - Capacité maximale et prix par nuit
+   - Activation/désactivation flexible
 
-1. **HomeController** : Gestion de la page d'accueil et landing page
-2. **AuthController** : Authentification, inscription et vérification
-3. **ReservationController** : Gestion complète des réservations
-4. **EspaceReservationController** : Espace personnel des utilisateurs
+5. **PersonneAccomp** : Accompagnants d'une réservation
+   - Informations d'identité
+   - Lien de parenté avec le réservant
 
-### Services
+6. **ExternAuthCode** : Codes d'authentification pour utilisateurs externes
+   - Code unique à usage unique
+   - Associé à un nom/prénom
 
-1. **ReservationService** : Logique métier des réservations
-2. **EmailService** : Envoi d'emails
-3. **SmsService** : Envoi de SMS
-4. **WordPressService** : Intégration WordPress
-5. **HomeContentService** : Gestion du contenu de la page d'accueil
-6. **CentresCsvService** : Import/Export CSV des centres
+### Contrôleurs (Presentation Layer)
 
-### Repositories
+- **AuthController** : Gestion de l'authentification (inscription, connexion, SMS)
+- **ReservationController** : CRUD des réservations et paiements
 
-Interfaces JPA pour l'accès aux données avec méthodes de requête personnalisées.
+### Services (Business Logic)
 
-## Principes de Design
+- **ReservationService** : Logique métier des réservations
+  - Création et validation
+  - Vérification de disponibilité
+  - Calcul des prix
+  
+- **SmsService** : Gestion des SMS de vérification
+  - Génération de codes
+  - Envoi via API externe
 
-- **Séparation des responsabilités** : Chaque classe a une responsabilité claire
-- **Inversion de dépendance** : Les contrôleurs dépendent des services, pas des repositories
-- **Encapsulation** : Données privées avec accesseurs publics
-- **Cohésion** : Classes fortement cohésives
-- **Couplage faible** : Dépendances minimisées entre les classes
+### Repositories (Data Access)
+
+Interfaces Spring Data JPA pour l'accès aux données :
+- **UserRepository** : Recherche par username, matricule, CIN, téléphone
+- **ReservationRepository** : Recherche par matricule, statut, dates
+- **CentreRepository** : Centres actifs, filtrage par ville
+- **TypeLogementRepository** : Types actifs, capacité
+
+## Relations Principales
+
+### Relations Entités
+- **User → Reservation** (1:N) : Un utilisateur peut créer plusieurs réservations
+- **Centre → Reservation** (1:N) : Un centre peut avoir plusieurs réservations
+- **TypeLogement → Reservation** (1:N) : Un type peut être réservé plusieurs fois
+- **Reservation → PersonneAccomp** (1:N) : Une réservation peut avoir plusieurs accompagnants
+
+### Architecture en Couches
+1. **Presentation** : Controllers gèrent les requêtes HTTP
+2. **Business** : Services encapsulent la logique métier
+3. **Data Access** : Repositories interfacent avec la base de données
+4. **Domain** : Entités représentent le modèle de données
+
+## Patterns Utilisés
+
+- **MVC** : Séparation Modèle-Vue-Contrôleur
+- **Repository** : Abstraction de l'accès aux données
+- **Service Layer** : Encapsulation de la logique métier
+- **Dependency Injection** : Injection des dépendances via Spring
+- **DTO** : Transfer Objects pour les échanges de données
+
+## Technologies
+
+- **Spring Boot** : Framework principal
+- **Spring Data JPA** : Persistence et repositories
+- **Hibernate** : ORM pour mapping objet-relationnel
+- **Spring Security** : Authentification et autorisation
+- **Thymeleaf** : Moteur de templates côté serveur

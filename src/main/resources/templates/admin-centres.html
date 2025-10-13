@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Gestion des Centres</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        h1 {
+            color: #5a2d82;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #6c757d;
+            margin-bottom: 30px;
+        }
+        .message {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .centres-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .centre-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        .centre-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+        .centre-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #343a40;
+            margin-bottom: 10px;
+        }
+        .centre-info {
+            color: #6c757d;
+            margin: 5px 0;
+            font-size: 0.9em;
+        }
+        .centre-info i {
+            width: 20px;
+            color: #667eea;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .status-active {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status-inactive {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        .back-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .info-box i {
+            color: #2196F3;
+            margin-right: 10px;
+        }
+        .stats-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .stat-box {
+            flex: 1;
+            min-width: 200px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><i class="fas fa-building"></i> Gestion des Centres</h1>
+        <p class="subtitle">Gérez les centres de vacances disponibles</p>
+
+        <div th:if="${message}" class="message success">
+            <i class="fas fa-check-circle"></i> <span th:text="${message}"></span>
+        </div>
+
+        <div th:if="${error}" class="message error">
+            <i class="fas fa-exclamation-circle"></i> <span th:text="${error}"></span>
+        </div>
+
+        <div class="info-box">
+            <i class="fas fa-info-circle"></i>
+            <strong>Information :</strong> Les centres sont actuellement chargés depuis le fichier CSV 
+            (<code>static/csv/output.csv</code>). Pour ajouter ou modifier des centres, éditez ce fichier.
+        </div>
+
+        <div class="stats-container">
+            <div class="stat-box">
+                <div class="stat-number" th:text="${centres != null ? centres.size() : 0}">0</div>
+                <div class="stat-label">Centres disponibles</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number" th:text="${centresActifs}">0</div>
+                <div class="stat-label">Centres actifs</div>
+            </div>
+        </div>
+
+        <h2><i class="fas fa-list"></i> Liste des Centres</h2>
+
+        <div class="centres-grid" th:if="${centres != null and !centres.isEmpty()}">
+            <div th:each="centre : ${centres}" class="centre-card">
+                <div class="centre-name" th:text="${centre['name']}">Nom du Centre</div>
+                
+                <div class="centre-info">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span th:text="${centre['address']}">Adresse</span>
+                </div>
+                
+                <div class="centre-info" th:if="${centre['phone'] != null}">
+                    <i class="fas fa-phone"></i>
+                    <span th:text="${centre['phone']}">Téléphone</span>
+                </div>
+                
+                <div class="centre-info" th:if="${centre['website'] != null}">
+                    <i class="fas fa-globe"></i>
+                    <a th:href="${centre['website']}" target="_blank" th:text="${centre['website']}" 
+                       style="color: #667eea; text-decoration: none;">Site web</a>
+                </div>
+                
+                <div class="centre-info" th:if="${centre['rating'] != null}">
+                    <i class="fas fa-star"></i>
+                    <span th:text="${centre['rating']} + '/5'">Note</span>
+                </div>
+                
+                <div class="centre-info">
+                    <i class="fas fa-info-circle"></i>
+                    <span th:text="${centre['description']}">Description</span>
+                </div>
+                
+                <span th:if="${centre['actif'] == true}" class="status-badge status-active">
+                    <i class="fas fa-check"></i> Actif
+                </span>
+                <span th:unless="${centre['actif'] == true}" class="status-badge status-inactive">
+                    <i class="fas fa-times"></i> Inactif
+                </span>
+            </div>
+        </div>
+
+        <div th:if="${centres == null or centres.isEmpty()}" class="info-box">
+            <i class="fas fa-exclamation-triangle"></i>
+            <strong>Aucun centre trouvé.</strong> Vérifiez que le fichier CSV contient des données.
+        </div>
+
+        <a href="/home" class="back-link">
+            <i class="fas fa-arrow-left"></i> Retour au Tableau de Bord
+        </a>
+    </div>
+</body>
+</html>
+

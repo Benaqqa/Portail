@@ -222,7 +222,7 @@
                 <h3>Connexion Régulière</h3>
                 <p>Vous avez déjà un mot de passe ? Connectez-vous avec votre Matricule ou Num CIN et mot de passe.</p>
                 <form method="post" action="/login/interne">
-                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <!-- CSRF disabled for testing -->
                     <div class="form-group">
                         <label for="identifier">Matricule ou Num CIN :</label>
                         <input type="text" id="identifier" name="identifier" required placeholder="Entrez votre matricule ou num CIN">
@@ -245,7 +245,7 @@
                         <h4>Première Connexion</h4>
                         <p>Vous n'avez pas encore de mot de passe ? Utilisez votre Matricule ou Num CIN pour configurer votre compte.</p>
                         <form method="post" action="/login/interne/first">
-                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                            <!-- CSRF disabled for testing -->
                             <div class="form-group">
                                 <label for="firstLoginIdentifier">Matricule ou Num CIN :</label>
                                 <input type="text" id="firstLoginIdentifier" name="identifier" required placeholder="Entrez votre matricule ou num CIN">
@@ -262,7 +262,7 @@
                 <h3>Connexion Externe</h3>
                 <p>Utilisez votre code d'authentification à usage unique et vérifiez votre identité.</p>
                 <form method="post" action="/login/extern">
-                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <!-- CSRF disabled for testing -->
                     <div class="form-group">
                         <label for="authCode">Code d'authentification à usage unique :</label>
                         <input type="text" id="authCode" name="authCode" required placeholder="Entrez votre code d'authentification">

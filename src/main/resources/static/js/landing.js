@@ -9,14 +9,25 @@ function showSection(sectionId) {
     const sections = document.querySelectorAll('.content-section');
     sections.forEach(section => {
         section.style.display = 'none';
+        section.style.opacity = '0';
+        section.style.visibility = 'hidden';
         section.classList.remove('active');
     });
     
     // Show the target section
     const targetSection = document.getElementById(sectionId);
     if (targetSection) {
+        // Force display immediately
         targetSection.style.display = 'block';
+        targetSection.style.visibility = 'visible';
+        targetSection.style.opacity = '1';
+        targetSection.style.position = 'relative';
+        targetSection.style.zIndex = '1';
         targetSection.classList.add('active');
+        
+        // Scroll to top of content
+        targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        
         console.log('Section shown:', sectionId);
     } else {
         console.error('Section not found:', sectionId);
@@ -74,7 +85,25 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Landing page initialization complete');
     console.log('Found sections:', document.querySelectorAll('.content-section').length);
     console.log('Found menu links:', menuLinks.length);
+    
+    // Initialize other functionality
+    addGalleryTabListeners();
+    addSearchFunctionality();
+    addContactFormHandling();
+    addResponsiveMenuToggle();
 });
+
+// Make sure to call initialization functions after DOM is ready
+setTimeout(function() {
+    console.log('Re-checking navigation after timeout...');
+    const firstSection = document.querySelector('.content-section.active');
+    if (firstSection) {
+        console.log('Active section found:', firstSection.id);
+    } else {
+        console.warn('No active section found, forcing actualites');
+        showSection('actualites');
+    }
+}, 500);
 
 // Gallery tab functionality
 function addGalleryTabListeners() {
@@ -292,33 +321,15 @@ document.addEventListener('click', function(e) {
 
 // Add loading animations for content sections
 function addContentAnimations() {
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    };
-
-    const observer = new IntersectionObserver(function(entries) {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
-            }
-        });
-    }, observerOptions);
-
-    // Observe all content sections
-    const sections = document.querySelectorAll('.content-section');
-    sections.forEach(section => {
-        section.style.opacity = '0';
-        section.style.transform = 'translateY(30px)';
-        section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-        observer.observe(section);
-    });
+    // Disable animations for sections - they interfere with navigation
+    // The CSS and inline styles will handle the transitions
+    console.log('Content animations disabled to prevent navigation issues');
 }
 
 // Initialize content animations when page loads
 window.addEventListener('load', function() {
-    addContentAnimations();
+    // Don't add animations that might interfere with section display
+    console.log('Page fully loaded');
 });
 
 // Add keyboard navigation support

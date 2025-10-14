@@ -1,0 +1,123 @@
+╔═══════════════════════════════════════════════════════════════╗
+║  COMMENT EXÉCUTER insert_centres_from_csv.sql                ║
+╚═══════════════════════════════════════════════════════════════╝
+
+📌 MÉTHODE 1 : COMMANDE DIRECTE (RECOMMANDÉE) ⭐
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Ouvrez PowerShell
+2. Allez dans le dossier COSONE :
+   cd C:\Users\Asus\IdeaProjects\COSONE
+
+3. Exécutez cette commande :
+   psql -U postgres -d cosone_db -f insert_centres_from_csv.sql
+
+   Remplacez :
+   - postgres     → votre utilisateur PostgreSQL
+   - cosone_db    → le nom de votre base de données
+
+4. Entrez votre mot de passe quand demandé
+
+✅ Vous verrez "INSERT 0 69" si tout fonctionne !
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📌 MÉTHODE 2 : MODE INTERACTIF
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Connectez-vous à PostgreSQL :
+   psql -U postgres -d cosone_db
+
+2. Une fois connecté, exécutez :
+   \i insert_centres_from_csv.sql
+
+3. Vérifiez le résultat :
+   SELECT COUNT(*) FROM centres;
+   (Devrait afficher 69)
+
+4. Quittez :
+   \q
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📌 MÉTHODE 3 : AVEC pgAdmin (Interface Graphique)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Ouvrez pgAdmin
+2. Connectez-vous à votre serveur PostgreSQL
+3. Clic droit sur votre base de données → Query Tool
+4. Menu : File → Open → Sélectionnez insert_centres_from_csv.sql
+5. Cliquez sur le bouton Execute (▶) ou F5
+6. Vérifiez dans l'onglet "Messages"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📌 MÉTHODE 4 : SCRIPT AUTOMATIQUE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Modifiez CHARGER_CENTRES_POSTGRESQL.ps1 :
+   - Ligne 4 : $PGUSER = "postgres"
+   - Ligne 5 : $PGDATABASE = "cosone_db"
+
+2. Dans PowerShell (dossier COSONE) :
+   .\CHARGER_CENTRES_POSTGRESQL.ps1
+
+3. Entrez votre mot de passe
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+❓ PROBLÈME : "psql : command not found"
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Solution : Ajoutez PostgreSQL au PATH
+
+1. Trouvez le dossier d'installation de PostgreSQL :
+   Exemple : C:\Program Files\PostgreSQL\16\bin
+
+2. Ajoutez-le au PATH :
+   - Recherchez "Variables d'environnement" dans Windows
+   - Cliquez sur "Variables d'environnement"
+   - Sélectionnez "Path" → Modifier
+   - Ajoutez : C:\Program Files\PostgreSQL\XX\bin
+   - OK → OK → Redémarrez PowerShell
+
+OU utilisez le chemin complet :
+"C:\Program Files\PostgreSQL\16\bin\psql" -U postgres -d cosone_db -f insert_centres_from_csv.sql
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+❓ PROBLÈME : "relation centres does not exist"
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Solution : Créez d'abord les tables
+
+psql -U postgres -d cosone_db -f create_reservation_tables.sql
+
+Puis réexécutez insert_centres_from_csv.sql
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ VÉRIFICATION APRÈS EXÉCUTION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Dans psql :
+   SELECT COUNT(*) FROM centres;
+   (Doit afficher 69)
+
+2. Dans votre navigateur :
+   http://localhost:8080/landing
+   Cliquez sur "Nos centres"
+   (Vous devriez voir les 69 centres)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 ASTUCE : Trouvez votre nom de base de données
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Le nom de votre base est dans :
+src\main\resources\application.properties
+
+Ligne : spring.datasource.url=jdbc:postgresql://localhost:5432/VOTRE_BASE
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+

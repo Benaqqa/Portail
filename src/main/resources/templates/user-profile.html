@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Profil - COSONE</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+        }
+
+        .profile-icon {
+            width: 120px;
+            height: 120px;
+            background: white;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            color: #667eea;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .profile-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 25px;
+        }
+
+        .profile-section h2 {
+            color: #212529;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 22px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: #6c757d;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-label i {
+            color: #667eea;
+            width: 20px;
+        }
+
+        .info-value {
+            font-size: 16px;
+            color: #212529;
+            font-weight: 500;
+            padding-left: 28px;
+        }
+
+        .role-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            flex: 1;
+            min-width: 200px;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        .divider {
+            height: 2px;
+            background: linear-gradient(to right, transparent, #dee2e6, transparent);
+            margin: 25px 0;
+        }
+
+        .quick-stats {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .quick-stats h3 {
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .quick-stats .stat {
+            font-size: 36px;
+            font-weight: bold;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .alert-info {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 20px;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .profile-icon {
+                width: 100px;
+                height: 100px;
+                font-size: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="profile-icon">
+                <i class="fas fa-user"></i>
+            </div>
+            <h1 th:text="${user.username}">Utilisateur</h1>
+            <p>Membre COSONE</p>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Info Message -->
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                <span>Consultez vos informations personnelles ci-dessous. Pour toute modification, contactez l'administrateur.</span>
+            </div>
+
+            <!-- Informations Personnelles -->
+            <div class="profile-section">
+                <h2>
+                    <i class="fas fa-user-circle"></i>
+                    Informations Personnelles
+                </h2>
+
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">
+                            <i class="fas fa-user"></i>
+                            Nom d'utilisateur
+                        </span>
+                        <span class="info-value" th:text="${user.username}">username</span>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">
+                            <i class="fas fa-id-card"></i>
+                            Matricule
+                        </span>
+                        <span class="info-value" th:text="${user.matricule ?: 'Non renseigné'}">MAT12345</span>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">
+                            <i class="fas fa-credit-card"></i>
+                            Numéro CIN
+                        </span>
+                        <span class="info-value" th:text="${user.numCin ?: 'Non renseigné'}">AB123456</span>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">
+                            <i class="fas fa-phone"></i>
+                            Téléphone
+                        </span>
+                        <span class="info-value" th:text="${user.phoneNumber ?: 'Non renseigné'}">+212 6XX XXX XXX</span>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">
+                            <i class="fas fa-shield-alt"></i>
+                            Rôle
+                        </span>
+                        <span class="role-badge" th:text="${user.role ?: 'USER'}">USER</span>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">
+                            <i class="fas fa-check-circle"></i>
+                            Statut du Compte
+                        </span>
+                        <span class="info-value">
+                            <i class="fas fa-check-circle" style="color: #28a745;"></i> Actif
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- Sécurité -->
+            <div class="profile-section">
+                <h2>
+                    <i class="fas fa-lock"></i>
+                    Sécurité
+                </h2>
+
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">
+                            <i class="fas fa-key"></i>
+                            Mot de passe
+                        </span>
+                        <span class="info-value">••••••••</span>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">
+                            <i class="fas fa-mobile-alt"></i>
+                            Vérification SMS
+                        </span>
+                        <span class="info-value">
+                            <i th:if="${user.phoneNumber}" class="fas fa-check-circle" style="color: #28a745;"></i>
+                            <i th:unless="${user.phoneNumber}" class="fas fa-times-circle" style="color: #dc3545;"></i>
+                            <span th:if="${user.phoneNumber}"> Activée</span>
+                            <span th:unless="${user.phoneNumber}"> Non configurée</span>
+                        </span>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <p style="color: #6c757d; font-size: 14px;">
+                        <i class="fas fa-info-circle"></i> 
+                        Pour modifier votre mot de passe ou vos informations de sécurité, veuillez contacter l'administrateur.
+                    </p>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- Actions -->
+            <div class="actions">
+                <a th:href="@{/home}" class="btn btn-secondary">
+                    <i class="fas fa-home"></i>
+                    Retour à l'Accueil
+                </a>
+
+                <a th:href="@{/user/history}" class="btn btn-primary">
+                    <i class="fas fa-history"></i>
+                    Mes Réservations
+                </a>
+
+                <a th:href="@{/reservation}" class="btn btn-success">
+                    <i class="fas fa-plus-circle"></i>
+                    Nouvelle Réservation
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

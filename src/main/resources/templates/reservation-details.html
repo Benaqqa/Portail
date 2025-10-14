@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Détails de Réservation - COSONE</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header i {
+            font-size: 60px;
+            margin-bottom: 15px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .alert-error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .alert i {
+            font-size: 24px;
+        }
+
+        .reservation-info {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: #6c757d;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .info-value {
+            font-size: 16px;
+            color: #212529;
+            font-weight: 500;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-en-attente {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-confirmee, .status-payee {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-annulee {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-expiree {
+            background-color: #e2e3e5;
+            color: #383d41;
+        }
+
+        .prix-total {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .prix-total .label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .prix-total .montant {
+            font-size: 42px;
+            font-weight: bold;
+        }
+
+        .divider {
+            height: 2px;
+            background: linear-gradient(to right, transparent, #dee2e6, transparent);
+            margin: 30px 0;
+        }
+
+        .contact-info {
+            background: #e8f4f8;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+
+        .contact-info h3 {
+            color: #0c5460;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .contact-item {
+            margin: 10px 0;
+            color: #495057;
+        }
+
+        .contact-item i {
+            width: 25px;
+            color: #17a2b8;
+        }
+
+        .actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            flex: 1;
+            min-width: 200px;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 20px;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .prix-total .montant {
+                font-size: 32px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <i class="fas fa-file-invoice"></i>
+            <h1>Détails de la Réservation</h1>
+            <p>Référence: <span th:text="${reservation.id}">123</span></p>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Messages de succès/erreur -->
+            <div th:if="${success}" class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
+                <span th:text="${success}"></span>
+            </div>
+
+            <div th:if="${error}" class="alert alert-error">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span th:text="${error}"></span>
+            </div>
+
+            <!-- Informations de la réservation -->
+            <div class="reservation-info">
+                <h2 style="margin-bottom: 20px; color: #212529;">
+                    <i class="fas fa-info-circle"></i> Informations de la Réservation
+                </h2>
+
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Centre</span>
+                        <span class="info-value" th:text="${reservation.centre.nom}">Centre de Vacances</span>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">Ville</span>
+                        <span class="info-value" th:text="${reservation.centre.ville}">Casablanca</span>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">Type de Logement</span>
+                        <span class="info-value" th:text="${reservation.typeLogement.nom}">Studio 2 personnes</span>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">Nombre de Personnes</span>
+                        <span class="info-value" th:text="${reservation.nombrePersonnes} + ' personne(s)'">2 personnes</span>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">Date d'Arrivée</span>
+                        <span class="info-value" th:text="${#temporals.format(reservation.dateDebut, 'dd/MM/yyyy')}">25/10/2025</span>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">Date de Départ</span>
+                        <span class="info-value" th:text="${#temporals.format(reservation.dateFin, 'dd/MM/yyyy')}">30/10/2025</span>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">Statut</span>
+                        <span th:class="'status-badge status-' + ${#strings.toLowerCase(#strings.replace(reservation.statut.name(), '_', '-'))}"
+                              th:text="${#strings.replace(reservation.statut.name(), '_', ' ')}">EN ATTENTE PAIEMENT</span>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">Date de Réservation</span>
+                        <span class="info-value" th:text="${#temporals.format(reservation.dateReservation, 'dd/MM/yyyy HH:mm')}">26/10/2025 18:00</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Prix Total -->
+            <div class="prix-total">
+                <div class="label">Prix Total</div>
+                <div class="montant" th:text="${#numbers.formatDecimal(reservation.prixTotal, 0, 'COMMA', 2, 'POINT')} + ' DH'">1000.00 DH</div>
+                <div class="label" style="margin-top: 10px; font-size: 12px;">
+                    <i class="fas fa-moon"></i> 
+                    <span th:text="${T(java.time.temporal.ChronoUnit).DAYS.between(reservation.dateDebut, reservation.dateFin)} + ' nuit(s)'">5 nuits</span>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- Coordonnées du Réservant -->
+            <div class="contact-info">
+                <h3>
+                    <i class="fas fa-user"></i>
+                    Coordonnées du Réservant
+                </h3>
+                <div class="contact-item">
+                    <i class="fas fa-id-card"></i>
+                    <strong>Matricule:</strong> <span th:text="${reservation.matricule}">N/A</span>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-credit-card"></i>
+                    <strong>CIN:</strong> <span th:text="${reservation.cin}">N/A</span>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-phone"></i>
+                    <strong>Téléphone:</strong> <span th:text="${reservation.telephone}">N/A</span>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-envelope"></i>
+                    <strong>Email:</strong> <span th:text="${reservation.email}">N/A</span>
+                </div>
+            </div>
+
+            <!-- Informations Paiement (si payée/confirmée) -->
+            <div th:if="${reservation.statut.name() == 'PAYEE' or reservation.statut.name() == 'CONFIRMEE'}" class="alert alert-success">
+                <i class="fas fa-check-double"></i>
+                <div>
+                    <strong>Paiement Confirmé</strong><br>
+                    <span th:if="${reservation.methodePaiement}">
+                        Méthode: <span th:text="${reservation.methodePaiement.name()}"></span><br>
+                    </span>
+                    <span th:if="${reservation.referencePaiement}">
+                        Référence: <span th:text="${reservation.referencePaiement}"></span><br>
+                    </span>
+                    <span th:if="${reservation.datePaiement}">
+                        Date: <span th:text="${#temporals.format(reservation.datePaiement, 'dd/MM/yyyy HH:mm')}"></span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="actions">
+                <a th:href="@{/home}" class="btn btn-secondary">
+                    <i class="fas fa-home"></i>
+                    Retour à l'Accueil
+                </a>
+
+                <a th:href="@{/user/history}" class="btn btn-secondary">
+                    <i class="fas fa-history"></i>
+                    Mes Réservations
+                </a>
+
+                <a th:if="${reservation.statut.name() == 'EN_ATTENTE_PAIEMENT'}"
+                   th:href="@{/reservation/confirmation/{id}(id=${reservation.id})}" 
+                   class="btn btn-success">
+                    <i class="fas fa-credit-card"></i>
+                    Effectuer le Paiement
+                </a>
+
+                <form th:if="${reservation.statut.name() == 'EN_ATTENTE_PAIEMENT'}" 
+                      th:action="@{/reservation/annuler/{id}(id=${reservation.id})}" 
+                      method="post"
+                      onsubmit="return confirm('Êtes-vous sûr de vouloir annuler cette réservation ?');"
+                      style="flex: 1; min-width: 200px;">
+                    <button type="submit" class="btn btn-danger" style="width: 100%;">
+                        <i class="fas fa-times-circle"></i>
+                        Annuler la Réservation
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

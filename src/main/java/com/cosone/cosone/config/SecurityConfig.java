@@ -47,10 +47,13 @@ public class SecurityConfig {
                 .requestMatchers("/", "/landing", "/login", "/register", "/login/**", "/register/**", 
                                 "/create-password", "/verify-phone", "/resend-code",
                                 "/css/**", "/js/**", "/images/**", "/static/**").permitAll()
+                // Stripe payment routes (success/cancel pages need auth, webhook doesn't)
+                .requestMatchers("/payment/webhook").permitAll()
                 // Admin pages require ADMIN role
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 // Other pages require authentication
-                .requestMatchers("/home", "/espace-reservation", "/reservation/**").authenticated()
+                .requestMatchers("/home", "/espace-reservation", "/reservation/**", "/payment/**", 
+                                "/historique", "/profil", "/user/**").authenticated()
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form

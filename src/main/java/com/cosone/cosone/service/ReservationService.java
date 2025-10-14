@@ -102,23 +102,24 @@ public class ReservationService {
         if (reservation.getNombrePersonnes() == null || reservation.getNombrePersonnes() <= 0) {
             throw new Exception("Le nombre de personnes est obligatoire et doit être positif");
         }
-        if (reservation.getPersonnesAccompagnement() == null || reservation.getPersonnesAccompagnement().isEmpty()) {
-            throw new Exception("Au moins une personne d'accompagnement est obligatoire");
-        }
         
-        // Valider les personnes d'accompagnement
-        for (PersonneAccompagnement personne : reservation.getPersonnesAccompagnement()) {
-            if (personne.getNom() == null || personne.getNom().trim().isEmpty()) {
-                throw new Exception("Le nom de la personne d'accompagnement est obligatoire");
-            }
-            if (personne.getPrenom() == null || personne.getPrenom().trim().isEmpty()) {
-                throw new Exception("Le prénom de la personne d'accompagnement est obligatoire");
-            }
-            if (personne.getCin() == null || personne.getCin().trim().isEmpty()) {
-                throw new Exception("Le CIN de la personne d'accompagnement est obligatoire");
-            }
-            if (personne.getLienParente() == null || personne.getLienParente().trim().isEmpty()) {
-                throw new Exception("Le lien de parenté est obligatoire");
+        // Les personnes d'accompagnement sont optionnelles (la personne peut voyager seule)
+        // Mais si elles sont présentes, valider leurs informations
+        if (reservation.getPersonnesAccompagnement() != null && !reservation.getPersonnesAccompagnement().isEmpty()) {
+            // Valider les personnes d'accompagnement
+            for (PersonneAccompagnement personne : reservation.getPersonnesAccompagnement()) {
+                if (personne.getNom() == null || personne.getNom().trim().isEmpty()) {
+                    throw new Exception("Le nom de la personne d'accompagnement est obligatoire");
+                }
+                if (personne.getPrenom() == null || personne.getPrenom().trim().isEmpty()) {
+                    throw new Exception("Le prénom de la personne d'accompagnement est obligatoire");
+                }
+                if (personne.getCin() == null || personne.getCin().trim().isEmpty()) {
+                    throw new Exception("Le CIN de la personne d'accompagnement est obligatoire");
+                }
+                if (personne.getLienParente() == null || personne.getLienParente().trim().isEmpty()) {
+                    throw new Exception("Le lien de parenté est obligatoire");
+                }
             }
         }
     }

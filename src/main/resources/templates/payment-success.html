@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paiement Réussi - COSONE</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 700px;
+            width: 100%;
+            overflow: hidden;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .success-icon {
+            width: 120px;
+            height: 120px;
+            background: white;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            color: #28a745;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            animation: scaleIn 0.6s ease-out 0.3s both;
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0);
+            }
+            to {
+                transform: scale(1);
+            }
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 18px;
+            opacity: 0.95;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .success-message {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .success-message h2 {
+            color: #155724;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        .success-message p {
+            color: #155724;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .reservation-summary {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .reservation-summary h3 {
+            color: #212529;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: #6c757d;
+            font-weight: 600;
+        }
+
+        .info-value {
+            color: #212529;
+            font-weight: 500;
+        }
+
+        .price-highlight {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 25px 0;
+        }
+
+        .price-highlight .label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .price-highlight .amount {
+            font-size: 36px;
+            font-weight: bold;
+        }
+
+        .actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            flex: 1;
+            min-width: 200px;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(40, 167, 69, 0.3);
+        }
+
+        .divider {
+            height: 2px;
+            background: linear-gradient(to right, transparent, #dee2e6, transparent);
+            margin: 25px 0;
+        }
+
+        .next-steps {
+            background: #e8f4f8;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 25px;
+        }
+
+        .next-steps h4 {
+            color: #0c5460;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .next-steps ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .next-steps li {
+            padding: 10px 0;
+            color: #495057;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .next-steps li i {
+            color: #17a2b8;
+            font-size: 18px;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 20px;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .success-icon {
+                width: 100px;
+                height: 100px;
+                font-size: 50px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="success-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h1>Paiement Réussi !</h1>
+            <p>Votre réservation est confirmée</p>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Success Message -->
+            <div class="success-message">
+                <h2><i class="fas fa-party-horn"></i> Félicitations !</h2>
+                <p>
+                    Votre paiement a été traité avec succès. Votre réservation est maintenant confirmée 
+                    et vous recevrez un email de confirmation sous peu.
+                </p>
+            </div>
+
+            <!-- Reservation Summary -->
+            <div class="reservation-summary">
+                <h3>
+                    <i class="fas fa-file-invoice"></i>
+                    Récapitulatif de la Réservation
+                </h3>
+
+                <div class="info-item">
+                    <span class="info-label">Réservation N°</span>
+                    <span class="info-value" th:text="${reservation.id}">123</span>
+                </div>
+
+                <div class="info-item">
+                    <span class="info-label">Centre</span>
+                    <span class="info-value" th:text="${reservation.centre.nom}">Centre</span>
+                </div>
+
+                <div class="info-item">
+                    <span class="info-label">Type de Logement</span>
+                    <span class="info-value" th:text="${reservation.typeLogement.nom}">Type</span>
+                </div>
+
+                <div class="info-item">
+                    <span class="info-label">Dates</span>
+                    <span class="info-value">
+                        <span th:text="${#temporals.format(reservation.dateDebut, 'dd/MM/yyyy')}"></span>
+                        -
+                        <span th:text="${#temporals.format(reservation.dateFin, 'dd/MM/yyyy')}"></span>
+                    </span>
+                </div>
+
+                <div class="info-item">
+                    <span class="info-label">Nombre de Personnes</span>
+                    <span class="info-value" th:text="${reservation.nombrePersonnes}">0</span>
+                </div>
+
+                <div class="info-item">
+                    <span class="info-label">Méthode de Paiement</span>
+                    <span class="info-value">Carte Bancaire (Stripe)</span>
+                </div>
+
+                <div class="info-item">
+                    <span class="info-label">Référence</span>
+                    <span class="info-value" th:text="${reservation.referencePaiement}">REF</span>
+                </div>
+            </div>
+
+            <!-- Price -->
+            <div class="price-highlight">
+                <div class="label">Montant Payé</div>
+                <div class="amount" th:text="${#numbers.formatDecimal(reservation.prixTotal, 0, 'COMMA', 2, 'POINT')} + ' DH'">1000.00 DH</div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- Next Steps -->
+            <div class="next-steps">
+                <h4>
+                    <i class="fas fa-info-circle"></i>
+                    Prochaines Étapes
+                </h4>
+                <ul>
+                    <li>
+                        <i class="fas fa-envelope"></i>
+                        Vous recevrez un email de confirmation avec tous les détails
+                    </li>
+                    <li>
+                        <i class="fas fa-calendar-check"></i>
+                        Présentez-vous au centre à la date d'arrivée
+                    </li>
+                    <li>
+                        <i class="fas fa-id-card"></i>
+                        N'oubliez pas votre pièce d'identité et le numéro de réservation
+                    </li>
+                    <li>
+                        <i class="fas fa-phone"></i>
+                        Pour toute question, contactez le centre directement
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Actions -->
+            <div class="actions">
+                <a th:href="@{/reservation/details/{id}(id=${reservation.id})}" class="btn btn-primary">
+                    <i class="fas fa-file-alt"></i>
+                    Voir les Détails
+                </a>
+
+                <a th:href="@{/user/history}" class="btn btn-success">
+                    <i class="fas fa-history"></i>
+                    Mes Réservations
+                </a>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <a th:href="@{/home}" style="color: #667eea; text-decoration: none; font-weight: 600;">
+                    <i class="fas fa-home"></i> Retour à l'Accueil
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

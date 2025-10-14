@@ -14,6 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -90,10 +91,9 @@ public class ReservationController {
 
             User user = userOpt.get();
             
-            // Parser les dates (format date seulement)
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
-            LocalDateTime dateDebut = LocalDateTime.parse(dateDebutStr, formatter);
-            LocalDateTime dateFin = LocalDateTime.parse(dateFinStr, formatter);
+            // Parser les dates (format date seulement depuis le formulaire HTML)
+            LocalDateTime dateDebut = LocalDate.parse(dateDebutStr).atStartOfDay();
+            LocalDateTime dateFin = LocalDate.parse(dateFinStr).atTime(23, 59, 59);
             
             // Récupérer le centre et le type de logement
             Centre centre = centreRepository.findById(centreId).orElseThrow();
@@ -184,7 +184,7 @@ public class ReservationController {
             redirectAttributes.addFlashAttribute("error", "Erreur lors de l'annulation: " + e.getMessage());
         }
         
-        return "redirect:/reservation";
+        return "redirect:/home";
     }
     
     /**

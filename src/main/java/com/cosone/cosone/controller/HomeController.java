@@ -76,4 +76,15 @@ public class HomeController {
         
         return "landing";
     }
+    
+    // Redirections pour les routes françaises
+    @GetMapping("/historique")
+    public String historique() {
+        return "redirect:/user/history";
+    }
+    
+    @GetMapping("/profil")
+    public String profil() {
+        return "redirect:/user/profile";
+    }
 } 

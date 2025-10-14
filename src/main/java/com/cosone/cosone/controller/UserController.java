@@ -29,7 +29,7 @@ public class UserController {
     /**
      * Afficher l'historique des réservations de l'utilisateur connecté
      */
-    @GetMapping("/history")
+    @GetMapping({"/history", "/historique"})
     public String showHistory(Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         
@@ -74,7 +74,7 @@ public class UserController {
     /**
      * Afficher le profil de l'utilisateur
      */
-    @GetMapping("/profile")
+    @GetMapping({"/profile", "/profil"})
     public String showProfile(Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         

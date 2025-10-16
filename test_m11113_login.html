@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Login M11113</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .form-group { margin: 10px 0; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+        button { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .result { margin-top: 20px; padding: 10px; border-radius: 4px; }
+        .success { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .error { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .info { background: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Test Login API - Utilisateur M11113</h1>
+        
+        <div class="form-group">
+            <label for="identifier">Identifiant (Matricule):</label>
+            <input type="text" id="identifier" value="M11113" placeholder="Entrez votre matricule">
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Mot de passe:</label>
+            <input type="password" id="password" value="admin" placeholder="Entrez votre mot de passe">
+        </div>
+        
+        <button onclick="testLogin()">🧪 Tester le Login</button>
+        
+        <div id="result"></div>
+        
+        <div class="info">
+            <h3>📋 Instructions:</h3>
+            <ol>
+                <li>Assurez-vous que Spring Boot est démarré (port 8080)</li>
+                <li>Vérifiez que l'utilisateur M11113 existe dans cosone_db</li>
+                <li>Cliquez sur "Tester le Login"</li>
+                <li>Regardez les logs dans la console (F12)</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        async function testLogin() {
+            const identifier = document.getElementById('identifier').value;
+            const password = document.getElementById('password').value;
+            const resultDiv = document.getElementById('result');
+            
+            console.log('🧪 Test de login avec:', { identifier, password });
+            
+            resultDiv.innerHTML = '<div class="info">🔄 Test en cours...</div>';
+            
+            try {
+                const response = await fetch('http://localhost:8080/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        identifier: identifier,
+                        password: password
+                    })
+                });
+                
+                console.log('📡 Réponse reçue:', response.status, response.statusText);
+                
+                const data = await response.json();
+                console.log('📊 Données reçues:', data);
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <h3>✅ Login réussi!</h3>
+                            <p><strong>Utilisateur:</strong> ${data.user.username}</p>
+                            <p><strong>Matricule:</strong> ${data.user.matricule}</p>
+                            <p><strong>Rôle:</strong> ${data.user.role}</p>
+                            <p><strong>Token:</strong> ${data.token.substring(0, 50)}...</p>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            <h3>❌ Login échoué</h3>
+                            <p><strong>Erreur:</strong> ${data.message}</p>
+                            <p><strong>Status:</strong> ${response.status}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('❌ Erreur:', error);
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h3>❌ Erreur de connexion</h3>
+                        <p><strong>Message:</strong> ${error.message}</p>
+                        <p><strong>Cause possible:</strong> Spring Boot n'est pas démarré ou l'API n'est pas accessible</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Test automatique au chargement de la page
+        window.onload = function() {
+            console.log('🚀 Page de test chargée');
+            console.log('🔍 Vérification de l\'API...');
+            
+            fetch('http://localhost:8080/api/auth/login', { method: 'POST' })
+                .then(response => {
+                    console.log('✅ API accessible - Status:', response.status);
+                })
+                .catch(error => {
+                    console.log('❌ API non accessible:', error.message);
+                });
+        };
+    </script>
+</body>
+</html>

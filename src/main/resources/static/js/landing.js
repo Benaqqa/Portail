@@ -47,6 +47,14 @@ function showSection(sectionId) {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM loaded, initializing landing page...');
     
+    // Add event listener for "Découvrir Notre Mission" button
+    const missionButton = document.querySelector('.btn-secondary');
+    if (missionButton) {
+        missionButton.addEventListener('click', function() {
+            showSection('qui-sommes-nous');
+        });
+    }
+    
     // Check if there's a hash in the URL
     const hash = window.location.hash.substring(1);
     if (hash) {

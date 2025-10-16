@@ -232,6 +232,9 @@
                         <input type="password" id="password" name="password" required placeholder="Entrez votre mot de passe">
                     </div>
                     <button type="submit" class="submit-btn">Se connecter</button>
+                    <div th:if="${error}" class="message error" style="margin-top: 12px;">
+                        <p th:text="${error}"></p>
+                    </div>
                 </form>
                 
                 <div class="first-login-toggle">
@@ -276,6 +279,9 @@
                         <input type="text" id="nom" name="nom" required placeholder="Entrez votre nom">
                     </div>
                     <button type="submit" class="submit-btn">Se connecter</button>
+                    <div th:if="${error}" class="message error" style="margin-top: 12px;">
+                        <p th:text="${error}"></p>
+                    </div>
                 </form>
             </div>
         </div>

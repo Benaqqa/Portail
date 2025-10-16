@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Landing Page - COSONE</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/landing.css}">
+    <link rel="stylesheet" th:href="@{/css/landing.css}?v=2025">
 </head>
 <body>
     <!-- Navigation Menu -->
@@ -53,21 +53,17 @@
 
     <!-- Main Content Area -->
     <main class="main-content">
-        <!-- Header -->
-        <header class="page-header">
-            <div class="header-content">
-                <div class="header-text">
-                    <h1>Bienvenue sur COSONE</h1>
-                    <p>Votre plateforme de gestion et de réservation</p>
-                </div>
-                <div class="header-actions">
-                    <a href="/login" class="login-header-btn">
-                        <i class="fas fa-sign-in-alt"></i>
-                        Se connecter
-                    </a>
+        <!-- Hero Section -->
+        <div class="hero">
+            <div class="hero-container">
+                <h1 class="hero-title">Portail Interactif du COS'ONE</h1>
+                <p class="hero-subtitle">Découvrez notre nouvelle plateforme digitale conçue pour être à la hauteur des attentes du personnel du COS'ONE.</p>
+                <div class="hero-actions">
+                    <a class="btn-hero btn-primary" href="/login">Accéder au Portail</a>
+                    <button class="btn-hero btn-secondary">Découvrir Notre Mission</button>
                 </div>
             </div>
-        </header>
+        </div>
 
         <!-- Content Sections -->
         <div class="content-container">
@@ -80,40 +76,49 @@
                     <div class="news-grid">
                         <article class="news-card">
                             <div class="news-image">
-                                <i class="fas fa-image"></i>
+                                <i class="fas fa-newspaper"></i>
                             </div>
                             <div class="news-content">
-                                <h3>Nouvelle formation disponible</h3>
-                                <p>Découvrez notre nouvelle formation en gestion de projet qui débutera le mois prochain.</p>
+                                <h3>Newsletter COS'ONE - Janvier 2025</h3>
+                                <p>Retrouvez toutes les actualités du mois : nouveaux services, événements à venir et témoignages du personnel.</p>
                                 <div class="news-meta">
-                                    <span class="news-date">15 Jan 2024</span>
-                                    <a href="#" class="read-more">Lire plus</a>
+                                    <span class="news-date">3 Janvier 2025</span>
+                                    <div class="news-actions">
+                                        <a href="#" class="read-more">Lire la newsletter</a>
+                                        <a href="#" class="read-more">Télécharger PDF</a>
+                                    </div>
                                 </div>
                             </div>
                         </article>
                         <article class="news-card">
                             <div class="news-image">
-                                <i class="fas fa-image"></i>
+                                <i class="fas fa-calendar-alt"></i>
                             </div>
                             <div class="news-content">
-                                <h3>Ouverture d'un nouveau centre</h3>
-                                <p>Nous sommes fiers d'annoncer l'ouverture de notre nouveau centre à Lyon.</p>
+                                <h3>Nouveaux services disponibles</h3>
+                                <p>Découvrez les nouveaux services mis à votre disposition : réservation en ligne, accompagnement personnalisé et plus encore.</p>
                                 <div class="news-meta">
-                                    <span class="news-date">10 Jan 2024</span>
-                                    <a href="#" class="read-more">Lire plus</a>
+                                    <span class="news-date">28 Décembre 2024</span>
+                                    <div class="news-actions">
+                                        <a href="#" class="read-more">Découvrir</a>
+                                        <a href="#" class="read-more">En savoir plus</a>
+                                    </div>
                                 </div>
                             </div>
                         </article>
                         <article class="news-card">
                             <div class="news-image">
-                                <i class="fas fa-image"></i>
+                                <i class="fas fa-users"></i>
                             </div>
                             <div class="news-content">
-                                <h3>Partenariat avec l'Université</h3>
-                                <p>Signature d'un nouveau partenariat avec l'Université de Paris pour des formations innovantes.</p>
+                                <h3>Événements à venir</h3>
+                                <p>Participez aux prochains événements organisés par le COS'ONE : formations, activités sportives et culturelles.</p>
                                 <div class="news-meta">
-                                    <span class="news-date">5 Jan 2024</span>
-                                    <a href="#" class="read-more">Lire plus</a>
+                                    <span class="news-date">20 Décembre 2024</span>
+                                    <div class="news-actions">
+                                        <a href="#" class="read-more">Voir le programme</a>
+                                        <a href="#" class="read-more">S'inscrire</a>
+                                    </div>
                                 </div>
                             </div>
                         </article>

@@ -9,8 +9,14 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 import com.cosone.cosone.service.UserDetailsServiceImpl;
 
@@ -18,8 +24,15 @@ import com.cosone.cosone.service.UserDetailsServiceImpl;
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
+    
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
+
+    @Autowired
+    private JwtAuthenticationFilter jwtAuthFilter;
+
+    @Autowired
+    private CorsConfigurationSource corsConfigurationSource;
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -42,31 +55,49 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+            .csrf(csrf -> csrf.disable())
+            .cors(cors -> cors.configurationSource(corsConfigurationSource))
             .authorizeHttpRequests(authz -> authz
-                // Public pages
+                // Public REST API endpoints
+                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/payment/webhook").permitAll()
+                .requestMatchers("/api/centres/**", "/api/types-logement/**").permitAll()
+                
+                // Admin REST API endpoints
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                
+                // Protected REST API endpoints
+                .requestMatchers("/api/**").authenticated()
+                
+                // Public pages (Thymeleaf - pour compatibilité)
                 .requestMatchers("/", "/landing", "/login", "/register", "/login/**", "/register/**", 
                                 "/create-password", "/verify-phone", "/resend-code",
                                 "/css/**", "/js/**", "/images/**", "/static/**").permitAll()
-                // Stripe payment routes (success/cancel pages need auth, webhook doesn't)
-                .requestMatchers("/payment/webhook").permitAll()
-                // Admin pages require ADMIN role
+                
+                // Admin pages (Thymeleaf)
                 .requestMatchers("/admin/**").hasRole("ADMIN")
-                // Other pages require authentication
+                
+                // Protected pages (Thymeleaf)
                 .requestMatchers("/home", "/espace-reservation", "/reservation/**", "/payment/**", 
                                 "/historique", "/profil", "/user/**").authenticated()
+                
                 .anyRequest().authenticated()
             )
-            .formLogin(form -> form
-                .loginPage("/login")
-                .permitAll()
-                .defaultSuccessUrl("/home", true)
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+            .formLogin(form -> form.disable())
+            .httpBasic(basic -> basic.disable())
+            .exceptionHandling(ex -> ex
+                .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
             )
             .logout(logout -> logout
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/login?message=Vous avez été déconnecté avec succès.")
                 .permitAll()
-            )
-            .csrf(csrf -> csrf.disable());
+            );
+        
         return http.build();
     }
-} 
+}

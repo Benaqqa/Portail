@@ -1,0 +1,40 @@
+/* COSONE Color Palette */
+:root {
+  /* Primary Colors - Bleu professionnel */
+  --primary-color: #3488c9;
+  --primary-light: #5ba3d9;
+  --primary-dark: #2c6ba3;
+  
+  /* Secondary Colors - Orange/Amber pour accent */
+  --secondary-color: #fbba14;
+  --secondary-light: #fccb3d;
+  --secondary-dark: #e6a612;
+  
+  /* Neutral Colors */
+  --text-primary: #1f2937;
+  --text-secondary: #6b7280;
+  --text-light: #9ca3af;
+  
+  /* Background Colors */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f9fafb;
+  --bg-tertiary: #f3f4f6;
+  
+  /* Success, Warning, Error */
+  --success-color: #10b981;
+  --warning-color: #f59e0b;
+  --error-color: #ef4444;
+  --info-color: #3488c9;
+  
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, #3488c9 0%, #5ba3d9 100%);
+  --gradient-secondary: linear-gradient(135deg, #fbba14 0%, #fccb3d 100%);
+  --gradient-success: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+

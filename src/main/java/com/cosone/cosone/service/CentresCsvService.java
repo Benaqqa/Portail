@@ -50,7 +50,7 @@ public class CentresCsvService {
                                 // Map CSV columns to our expected format
                                 switch (headers[i].toLowerCase()) {
                                     case "name":
-                                        centre.put("nom", value);
+                                        centre.put("name", value);
                                         break;
                                     case "description":
                                         centre.put("description", value);
@@ -67,13 +67,13 @@ public class CentresCsvService {
                                         centre.put("website", value);
                                         break;
                                     case "phone":
-                                        centre.put("telephone", value);
+                                        centre.put("phone", value);
                                         break;
                                     case "featured_image":
                                         centre.put("image", value);
                                         break;
                                     case "address":
-                                        centre.put("adresse", value);
+                                        centre.put("address", value);
                                         // Extract city from address if possible
                                         String city = extractCityFromAddress(value);
                                         if (city != null) {
@@ -85,17 +85,17 @@ public class CentresCsvService {
                         }
                         
                         // Set default values for missing fields
-                        if (!centre.containsKey("nom")) {
-                            centre.put("nom", "Centre sans nom");
+                        if (!centre.containsKey("name")) {
+                            centre.put("name", "Centre sans nom");
                         }
-                        if (!centre.containsKey("adresse")) {
-                            centre.put("adresse", "Adresse non disponible");
+                        if (!centre.containsKey("address")) {
+                            centre.put("address", "Adresse non disponible");
                         }
                         if (!centre.containsKey("ville")) {
                             centre.put("ville", "Ville non disponible");
                         }
-                        if (!centre.containsKey("telephone")) {
-                            centre.put("telephone", "Téléphone non disponible");
+                        if (!centre.containsKey("phone")) {
+                            centre.put("phone", "Téléphone non disponible");
                         }
                         if (!centre.containsKey("description")) {
                             centre.put("description", "Aucune description disponible");
@@ -105,7 +105,7 @@ public class CentresCsvService {
                         centre.put("actif", true);
                         
                         // Only add centres that have at least a name
-                        if (StringUtils.hasText((String) centre.get("nom"))) {
+                        if (StringUtils.hasText((String) centre.get("name"))) {
                             centres.add(centre);
                         }
                     }

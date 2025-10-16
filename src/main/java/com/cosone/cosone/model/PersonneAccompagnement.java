@@ -25,14 +25,18 @@ public class PersonneAccompagnement {
     @Column(nullable = false)
     private String lienParente;
 
+    @Column
+    private String telephone;
+
     // Constructeurs
     public PersonneAccompagnement() {}
 
-    public PersonneAccompagnement(String nom, String prenom, String cin, String lienParente) {
+    public PersonneAccompagnement(String nom, String prenom, String cin, String lienParente, String telephone) {
         this.nom = nom;
         this.prenom = prenom;
         this.cin = cin;
         this.lienParente = lienParente;
+        this.telephone = telephone;
     }
 
     // Getters et Setters
@@ -53,6 +57,9 @@ public class PersonneAccompagnement {
 
     public String getLienParente() { return lienParente; }
     public void setLienParente(String lienParente) { this.lienParente = lienParente; }
+
+    public String getTelephone() { return telephone; }
+    public void setTelephone(String telephone) { this.telephone = telephone; }
 
     @Override
     public String toString() {

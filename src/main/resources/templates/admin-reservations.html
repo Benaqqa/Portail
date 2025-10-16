@@ -128,53 +128,87 @@
 
         <div class="stats-container">
             <div class="stat-box">
-                <div class="stat-number">0</div>
+                <div class="stat-number" th:text="${totalReservations}">0</div>
                 <div class="stat-label">Total réservations</div>
             </div>
             <div class="stat-box">
-                <div class="stat-number">0</div>
-                <div class="stat-label">En attente</div>
+                <div class="stat-number" th:text="${pendingReservations}">0</div>
+                <div class="stat-label">En attente paiement</div>
             </div>
             <div class="stat-box">
-                <div class="stat-number">0</div>
+                <div class="stat-number" th:text="${confirmedReservations}">0</div>
                 <div class="stat-label">Confirmées</div>
             </div>
             <div class="stat-box">
-                <div class="stat-number">0</div>
+                <div class="stat-number" th:text="${cancelledReservations}">0</div>
                 <div class="stat-label">Annulées</div>
             </div>
         </div>
 
-        <div class="info-box">
-            <i class="fas fa-info-circle"></i>
-            <strong>Fonctionnalité en développement :</strong> Le système de gestion des réservations sera bientôt disponible.
-            Les réservations seront stockées dans la base de données et affichées ici.
+        <div th:if="${error}" class="message error">
+            <i class="fas fa-exclamation-circle"></i> <span th:text="${error}"></span>
         </div>
 
         <h2><i class="fas fa-list"></i> Liste des Réservations</h2>
 
-        <table>
+        <table th:if="${reservations != null and !reservations.isEmpty()}">
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Utilisateur</th>
+                    <th>Matricule</th>
+                    <th>CIN</th>
                     <th>Centre</th>
                     <th>Type Logement</th>
                     <th>Date Début</th>
                     <th>Date Fin</th>
                     <th>Statut</th>
+                    <th>Prix Total</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td colspan="8" style="text-align: center; padding: 40px; color: #6c757d;">
-                        <i class="fas fa-inbox" style="font-size: 3em; margin-bottom: 10px; display: block;"></i>
-                        Aucune réservation pour le moment.
+                <tr th:each="reservation : ${reservations}">
+                    <td th:text="${reservation.id}"></td>
+                    <td th:text="${reservation.matricule}"></td>
+                    <td th:text="${reservation.cin}"></td>
+                    <td th:text="${reservation.centre?.name ?: 'N/A'}"></td>
+                    <td th:text="${reservation.typeLogement?.type ?: 'N/A'}"></td>
+                    <td th:text="${#temporals.format(reservation.dateDebut, 'dd/MM/yyyy HH:mm')}"></td>
+                    <td th:text="${#temporals.format(reservation.dateFin, 'dd/MM/yyyy HH:mm')}"></td>
+                    <td>
+                        <span th:if="${reservation.statut?.name() == 'EN_ATTENTE_PAIEMENT'}" class="status-badge status-pending">
+                            <i class="fas fa-clock"></i> En attente paiement
+                        </span>
+                        <span th:if="${reservation.statut?.name() == 'CONFIRMEE'}" class="status-badge status-confirmed">
+                            <i class="fas fa-check"></i> Confirmée
+                        </span>
+                        <span th:if="${reservation.statut?.name() == 'ANNULEE'}" class="status-badge status-cancelled">
+                            <i class="fas fa-times"></i> Annulée
+                        </span>
+                        <span th:if="${reservation.statut?.name() == 'PAYEE'}" class="status-badge status-confirmed">
+                            <i class="fas fa-euro-sign"></i> Payée
+                        </span>
+                        <span th:if="${reservation.statut?.name() == 'EXPIREE'}" class="status-badge status-cancelled">
+                            <i class="fas fa-hourglass-end"></i> Expirée
+                        </span>
+                    </td>
+                    <td th:text="${reservation.prixTotal != null ? reservation.prixTotal + '€' : 'N/A'}"></td>
+                    <td>
+                        <button class="btn-action" style="background-color: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; margin-right: 5px;">
+                            <i class="fas fa-eye"></i> Voir
+                        </button>
+                        <button class="btn-action" style="background-color: #007bff; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">
+                            <i class="fas fa-edit"></i> Modifier
+                        </button>
                     </td>
                 </tr>
             </tbody>
         </table>
+
+        <div th:if="${reservations == null or reservations.isEmpty()}" class="info-box">
+            <i class="fas fa-inbox"></i>
+            <strong>Aucune réservation trouvée.</strong> Les réservations apparaîtront ici une fois créées par les utilisateurs.
+        </div>
 
         <a href="/home" class="back-link">
             <i class="fas fa-arrow-left"></i> Retour au Tableau de Bord

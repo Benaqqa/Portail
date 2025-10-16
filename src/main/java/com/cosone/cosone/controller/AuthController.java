@@ -316,13 +316,6 @@ public class AuthController {
         return "redirect:/home";
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/admin/generate-code")
-    public String showGenerateCodeForm(Model model) {
-        // Also load existing codes to show them
-        model.addAttribute("existingCodes", externAuthCodeRepository.findAll());
-        return "admin-generate-code";
-    }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/admin/generate-code")
@@ -332,8 +325,7 @@ public class AuthController {
                                    Model model) {
         if (externAuthCodeRepository.findByCode(code).isPresent()) {
             model.addAttribute("error", "Le code existe déjà");
-            model.addAttribute("existingCodes", externAuthCodeRepository.findAll());
-            return "admin-generate-code";
+            return "redirect:/admin/generate-code";
         }
         ExternAuthCode newCode = new ExternAuthCode();
         newCode.setCode(code);
@@ -341,8 +333,7 @@ public class AuthController {
         newCode.setNom(nom);
         externAuthCodeRepository.save(newCode);
         model.addAttribute("message", "Code généré : " + code + " pour " + prenom + " " + nom);
-        model.addAttribute("existingCodes", externAuthCodeRepository.findAll());
-        return "admin-generate-code";
+        return "redirect:/admin/generate-code";
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -356,16 +347,9 @@ public class AuthController {
             externAuthCodeRepository.delete(code);
             model.addAttribute("message", "Code supprimé : " + code.getCode() + " pour " + code.getPrenom() + " " + code.getNom());
         }
-        model.addAttribute("existingCodes", externAuthCodeRepository.findAll());
-        return "admin-generate-code";
+        return "redirect:/admin/generate-code";
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/admin/users")
-    public String adminUsers(Model model) {
-        model.addAttribute("users", userRepository.findAll());
-        return "admin-users";
-    }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/admin/users/add-phone")
@@ -373,14 +357,13 @@ public class AuthController {
         var userOpt = userRepository.findById(userId);
         if (userOpt.isEmpty()) {
             model.addAttribute("error", "Utilisateur introuvable");
-            return "admin-users";
+            return "redirect:/admin/users";
         }
         User user = userOpt.get();
         user.setPhoneNumber(phoneNumber);
         userRepository.save(user);
         model.addAttribute("message", "Numéro de téléphone ajouté avec succès");
-        model.addAttribute("users", userRepository.findAll());
-        return "admin-users";
+        return "redirect:/admin/users";
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -389,14 +372,13 @@ public class AuthController {
         var userOpt = userRepository.findById(userId);
         if (userOpt.isEmpty()) {
             model.addAttribute("error", "Utilisateur introuvable");
-            return "admin-users";
+            return "redirect:/admin/users";
         }
         User user = userOpt.get();
         user.setPhoneNumber(phoneNumber);
         userRepository.save(user);
         model.addAttribute("message", "Numéro de téléphone mis à jour avec succès");
-        model.addAttribute("users", userRepository.findAll());
-        return "admin-users";
+        return "redirect:/admin/users";
     }
 
     @GetMapping("/dev/sms")

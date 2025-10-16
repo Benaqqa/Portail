@@ -169,7 +169,7 @@
         <div class="stats-grid">
             <div class="stat-card">
                 <i class="fas fa-users"></i>
-                <div class="stat-number">0</div>
+                <div class="stat-number" th:text="${totalUsers}">0</div>
                 <div class="stat-label">Utilisateurs inscrits</div>
             </div>
             <div class="stat-card">
@@ -179,13 +179,13 @@
             </div>
             <div class="stat-card">
                 <i class="fas fa-calendar-check"></i>
-                <div class="stat-number">0</div>
-                <div class="stat-label">Réservations ce mois</div>
+                <div class="stat-number" th:text="${totalReservations}">0</div>
+                <div class="stat-label">Total réservations</div>
             </div>
             <div class="stat-card">
-                <i class="fas fa-euro-sign"></i>
-                <div class="stat-number">0€</div>
-                <div class="stat-label">Revenus ce mois</div>
+                <i class="fas fa-key"></i>
+                <div class="stat-number" th:text="${totalAuthCodes}">0</div>
+                <div class="stat-label">Codes d'authentification</div>
             </div>
         </div>
 

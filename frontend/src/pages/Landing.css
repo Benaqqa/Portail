@@ -1844,21 +1844,21 @@ button.nav-item:hover {
 .actualites-list {
   display: flex;
   flex-direction: column;
-  gap: 40px;
+  gap: 20px;
   margin-top: 40px;
 }
 
 .actualite-item {
   display: flex;
   align-items: stretch;
-  gap: 40px;
-  padding: 30px;
+  gap: 20px;
+  padding: 16px;
   background: white;
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
   border: 1px solid #e2e8f0;
   transition: all 0.3s ease;
-  min-height: 160px;
+  min-height: 100px;
 }
 
 .actualite-item:hover {
@@ -1965,8 +1965,8 @@ button.nav-item:hover {
 }
 
 .actualite-image-placeholder {
-  width: 120px;
-  height: 80px;
+  width: 100px;
+  height: 64px;
   flex-shrink: 0;
   border-radius: 8px;
   overflow: hidden;
@@ -2090,8 +2090,8 @@ button.nav-item:hover {
   }
   
   .actualite-image-placeholder {
-    width: 120px;
-    height: 80px;
+    width: 100px;
+    height: 64px;
     align-self: center;
     order: -1;
   }

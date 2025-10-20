@@ -12,6 +12,7 @@ import ReservationDetails from './pages/ReservationDetails'
 import UserHistory from './pages/UserHistory'
 import UserProfile from './pages/UserProfile'
 import AdminCentres from './pages/admin/AdminCentres'
+import AdminEditCentre from './pages/admin/AdminEditCentre'
 import AdminReservations from './pages/admin/AdminReservations'
 import AdminUsers from './pages/admin/AdminUsers'
 import AdminGenerateCode from './pages/admin/AdminGenerateCode'
@@ -121,6 +122,14 @@ function App() {
             element={
               <ProtectedRoute adminOnly>
                 <AdminCentres />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/home/admin/centres/edit/:centreId"
+            element={
+              <ProtectedRoute adminOnly>
+                <AdminEditCentre />
               </ProtectedRoute>
             }
           />

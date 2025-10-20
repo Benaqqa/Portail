@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
+import api from '../services/api'
 import AnimatedList from '../components/AnimatedList'
 import BlurText from '../components/BlurText'
 import '../colors.css'
@@ -8,6 +9,9 @@ import './Landing.css'
 function Landing() {
   const [activeSection, setActiveSection] = useState('actualites')
   const [centres, setCentres] = useState([])
+  const [actualites, setActualites] = useState([])
+  const [actualitesLoading, setActualitesLoading] = useState(false)
+  const [actualitesError, setActualitesError] = useState('')
   const [loading, setLoading] = useState(false)
   
   // États pour le moteur de recherche
@@ -233,6 +237,27 @@ function Landing() {
     }
   }, [activeSection, centres.length])
 
+  // Charger les actualités dynamiques quand la section "actualites" est activée
+  useEffect(() => {
+    const loadActualites = async () => {
+      try {
+        setActualitesLoading(true)
+        setActualitesError('')
+        const resp = await api.get('/api/public/actualites')
+        const list = resp.data?.actualites || resp.data || []
+        setActualites(list)
+      } catch (e) {
+        console.error('Erreur chargement actualités landing:', e)
+        setActualitesError("Impossible de charger les actualités")
+      } finally {
+        setActualitesLoading(false)
+      }
+    }
+    if (activeSection === 'actualites' && actualites.length === 0) {
+      loadActualites()
+    }
+  }, [activeSection, actualites.length])
+
   return (
     <div className="landing-page">
       {/* Navigation */}
@@ -403,125 +428,33 @@ function Landing() {
                 <h2 className="section-title">Actualités</h2>
                 
                 <div className="actualites-list">
-                  <div className="actualite-item aligned">
-                    <div className="actualite-image-placeholder">
-                      <img src="/src/Logo/vacances.webp" alt="Nouveau portail" />
-                    </div>
-                    <div className="actualite-content">
-                      <div className="actualite-meta">
-                        <span className="actualite-date">15 Janvier 2025</span>
+                  {actualitesLoading && (
+                    <div className="loading-container"><div className="loading-spinner"></div><p>Chargement des actualités...</p></div>
+                  )}
+                  {actualitesError && (
+                    <div className="alert alert-error"><i className="fas fa-exclamation-circle"></i> {actualitesError}</div>
+                  )}
+                  {(!actualitesLoading && actualites.length === 0 && !actualitesError) && (
+                    <div className="empty-state"><p>Aucune actualité publiée pour le moment.</p></div>
+                  )}
+                  {actualites.map((act, idx) => (
+                    <div key={act.id || idx} className="actualite-item aligned">
+                      <div className="actualite-image-placeholder">
+                        {act.imageUrl ? (
+                          <img src={act.imageUrl} alt={act.titre || 'Actualité'} />
+                        ) : (
+                          <img src="/src/Logo/LOGO.png" alt="Actualité" />
+                        )}
                       </div>
-                      <h3 className="actualite-title">Lancement du Portail Interactif COS'ONE</h3>
-                      <p className="actualite-text">
-                        Découvrez notre nouvelle plateforme digitale qui révolutionne l'expérience du personnel. 
-                        Accédez à tous vos services en ligne avec une interface moderne et intuitive.
-                      </p>
-                      <div className="actualite-actions">
-                        <a href="#" className="btn-actualite">Lire la suite</a>
-                        <a href="#" className="btn-download">Télécharger le communiqué</a>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="actualite-item aligned">
-                    <div className="actualite-image-placeholder">
-                      <img src="/src/Logo/kids.jpg" alt="Assemblée générale" />
-                    </div>
-                    <div className="actualite-content">
-                      <div className="actualite-meta">
-                        <span className="actualite-date">10 Janvier 2025</span>
-                      </div>
-                      <h3 className="actualite-title">Assemblée Générale du COS'ONE 2025</h3>
-                      <p className="actualite-text">
-                        L'assemblée générale annuelle se tiendra le 28 février 2025. 
-                        Inscription obligatoire via le portail jusqu'au 20 février.
-                      </p>
-                      <div className="actualite-actions">
-                        <a href="#" className="btn-actualite">S'inscrire</a>
-                        <a href="#" className="btn-download">Télécharger le communiqué</a>
+                      <div className="actualite-content">
+                        <div className="actualite-meta">
+                          <span className="actualite-date">{act.datePublication ? new Date(act.datePublication).toLocaleDateString('fr-FR') : ''}</span>
+                        </div>
+                        <h3 className="actualite-title">{act.titre}</h3>
+                        <p className="actualite-text">{act.contenu?.length > 300 ? act.contenu.substring(0, 300) + '…' : act.contenu}</p>
                       </div>
                     </div>
-                  </div>
-
-                  <div className="actualite-item aligned">
-                    <div className="actualite-image-placeholder">
-                      <img src="/src/Logo/vacances 1.webp" alt="Formation en ligne" />
-                    </div>
-                    <div className="actualite-content">
-                      <div className="actualite-meta">
-                        <span className="actualite-date">8 Janvier 2025</span>
-                      </div>
-                      <h3 className="actualite-title">Nouveaux Modules de Formation en Ligne</h3>
-                      <p className="actualite-text">
-                        Découvrez nos nouveaux modules de formation disponibles sur la plateforme : 
-                        gestion du stress, communication digitale et bien-être au travail.
-                      </p>
-                      <div className="actualite-actions">
-                        <a href="#" className="btn-actualite">Consulter le catalogue</a>
-                        <a href="#" className="btn-download">Télécharger le communiqué</a>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="actualite-item aligned">
-                    <div className="actualite-image-placeholder">
-                      <img src="/src/Logo/vacances 2.webp" alt="Centres de vacances" />
-                    </div>
-                    <div className="actualite-content">
-                      <div className="actualite-meta">
-                        <span className="actualite-date">5 Janvier 2025</span>
-                      </div>
-                      <h3 className="actualite-title">Ouverture des Réservations Été 2025</h3>
-                      <p className="actualite-text">
-                        Les réservations pour les centres de vacances d'été sont maintenant ouvertes. 
-                        Tarifs préférentiels pour les premiers inscrits.
-                      </p>
-                      <div className="actualite-actions">
-                        <a href="#" className="btn-actualite">Réserver maintenant</a>
-                        <a href="#" className="btn-download">Télécharger la brochure</a>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="actualite-item aligned">
-                    <div className="actualite-image-placeholder">
-                      <img src="/src/Logo/centre_de_vacances.jpg" alt="Newsletter" />
-                    </div>
-                    <div className="actualite-content">
-                      <div className="actualite-meta">
-                        <span className="actualite-date">3 Janvier 2025</span>
-                      </div>
-                      <h3 className="actualite-title">Newsletter COS'ONE - Janvier 2025</h3>
-                      <p className="actualite-text">
-                        Retrouvez toutes les actualités du mois : nouveaux services, 
-                        événements à venir et témoignages du personnel.
-                      </p>
-                      <div className="actualite-actions">
-                        <a href="#" className="btn-actualite">Lire la newsletter</a>
-                        <a href="#" className="btn-download">Télécharger PDF</a>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="actualite-item aligned">
-                    <div className="actualite-image-placeholder">
-                      <img src="/src/Logo/LOGO.png" alt="Orientations stratégiques" />
-                    </div>
-                    <div className="actualite-content">
-                      <div className="actualite-meta">
-                        <span className="actualite-date">1er Janvier 2025</span>
-                      </div>
-                      <h3 className="actualite-title">Nouvelles Orientations Stratégiques 2025</h3>
-                      <p className="actualite-text">
-                        Découvrez les nouvelles orientations du COS'ONE pour 2025 : 
-                        digitalisation, innovation sociale et proximité humaine renforcée.
-                      </p>
-                      <div className="actualite-actions">
-                        <a href="#" className="btn-actualite">Consulter le document</a>
-                        <a href="#" className="btn-download">Télécharger le communiqué</a>
-                      </div>
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </div>
             </section>

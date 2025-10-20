@@ -449,15 +449,9 @@ function Home() {
                   <div className="actualite-content">
                     <div className="actualite-meta">
                       <span className="actualite-date">{act.datePublication ? new Date(act.datePublication).toLocaleDateString('fr-FR') : ''}</span>
-                      {act.featured && <span className="actualite-tag">En vedette</span>}
                     </div>
                     <h3 className="actualite-title">{act.titre}</h3>
                     <p className="actualite-text">{act.contenu?.length > 300 ? act.contenu.substring(0, 300) + '…' : act.contenu}</p>
-                    <div className="actualite-actions">
-                      {act.pieceJointe && (
-                        <a href={act.pieceJointe} className="btn-download" target="_blank" rel="noreferrer">Télécharger</a>
-                      )}
-                    </div>
                   </div>
                 </div>
               ))}

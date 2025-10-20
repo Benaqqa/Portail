@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { adminService } from '../../services/adminService'
+import AnimatedList from '../../components/AnimatedList'
 
 function AdminCentres() {
   const navigate = useNavigate()
@@ -38,17 +39,20 @@ function AdminCentres() {
   }, [])
 
   const handleEditCentre = (centre) => {
-    setEditingCentre(centre)
-    setCentreForm({
-      nom: centre.nom || '',
-      adresse: centre.adresse || '',
-      ville: centre.ville || '',
-      telephone: centre.telephone || '',
-      description: centre.description || '',
-      actif: centre.actif || true,
-      rating: centre.rating || 4.0
-    })
-    setShowEditModal(true)
+    console.log('Centre to edit:', centre)
+    console.log('Centre ID:', centre.id)
+    console.log('Centre name:', centre.nom)
+    
+    // Try different ID properties
+    const centreId = centre.id || centre.name || centre.nom
+    console.log('Using centreId:', centreId)
+    
+    if (centreId) {
+      navigate(`/home/admin/centres/edit/${centreId}`)
+    } else {
+      console.error('No valid ID found for centre:', centre)
+      alert('Erreur: Impossible de trouver l\'ID du centre')
+    }
   }
 
   const handleAddCentre = () => {
@@ -168,38 +172,78 @@ function AdminCentres() {
           </div>
         </div>
         
-        <div className="centres-grid">
-          {centres.map((centre, index) => (
-            <div key={index} className="centre-card">
-              <div className="centre-card-header">
-                <h3>{centre.nom || centre.name || 'Nom non disponible'}</h3>
-                <div className="centre-actions">
-                  <button 
-                    onClick={() => handleEditCentre(centre)}
-                    className="btn-edit-small"
-                    title="Modifier"
-                  >
-                    <i className="fas fa-edit"></i>
-                  </button>
-                  <button 
-                    onClick={() => handleDeleteCentre(centre.id)}
-                    className="btn-delete-small"
-                    title="Supprimer"
-                  >
-                    <i className="fas fa-trash"></i>
-                  </button>
-                </div>
-              </div>
-              <p><strong>Adresse:</strong> {centre.adresse || centre.address || 'Non disponible'}</p>
-              {centre.ville && <p><strong>Ville:</strong> {centre.ville}</p>}
-              {centre.telephone && <p><strong>Téléphone:</strong> {centre.telephone}</p>}
-              {centre.rating && <p><strong>Note:</strong> {centre.rating}/5 ⭐</p>}
-              {centre.description && <p><strong>Description:</strong> {centre.description}</p>}
-              <div className={`status-badge ${centre.actif ? 'status-active' : 'status-inactive'}`}>
-                {centre.actif ? 'Actif' : 'Inactif'}
-              </div>
-            </div>
-          ))}
+        <div className="centres-animated-container">
+          <div className="centres-info">
+            <h3>Nos Centres de Vacances</h3>
+            <p>Cliquez sur un centre pour voir plus de détails et gérer</p>
+          </div>
+          <div className="centres-list-wrapper">
+            <AnimatedList
+              items={centres.map(centre => `${centre.nom || centre.name || 'Nom non disponible'} - ${centre.ville || 'Ville non disponible'}`)}
+              onItemSelect={(item, index) => {
+                const selectedCentre = centres[index];
+                console.log('Centre sélectionné:', selectedCentre);
+              }}
+              expandedContent={(item, index) => {
+                const centre = centres[index];
+                return (
+                  <div className="centre-admin-details">
+                    <div className="centre-detail-section">
+                      <h4>Informations du centre</h4>
+                      <p>{centre.description || 'Centre de vacances de qualité'}</p>
+                      
+                      <div className="centre-detail">
+                        <i className="fas fa-map-marker-alt"></i>
+                        <span>{centre.adresse || centre.address || 'Adresse non disponible'}, {centre.ville || 'Ville non disponible'}</span>
+                      </div>
+                      
+                      {(centre.telephone || centre.phone) && (
+                        <div className="centre-detail">
+                          <i className="fas fa-phone"></i>
+                          <span>{centre.telephone || centre.phone}</span>
+                        </div>
+                      )}
+                      
+                      {centre.rating && (
+                        <div className="centre-rating">
+                          <div className="rating-stars">
+                            {[...Array(5)].map((_, i) => (
+                              <span key={i} className={i < Math.floor(centre.rating) ? 'star filled' : 'star empty'}>
+                                ★
+                              </span>
+                            ))}
+                          </div>
+                          <span className="rating-value">{centre.rating}</span>
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div className="centre-admin-actions">
+                      <button 
+                        onClick={() => handleEditCentre(centre)}
+                        className="btn-edit"
+                        title="Modifier le centre"
+                      >
+                        <i className="fas fa-edit"></i> Modifier
+                      </button>
+                      <button 
+                        onClick={() => handleDeleteCentre(centre.id || centre.name)}
+                        className="btn-delete"
+                        title="Supprimer le centre"
+                      >
+                        <i className="fas fa-trash"></i> Supprimer
+                      </button>
+                    </div>
+                  </div>
+                );
+              }}
+              showGradients={true}
+              enableArrowNavigation={true}
+              displayScrollbar={true}
+              className="centres-animated-list"
+              itemClassName="centre-item"
+            />
+          </div>
         </div>
 
         {/* Add/Edit Centre Modal */}

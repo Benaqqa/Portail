@@ -2,14 +2,12 @@ package com.cosone.cosone.controller.api;
 
 import com.cosone.cosone.model.*;
 import com.cosone.cosone.repository.*;
-import com.cosone.cosone.service.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -18,9 +16,6 @@ import java.util.Optional;
 @RequestMapping("/api/reservations")
 @CrossOrigin(origins = "http://localhost:3000")
 public class ReservationRestController {
-
-    @Autowired
-    private ReservationService reservationService;
 
     @Autowired
     private ReservationRepository reservationRepository;
@@ -113,10 +108,10 @@ public class ReservationRestController {
     }
 
     /**
-     * Récupérer toutes les réservations de l'utilisateur connecté
+     * Récupérer toutes les réservations de l'utilisateur connecté par matricule
      */
-    @GetMapping("/user")
-    public List<Reservation> getUserReservations(Authentication auth) {
+    @GetMapping("/user/matricule")
+    public List<Reservation> getUserReservationsByMatricule(Authentication auth) {
         String username = auth.getName();
         Optional<User> userOpt = userRepository.findByUsername(username);
         if (userOpt.isEmpty()) {
@@ -126,6 +121,22 @@ public class ReservationRestController {
         User user = userOpt.get();
         String matricule = user.getMatricule();
         return reservationRepository.findByMatriculeOrderByDateReservationDesc(matricule);
+    }
+
+    /**
+     * Récupérer toutes les réservations de l'utilisateur connecté par CIN (fallback)
+     */
+    @GetMapping("/user/cin")
+    public List<Reservation> getUserReservationsByCin(Authentication auth) {
+        String username = auth.getName();
+        Optional<User> userOpt = userRepository.findByUsername(username);
+        if (userOpt.isEmpty()) {
+            return List.of(); // Retourner une liste vide si utilisateur non trouvé
+        }
+        
+        User user = userOpt.get();
+        String cin = user.getNumCin();
+        return reservationRepository.findByCinOrderByDateReservationDesc(cin);
     }
 
     /**

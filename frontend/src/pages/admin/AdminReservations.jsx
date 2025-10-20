@@ -102,8 +102,8 @@ function AdminReservations() {
                   <td>{reservation.id}</td>
                   <td>{reservation.matricule}</td>
                   <td>{reservation.numCin}</td>
-                  <td>{reservation.centreNom}</td>
-                  <td>{reservation.typeLogementNom}</td>
+                  <td>{reservation.centre?.nom || reservation.centreNom || 'N/A'}</td>
+                  <td>{reservation.typeLogement?.nom || reservation.typeLogementNom || 'N/A'}</td>
                   <td>{reservation.dateDebut ? new Date(reservation.dateDebut).toLocaleDateString('fr-FR') : 'N/A'}</td>
                   <td>{reservation.dateFin ? new Date(reservation.dateFin).toLocaleDateString('fr-FR') : 'N/A'}</td>
                   <td>

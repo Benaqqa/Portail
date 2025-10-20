@@ -19,9 +19,21 @@ const reservationService = {
     return response.data
   },
 
-  // Récupérer l'historique des réservations de l'utilisateur
+  // Récupérer l'historique des réservations de l'utilisateur par matricule
+  getUserReservationsByMatricule: async () => {
+    const response = await api.get('/api/reservations/user/matricule')
+    return response.data
+  },
+
+  // Récupérer l'historique des réservations de l'utilisateur par CIN
+  getUserReservationsByCin: async () => {
+    const response = await api.get('/api/reservations/user/cin')
+    return response.data
+  },
+
+  // Récupérer l'historique des réservations de l'utilisateur (alias)
   getUserReservations: async () => {
-    const response = await api.get('/api/reservations/user')
+    const response = await api.get('/api/reservations/user/cin')
     return response.data
   },
 

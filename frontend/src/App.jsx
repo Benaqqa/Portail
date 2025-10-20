@@ -117,7 +117,7 @@ function App() {
 
           {/* Admin Routes */}
           <Route
-            path="/admin/centres"
+            path="/home/admin/centres"
             element={
               <ProtectedRoute adminOnly>
                 <AdminCentres />
@@ -125,7 +125,7 @@ function App() {
             }
           />
           <Route
-            path="/admin/reservations"
+            path="/home/admin/reservations"
             element={
               <ProtectedRoute adminOnly>
                 <AdminReservations />
@@ -133,7 +133,7 @@ function App() {
             }
           />
           <Route
-            path="/admin/users"
+            path="/home/admin/users"
             element={
               <ProtectedRoute adminOnly>
                 <AdminUsers />
@@ -141,7 +141,7 @@ function App() {
             }
           />
           <Route
-            path="/admin/generate-code"
+            path="/home/admin/generate-code"
             element={
               <ProtectedRoute adminOnly>
                 <AdminGenerateCode />
@@ -149,7 +149,7 @@ function App() {
             }
           />
           <Route
-            path="/admin/actualites"
+            path="/home/admin/actualites"
             element={
               <ProtectedRoute adminOnly>
                 <AdminActualites />

@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
+import AnimatedList from '../components/AnimatedList'
+import BlurText from '../components/BlurText'
 import '../colors.css'
 import './Landing.css'
 
@@ -331,12 +333,28 @@ function Landing() {
           <section className="content-section active">
             <div className="hero">
               <div className="hero-container">
-                <h1 className="hero-title">
-                  Portail Interactif du COS'ONE
-                </h1>
-                <p className="hero-subtitle">
-                  Découvrez notre nouvelle plateforme digitale conçue pour être à la hauteur des attentes du personnel du COS'ONE.
-                </p>
+                <BlurText
+                  text="Portail Interactif du COS'ONE"
+                  delay={14}
+                  animateBy="chars"
+                  direction="top"
+                  onAnimationComplete={() => {
+                    console.log('Hero title animation completed!');
+                  }}
+                  className="hero-title"
+                  tag="h1"
+                />
+                <BlurText
+                  text="Découvrez notre nouvelle plateforme digitale conçue pour être à la hauteur des attentes du personnel du COS'ONE."
+                  delay={5}
+                  animateBy="chars"
+                  direction="top"
+                  onAnimationComplete={() => {
+                    console.log('Hero subtitle animation completed!');
+                  }}
+                  className="hero-subtitle"
+                  tag="p"
+                />
                 <div className="hero-actions">
                   <Link to="/login" className="btn-hero btn-primary">
                     Accéder au Portail
@@ -381,7 +399,7 @@ function Landing() {
 
             {/* Actualités */}
             <section className="section-actualites">
-              <div className="container">
+              <div className="container-full-width">
                 <h2 className="section-title">Actualités</h2>
                 
                 <div className="actualites-list">
@@ -508,7 +526,7 @@ function Landing() {
               </div>
             </section>
 
-            {/* CTA Section */}
+            {/* CTA Section - Only show on actualites section */}
             <section className="section-cta">
               <div className="container">
                 <div className="cta-content">
@@ -523,6 +541,7 @@ function Landing() {
                 </div>
               </div>
             </section>
+
           </section>
         )}
 
@@ -534,25 +553,26 @@ function Landing() {
                 <h2 className="section-title">Qui sommes-nous</h2>
               </div>
               
-              <div className="about-content">
-                <div className="about-text">
-                  <h3>Orientations stratégiques et innovation digitale</h3>
-                  <p>En tenant compte des orientations stratégiques du Conseil des œuvres sociales de l'ONE pour être à la hauteur des attentes du personnel du COS'ONE, nous avons développé un <strong>portail web interactif et innovant</strong> qui révolutionne notre approche du service social.</p>
-                  
-                  <p>Cette plateforme digitale moderne facilite l'échange, le partage et la communication entre le COS'ONE et nos utilisateurs définis, s'inscrivant parfaitement dans le développement actuel en matière de digitalisation.</p>
-                  
-                  <h3>Notre engagement digital</h3>
+              <div className="about-cards-container">
+                <div className="about-card">
+                  <h3>Contexte et mission</h3>
+                  <p>Au cœur de l'humain et au service du collectif, le <strong>COS'ONE (Conseil des Œuvres Sociales de l'Office National de l'Électricité)</strong> est un acteur clé du bien-être au travail au sein de l'ONEE. Plus qu'un organisme social, il constitue un lien de solidarité durable entre l'institution et ses collaborateurs, en valorisant l'écoute, l'entraide et la considération.</p>
+                  <p>La mission du COS'ONE est de concevoir et d'opérer des services sociaux de qualité, utiles et inclusifs, pour répondre aux besoins concrets des agents et de leurs familles.</p>
+                </div>
+
+                <div className="about-card">
+                  <h3>Nos piliers directeurs</h3>
                   <ul>
-                    <li><strong>Innovation technologique</strong> - Un portail web interactif à la pointe de la technologie</li>
-                    <li><strong>Accessibilité permanente</strong> - Services disponibles 24h/24, 7j/7</li>
-                    <li><strong>Communication directe</strong> - Échange facilité avec le personnel COS'ONE</li>
-                    <li><strong>Transparence totale</strong> - Gestion simplifiée et traçable de tous les services</li>
+                    <li><strong>Rigueur de gestion</strong> - Une gestion transparente et efficace des ressources</li>
+                    <li><strong>Innovation sociale</strong> - Des solutions adaptées aux besoins émergents</li>
+                    <li><strong>Proximité humaine</strong> - Un accompagnement attentif et personnalisé</li>
                   </ul>
-                  
-                  <p>Cette transformation digitale renforce notre mission de service public exemplaire et améliore considérablement l'expérience utilisateur de notre communauté.</p>
-                  
-                  <h3>Vision digitale du COS'ONE</h3>
-                  <p>Un portail web interactif et innovant qui place la technologie au service du bien-être du personnel, créant un lien numérique fort entre l'institution et ses collaborateurs.</p>
+                  <p>Ces piliers contribuent à un environnement de travail épanouissant et à la valorisation du capital humain de l'ONEE.</p>
+                </div>
+
+                <div className="about-card">
+                  <h3>Notre vision</h3>
+                  <p>Chaque collaborateur mérite attention, respect et considération, dans une dynamique de service public exemplaire.</p>
                 </div>
               </div>
             </div>
@@ -570,9 +590,6 @@ function Landing() {
               
               <div className="activities-grid">
                 <div className="activity-card">
-                  <div className="activity-icon">
-                    <i className="fas fa-laptop"></i>
-                  </div>
                   <h3>Portail web interactif</h3>
                   <p>Une plateforme digitale innovante qui facilite l'échange, le partage et la communication entre le COS'ONE et ses utilisateurs.</p>
                   <ul>
@@ -583,9 +600,6 @@ function Landing() {
                 </div>
                 
                 <div className="activity-card">
-                  <div className="activity-icon">
-                    <i className="fas fa-mobile-alt"></i>
-                  </div>
                   <h3>Services mobiles et digitaux</h3>
                   <p>Des services accessibles partout, à tout moment, pour répondre aux attentes du personnel COS'ONE.</p>
                   <ul>
@@ -596,9 +610,6 @@ function Landing() {
                 </div>
                 
                 <div className="activity-card">
-                  <div className="activity-icon">
-                    <i className="fas fa-comments"></i>
-                  </div>
                   <h3>Communication digitale</h3>
                   <p>Un système de communication moderne qui renforce les liens entre le COS'ONE et son personnel.</p>
                   <ul>
@@ -609,9 +620,6 @@ function Landing() {
                 </div>
                 
                 <div className="activity-card">
-                  <div className="activity-icon">
-                    <i className="fas fa-chart-line"></i>
-                  </div>
                   <h3>Analytics et insights</h3>
                   <p>Des données et analyses en temps réel pour optimiser nos services et mieux comprendre les besoins du personnel.</p>
                   <ul>
@@ -622,9 +630,6 @@ function Landing() {
                 </div>
                 
                 <div className="activity-card">
-                  <div className="activity-icon">
-                    <i className="fas fa-shield-alt"></i>
-                  </div>
                   <h3>Sécurité et confidentialité</h3>
                   <p>Un environnement sécurisé et confidentiel pour protéger les données et garantir la confiance du personnel.</p>
                   <ul>
@@ -656,51 +661,59 @@ function Landing() {
                   <p>Chargement des centres...</p>
                 </div>
               ) : centres.length > 0 ? (
-                <div className="centres-grid">
-                  {centres.map((centre) => (
-                    <div key={centre.id} className="centre-card">
-                      <div className="centre-icon">
-                        {centre.ville === 'Agadir' ? '🏖️' : 
-                         centre.ville === 'Ifrane' || centre.nom.includes('Atlas') ? '🏔️' : 
-                         centre.ville === 'Merzouga' ? '🏜️' : '🏢'}
-                      </div>
-                      <h3>{centre.nom}</h3>
-                      <p>{centre.description || 'Centre de vacances de qualité'}</p>
-                      
-                      <div className="centre-details">
-                        <div className="centre-detail">
-                          <i className="fas fa-map-marker-alt"></i>
-                          <span>{centre.adresse}, {centre.ville}</span>
-                        </div>
-                        
-                        {centre.telephone && (
-                          <div className="centre-detail">
-                            <i className="fas fa-phone"></i>
-                            <span>{centre.telephone}</span>
-                          </div>
-                        )}
-                        
-                        {centre.rating && (
-                          <div className="centre-rating">
-                            <div className="rating-stars">
-                              {[...Array(5)].map((_, i) => (
-                                <span key={i} className={i < Math.floor(centre.rating) ? 'star filled' : 'star empty'}>
-                                  ★
-                                </span>
-                              ))}
+                <div className="centres-animated-container">
+                  <div className="centres-info">
+                    <h3>Nos Centres de Vacances</h3>
+                    <p>Cliquez sur un centre pour voir plus de détails</p>
+                  </div>
+                  <div className="centres-list-wrapper">
+                    <AnimatedList
+                      items={centres.map(centre => `${centre.nom} - ${centre.ville}`)}
+                      onItemSelect={(item, index) => {
+                        const selectedCentre = centres[index];
+                        console.log('Centre sélectionné:', selectedCentre);
+                      }}
+                      expandedContent={(item, index) => {
+                        const centre = centres[index];
+                        return (
+                          <div>
+                            <h4>Informations du centre</h4>
+                            <p>{centre.description || 'Centre de vacances de qualité'}</p>
+                            
+                            <div className="centre-detail">
+                              <i className="fas fa-map-marker-alt"></i>
+                              <span>{centre.adresse}, {centre.ville}</span>
                             </div>
-                            <span className="rating-value">{centre.rating}</span>
+                            
+                            {centre.telephone && (
+                              <div className="centre-detail">
+                                <i className="fas fa-phone"></i>
+                                <span>{centre.telephone}</span>
+                              </div>
+                            )}
+                            
+                            {centre.rating && (
+                              <div className="centre-rating">
+                                <div className="rating-stars">
+                                  {[...Array(5)].map((_, i) => (
+                                    <span key={i} className={i < Math.floor(centre.rating) ? 'star filled' : 'star empty'}>
+                                      ★
+                                    </span>
+                                  ))}
+                                </div>
+                                <span className="rating-value">{centre.rating}</span>
+                              </div>
+                            )}
                           </div>
-                        )}
-                        
-                        <div className="centre-status">
-                          <span className={`status-badge ${centre.actif ? 'status-active' : 'status-inactive'}`}>
-                            {centre.actif ? '✓ Actif' : '✗ Inactif'}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                        );
+                      }}
+                      showGradients={true}
+                      enableArrowNavigation={true}
+                      displayScrollbar={true}
+                      className="centres-animated-list"
+                      itemClassName="centre-item"
+                    />
+                  </div>
                 </div>
               ) : (
                 <div className="no-centres-message">

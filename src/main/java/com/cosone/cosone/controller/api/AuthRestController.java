@@ -2,11 +2,15 @@ package com.cosone.cosone.controller.api;
 
 import com.cosone.cosone.model.User;
 import com.cosone.cosone.model.ExternAuthCode;
+import com.cosone.cosone.model.PhoneVerificationCode;
 import com.cosone.cosone.repository.UserRepository;
 import com.cosone.cosone.repository.ExternAuthCodeRepository;
+import com.cosone.cosone.repository.PhoneVerificationCodeRepository;
+import com.cosone.cosone.service.SmsService;
 import com.cosone.cosone.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +31,12 @@ public class AuthRestController {
 
     @Autowired
     private ExternAuthCodeRepository externAuthCodeRepository;
+
+    @Autowired
+    private PhoneVerificationCodeRepository phoneVerificationCodeRepository;
+
+    @Autowired
+    private SmsService smsService;
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
@@ -284,13 +294,137 @@ public class AuthRestController {
                 .body(Map.of("message", "Cet utilisateur a déjà un mot de passe configuré"));
         }
 
-        // TODO: Ici vous pouvez implémenter l'envoi d'email/SMS avec un code de validation
-        // Pour l'instant, on retourne juste un message de succès
+        String phoneNumber = user.getPhoneNumber();
+        if (phoneNumber == null || phoneNumber.isEmpty()) {
+            return ResponseEntity.badRequest()
+                .body(Map.of("message", "Aucun numéro de téléphone associé à cet utilisateur. Veuillez contacter l'administrateur."));
+        }
+        
+        // Generate and send verification code
+        String verificationCode = generateVerificationCode();
+        PhoneVerificationCode code = new PhoneVerificationCode();
+        code.setPhoneNumber(phoneNumber);
+        code.setCode(verificationCode);
+        phoneVerificationCodeRepository.save(code);
+        smsService.sendSms(phoneNumber, "Votre code de vérification est : " + verificationCode);
         
         return ResponseEntity.ok(Map.of(
-            "message", "Première connexion initiée. Vérifiez votre email/SMS pour le code de validation.",
-            "requiresPassword", true
+            "message", "Code de vérification SMS envoyé",
+            "phoneNumber", phoneNumber,
+            "identifier", identifier,
+            "requiresSmsVerification", true
         ));
+    }
+
+    /**
+     * Verify SMS code endpoint
+     * POST /api/auth/verify-sms
+     */
+    @PostMapping("/verify-sms")
+    public ResponseEntity<?> verifySms(@RequestBody Map<String, String> request) {
+        String identifier = request.get("identifier");
+        String phoneNumber = request.get("phoneNumber");
+        String verificationCode = request.get("verificationCode");
+        
+        if (identifier == null || phoneNumber == null || verificationCode == null) {
+            return ResponseEntity.badRequest()
+                .body(Map.of("message", "Données manquantes"));
+        }
+
+        var codeOpt = phoneVerificationCodeRepository.findByPhoneNumberAndCode(phoneNumber, verificationCode);
+        
+        if (codeOpt.isEmpty()) {
+            return ResponseEntity.badRequest()
+                .body(Map.of("message", "Code de vérification invalide"));
+        }
+        
+        PhoneVerificationCode code = codeOpt.get();
+        
+        if (code.isUsed()) {
+            return ResponseEntity.badRequest()
+                .body(Map.of("message", "Le code de vérification a déjà été utilisé"));
+        }
+        
+        if (LocalDateTime.now().isAfter(code.getExpiresAt())) {
+            return ResponseEntity.badRequest()
+                .body(Map.of("message", "Le code de vérification a expiré"));
+        }
+        
+        // Mark code as used
+        code.setUsed(true);
+        phoneVerificationCodeRepository.save(code);
+        
+        return ResponseEntity.ok(Map.of(
+            "message", "Code de vérification validé",
+            "identifier", identifier,
+            "requiresPasswordCreation", true
+        ));
+    }
+
+    /**
+     * Create password endpoint
+     * POST /api/auth/create-password
+     */
+    @PostMapping("/create-password")
+    public ResponseEntity<?> createPassword(@RequestBody Map<String, String> request) {
+        String identifier = request.get("identifier");
+        String password = request.get("password");
+        
+        if (identifier == null || password == null) {
+            return ResponseEntity.badRequest()
+                .body(Map.of("message", "Données manquantes"));
+        }
+
+        // Find user
+        Optional<User> userOpt = userRepository.findByMatricule(identifier.trim());
+        if (userOpt.isEmpty()) {
+            userOpt = userRepository.findByNumCin(identifier.trim());
+        }
+
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.badRequest()
+                .body(Map.of("message", "Utilisateur introuvable"));
+        }
+
+        User user = userOpt.get();
+        
+        // Check if user already has a password
+        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+            return ResponseEntity.badRequest()
+                .body(Map.of("message", "Cet utilisateur a déjà un mot de passe configuré"));
+        }
+
+        // Validate password strength
+        if (password.length() < 8) {
+            return ResponseEntity.badRequest()
+                .body(Map.of("message", "Le mot de passe doit contenir au moins 8 caractères"));
+        }
+
+        // Set password
+        user.setPassword(passwordEncoder.encode(password));
+        userRepository.save(user);
+
+        // Generate token and login user
+        String token = jwtUtil.generateToken(user.getUsername(), user.getRole());
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("token", token);
+        
+        Map<String, Object> userData = new HashMap<>();
+        userData.put("username", user.getUsername());
+        userData.put("prenom", user.getPrenom());
+        userData.put("nom", user.getNom());
+        userData.put("matricule", user.getMatricule());
+        userData.put("role", user.getRole() != null ? user.getRole() : "USER");
+        userData.put("isExternal", false);
+        
+        response.put("user", userData);
+
+        return ResponseEntity.ok(response);
+    }
+
+    private String generateVerificationCode() {
+        return String.format("%06d", (int) (Math.random() * 1000000));
     }
 }
 

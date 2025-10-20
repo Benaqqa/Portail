@@ -162,6 +162,43 @@ export function AuthProvider({ children }) {
     }
   }
 
+  const verifySms = async (identifier, phoneNumber, verificationCode) => {
+    try {
+      const response = await api.post('/api/auth/verify-sms', { 
+        identifier, 
+        phoneNumber, 
+        verificationCode 
+      })
+      return { success: true, data: response.data }
+    } catch (error) {
+      return {
+        success: false,
+        error: error.response?.data?.message || 'Erreur lors de la vérification du code SMS'
+      }
+    }
+  }
+
+  const createPassword = async (identifier, password) => {
+    try {
+      const response = await api.post('/api/auth/create-password', { 
+        identifier, 
+        password 
+      })
+      const { token, user: userData } = response.data
+      
+      localStorage.setItem('token', token)
+      localStorage.setItem('user', JSON.stringify(userData))
+      setUser(userData)
+      
+      return { success: true, data: response.data }
+    } catch (error) {
+      return {
+        success: false,
+        error: error.response?.data?.message || 'Erreur lors de la création du mot de passe'
+      }
+    }
+  }
+
   const login = async (credentials) => {
     // Mode production : appel API réel pour vérifier dans table users
     try {
@@ -205,6 +242,8 @@ export function AuthProvider({ children }) {
     login,
     externalLogin,
     firstLogin,
+    verifySms,
+    createPassword,
     register,
     logout,
     isAuthenticated: !!user,

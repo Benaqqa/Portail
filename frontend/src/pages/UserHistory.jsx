@@ -17,7 +17,7 @@ function UserHistory() {
   const loadReservations = async () => {
     try {
       setLoading(true)
-      const data = await reservationService.getUserReservations()
+      const data = await reservationService.getUserReservationsByCin()
       setReservations(data)
     } catch (err) {
       setError('Erreur lors du chargement de l\'historique')
@@ -137,14 +137,31 @@ function UserHistory() {
                     >
                       <i className="fas fa-eye"></i>
                     </button>
-                    {reservation.statut === 'EN_ATTENTE_PAIEMENT' && (
+                    {reservation.statut === 'ANNULEE' ? (
                       <button
-                        onClick={() => handleCancelReservation(reservation.id)}
-                        className="btn-cancel"
-                        title="Annuler"
+                        onClick={() => navigate('/reservation')}
+                        className="btn-primary"
+                        title="Réserver à nouveau"
                       >
-                        <i className="fas fa-times"></i>
+                        <i className="fas fa-plus"></i>
                       </button>
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => navigate(`/reservation/details/${reservation.id}`)}
+                          className="btn-outline"
+                          title="Modifier"
+                        >
+                          <i className="fas fa-edit"></i>
+                        </button>
+                        <button
+                          onClick={() => handleCancelReservation(reservation.id)}
+                          className="btn-cancel"
+                          title="Annuler"
+                        >
+                          <i className="fas fa-times"></i>
+                        </button>
+                      </>
                     )}
                   </div>
                 </div>

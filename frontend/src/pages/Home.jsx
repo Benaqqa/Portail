@@ -1,17 +1,39 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import AdminCentres from './admin/AdminCentres'
+import AdminReservations from './admin/AdminReservations'
+import AdminUsers from './admin/AdminUsers'
+import AdminGenerateCode from './admin/AdminGenerateCode'
+import AdminActualites from './admin/AdminActualites'
 import { useAuth } from '../context/AuthContext'
 import { useState, useEffect } from 'react'
 import api from '../services/api'
+import reservationService from '../services/reservationService'
 import '../colors.css'
 import './Home.css'
 
 function Home() {
   const { user, logout } = useAuth()
+  const navigate = useNavigate()
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [activeSection, setActiveSection] = useState('actualites')
+  const [dynamicActualites, setDynamicActualites] = useState([])
+  const [actualitesLoading, setActualitesLoading] = useState(false)
+  const [actualitesError, setActualitesError] = useState('')
   const [nombrePersonnes, setNombrePersonnes] = useState(1)
   const [centres, setCentres] = useState([])
   const [currentStep, setCurrentStep] = useState(1)
+  const [reservationFilter, setReservationFilter] = useState('all')
+  const [reservations, setReservations] = useState([])
+  const [reservationsLoading, setReservationsLoading] = useState(false)
+  const [reservationsError, setReservationsError] = useState('')
+  const [expandedReservations, setExpandedReservations] = useState(new Set())
+  const [profileData, setProfileData] = useState({
+    email: user?.email || '',
+    telephone: user?.phoneNumber || ''
+  })
+  const [profileLoading, setProfileLoading] = useState(false)
+  const [profileError, setProfileError] = useState('')
+  const [profileSuccess, setProfileSuccess] = useState('')
   const [formData, setFormData] = useState({
     cin: user?.cin || '',
     telephone: user?.telephone || '',
@@ -37,9 +59,154 @@ function Home() {
     }
   }, [activeSection, centres.length])
 
+  // Charger les actualités dynamiques quand la section actualités est activée
+  useEffect(() => {
+    const loadActualites = async () => {
+      try {
+        setActualitesLoading(true)
+        setActualitesError('')
+        const resp = await api.get('/api/public/actualites')
+        const list = resp.data?.actualites || resp.data || []
+        setDynamicActualites(list)
+      } catch (e) {
+        console.error('Erreur chargement actualités:', e)
+        setActualitesError("Impossible de charger les actualités")
+      } finally {
+        setActualitesLoading(false)
+      }
+    }
+
+    if (activeSection === 'actualites' && dynamicActualites.length === 0) {
+      loadActualites()
+    }
+  }, [activeSection, dynamicActualites.length])
+
+  // Charger les réservations quand la section history est activée
+  useEffect(() => {
+    if (activeSection === 'history' && reservations.length === 0) {
+      if (user) {
+        setReservationsError('') // Clear any previous error
+        loadReservations()
+      } else {
+        // User is not authenticated, show message instead of loading
+        setReservationsError('Vous devez être connecté pour voir vos réservations.')
+      }
+    }
+  }, [activeSection, reservations.length, user])
+
   const handleSectionClick = (section) => {
     setActiveSection(section);
   };
+
+  const handleFilterChange = (filter) => {
+    setReservationFilter(filter);
+  };
+
+  const toggleReservationExpansion = (reservationId) => {
+    const newExpanded = new Set(expandedReservations);
+    if (newExpanded.has(reservationId)) {
+      newExpanded.delete(reservationId);
+    } else {
+      newExpanded.add(reservationId);
+    }
+    setExpandedReservations(newExpanded);
+  };
+
+  const handleProfileInputChange = (e) => {
+    const { name, value } = e.target;
+    setProfileData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleProfileUpdate = async (e) => {
+    e.preventDefault();
+    setProfileLoading(true);
+    setProfileError('');
+    setProfileSuccess('');
+
+    try {
+      const response = await api.put('/api/user/profile', profileData);
+      
+      // Update the user context with new data
+      const updatedUser = { ...user, ...profileData };
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      
+      setProfileSuccess('Profil mis à jour avec succès!');
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => {
+        setProfileSuccess('');
+      }, 3000);
+      
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour du profil:', error);
+      
+      let errorMessage = 'Erreur lors de la mise à jour du profil.';
+      
+      if (error.response) {
+        if (error.response.status === 401) {
+          errorMessage = 'Vous n\'êtes pas autorisé. Veuillez vous reconnecter.';
+        } else if (error.response.status === 400) {
+          errorMessage = 'Données invalides. Vérifiez les informations saisies.';
+        } else if (error.response.status === 500) {
+          errorMessage = 'Erreur du serveur. Veuillez réessayer plus tard.';
+        } else {
+          errorMessage = `Erreur ${error.response.status}: ${error.response.data?.message || 'Erreur inconnue'}`;
+        }
+      } else if (error.request) {
+        errorMessage = 'Impossible de contacter le serveur. Vérifiez votre connexion.';
+      }
+      
+      setProfileError(errorMessage);
+    } finally {
+      setProfileLoading(false);
+    }
+  };
+
+  const loadReservations = async () => {
+    try {
+      setReservationsLoading(true)
+      setReservationsError('')
+      
+      console.log('Loading reservations for user:', user?.matricule, user?.numCin)
+      
+      // Try matricule first (better for admin users), fallback to CIN
+      let data = await reservationService.getUserReservationsByMatricule()
+      console.log('Reservations by matricule:', data)
+      
+      if (!data || data.length === 0) {
+        console.log('No reservations found by matricule, trying CIN...')
+        data = await reservationService.getUserReservationsByCin()
+        console.log('Reservations by CIN:', data)
+      }
+      
+      setReservations(data)
+    } catch (error) {
+      console.error('Erreur lors du chargement des réservations:', error)
+      if (error.response?.status === 401) {
+        setReservationsError('Vous devez être connecté pour voir vos réservations. Veuillez vous reconnecter.')
+        // Clear auth data and redirect to login
+        localStorage.removeItem('token')
+        localStorage.removeItem('user')
+        window.location.href = '/login'
+      } else {
+        setReservationsError('Erreur lors du chargement des réservations. Veuillez réessayer.')
+        setReservations([])
+      }
+    } finally {
+      setReservationsLoading(false)
+    }
+  };
+
+  const filteredReservations = reservations.filter(reservation => {
+    if (reservationFilter === 'all') return true;
+    if (reservationFilter === 'confirmed') return reservation.statut === 'CONFIRMEE';
+    if (reservationFilter === 'pending') return reservation.statut === 'EN_ATTENTE_PAIEMENT';
+    if (reservationFilter === 'completed') return reservation.statut === 'ANNULEE'; // Assuming cancelled means completed for now
+    return true;
+  });
 
   const handleNombrePersonnesChange = (e) => {
     const value = parseInt(e.target.value) || 1;
@@ -70,6 +237,20 @@ function Home() {
     e.preventDefault();
     if (currentStep === 2) {
       try {
+        // Validate required fields
+        if (!formData.dateDebut || !formData.dateFin) {
+          alert('Veuillez sélectionner les dates de début et de fin.');
+          return;
+        }
+        if (!formData.centreId || !formData.typeLogementId) {
+          alert('Veuillez sélectionner un centre et un type de logement.');
+          return;
+        }
+        if (!formData.cin || !formData.telephone || !formData.email) {
+          alert('Veuillez remplir tous les champs obligatoires.');
+          return;
+        }
+
         // Prepare reservation data
         const reservationData = {
           matricule: user?.matricule || 'MATRICULE-ADMIN',
@@ -78,28 +259,34 @@ function Home() {
           email: formData.email,
           centreId: parseInt(formData.centreId),
           typeLogementId: parseInt(formData.typeLogementId),
-          dateDebut: formData.dateDebut,
-          dateFin: formData.dateFin,
+          dateDebut: formData.dateDebut + 'T00:00:00', // Convert to LocalDateTime format
+          dateFin: formData.dateFin + 'T00:00:00', // Convert to LocalDateTime format
           nombrePersonnes: parseInt(formData.nombrePersonnes),
           paymentMethod: formData.paymentMethod,
-          notes: formData.notes || '',
+          commentaires: formData.notes || '', // Changed from 'notes' to 'commentaires'
           status: 'EN_ATTENTE' // Default status
         };
 
         // Add person information if more than 1 person
         if (nombrePersonnes > 1) {
-          reservationData.personnes = [];
+          reservationData.personnesAccompagnement = []; // Changed from 'personnes' to 'personnesAccompagnement'
           for (let i = 2; i <= nombrePersonnes; i++) {
             const nomField = document.getElementById(`nom_${i}`);
             const cinField = document.getElementById(`cin_${i}`);
             if (nomField && cinField) {
-              reservationData.personnes.push({
+              reservationData.personnesAccompagnement.push({
                 nom: nomField.value,
-                cin: cinField.value
+                prenom: '', // Add required prenom field
+                cin: cinField.value,
+                telephone: '', // Add required telephone field
+                lienParente: 'Accompagnant' // Add required lienParente field
               });
             }
           }
         }
+
+        // Debug: Log the data being sent
+        console.log('Reservation data being sent:', reservationData);
 
         // Send reservation to backend using API service
         const response = await api.post('/api/reservations', reservationData);
@@ -146,6 +333,35 @@ function Home() {
       }
     } else {
       handleNextStep();
+    }
+  };
+
+  // Handler functions for reservation buttons
+  const handleReserverANouveau = () => {
+    setActiveSection('reservation');
+  };
+
+  const handleVoirDetails = (reservationId) => {
+    navigate(`/reservation/details/${reservationId}`);
+  };
+
+  const handleModifierReservation = (reservationId) => {
+    // For now, navigate to details page where user can see options
+    navigate(`/reservation/details/${reservationId}`);
+  };
+
+  const handleAnnulerReservation = async (reservationId) => {
+    if (!window.confirm('Êtes-vous sûr de vouloir annuler cette réservation ?')) {
+      return;
+    }
+
+    try {
+      await reservationService.cancelReservation(reservationId);
+      // Reload reservations
+      loadReservations();
+    } catch (err) {
+      alert('Erreur lors de l\'annulation de la réservation');
+      console.error(err);
     }
   };
 
@@ -212,6 +428,39 @@ function Home() {
         return (
           <section className="actualites-section">
             <div className="actualites-list">
+              {actualitesLoading && (
+                <div className="loading-container"><div className="loading-spinner"></div><p>Chargement des actualités...</p></div>
+              )}
+              {actualitesError && (
+                <div className="alert alert-error"><i className="fas fa-exclamation-circle"></i> {actualitesError}</div>
+              )}
+              {(!actualitesLoading && dynamicActualites.length === 0 && !actualitesError) && (
+                <div className="empty-state"><p>Aucune actualité publiée pour le moment.</p></div>
+              )}
+              {dynamicActualites.map((act, idx) => (
+                <div key={act.id || idx} className="actualite-item aligned">
+                  <div className="actualite-image-placeholder">
+                    {act.imageUrl ? (
+                      <img src={act.imageUrl} alt={act.titre || 'Actualité'} />
+                    ) : (
+                      <img src="/src/Logo/LOGO.png" alt="Actualité" />
+                    )}
+                  </div>
+                  <div className="actualite-content">
+                    <div className="actualite-meta">
+                      <span className="actualite-date">{act.datePublication ? new Date(act.datePublication).toLocaleDateString('fr-FR') : ''}</span>
+                      {act.featured && <span className="actualite-tag">En vedette</span>}
+                    </div>
+                    <h3 className="actualite-title">{act.titre}</h3>
+                    <p className="actualite-text">{act.contenu?.length > 300 ? act.contenu.substring(0, 300) + '…' : act.contenu}</p>
+                    <div className="actualite-actions">
+                      {act.pieceJointe && (
+                        <a href={act.pieceJointe} className="btn-download" target="_blank" rel="noreferrer">Télécharger</a>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
               <div className="actualite-item aligned">
                 <div className="actualite-image-placeholder">
                   <img src="/src/Logo/vacances.webp" alt="Nouveau portail" />
@@ -434,6 +683,8 @@ function Home() {
                     <select
                       id="centreId"
                       name="centreId"
+                      value={formData.centreId}
+                      onChange={handleInputChange}
                       required
                       className="form-select"
                     >
@@ -453,6 +704,8 @@ function Home() {
                     <select
                       id="typeLogementId"
                       name="typeLogementId"
+                      value={formData.typeLogementId}
+                      onChange={handleInputChange}
                       required
                       className="form-select"
                     >
@@ -473,6 +726,8 @@ function Home() {
                         type="date"
                         id="dateDebut"
                         name="dateDebut"
+                        value={formData.dateDebut}
+                        onChange={handleInputChange}
                         min={new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}
                         required
                         className="form-input"
@@ -488,6 +743,8 @@ function Home() {
                         type="date"
                         id="dateFin"
                         name="dateFin"
+                        value={formData.dateFin}
+                        onChange={handleInputChange}
                         required
                         className="form-input"
                       />
@@ -588,125 +845,271 @@ function Home() {
             </div>
             
             <div className="reservations-filters">
-              <button className="filter-btn active">Toutes</button>
-              <button className="filter-btn">Confirmées</button>
-              <button className="filter-btn">En attente</button>
-              <button className="filter-btn">Terminées</button>
+              <button 
+                className={`filter-btn ${reservationFilter === 'all' ? 'active' : ''}`}
+                onClick={() => handleFilterChange('all')}
+              >
+                Toutes
+              </button>
+              <button 
+                className={`filter-btn ${reservationFilter === 'confirmed' ? 'active' : ''}`}
+                onClick={() => handleFilterChange('confirmed')}
+              >
+                Confirmées
+              </button>
+              <button 
+                className={`filter-btn ${reservationFilter === 'pending' ? 'active' : ''}`}
+                onClick={() => handleFilterChange('pending')}
+              >
+                En attente
+              </button>
+              <button 
+                className={`filter-btn ${reservationFilter === 'completed' ? 'active' : ''}`}
+                onClick={() => handleFilterChange('completed')}
+              >
+                Terminées
+              </button>
             </div>
             
             <div className="reservations-list">
-              <div className="reservation-card confirmed">
-                <div className="card-header">
-                  <div className="reservation-status confirmed">
-                    <span className="status-icon">✓</span>
-                    Confirmée
-                  </div>
-                  <div className="reservation-id">#RES-2025-001</div>
+              {!user && (
+                <div className="alert alert-error">
+                  <i className="fas fa-exclamation-circle"></i> Vous devez être connecté pour voir vos réservations.
                 </div>
-                
-                <div className="card-content">
-                  <div className="reservation-details">
-                    <h3>Centre d'Agadir</h3>
-                    <div className="detail-row">
-                      <span className="detail-label">Dates:</span>
-                      <span className="detail-value">15 - 22 Janvier 2025</span>
-                    </div>
-                    <div className="detail-row">
-                      <span className="detail-label">Durée:</span>
-                      <span className="detail-value">7 nuits</span>
-                    </div>
-                    <div className="detail-row">
-                      <span className="detail-label">Personnes:</span>
-                      <span className="detail-value">2 adultes</span>
-                    </div>
-                    <div className="detail-row">
-                      <span className="detail-label">Logement:</span>
-                      <span className="detail-value">Chambre Supérieure</span>
-                    </div>
-                  </div>
-                  
-                  <div className="card-actions">
-                    <button className="btn-outline">Voir détails</button>
-                    <button className="btn-outline">Modifier</button>
-                    <button className="btn-danger">Annuler</button>
-                  </div>
-                </div>
-              </div>
+              )}
               
-              <div className="reservation-card pending">
-                <div className="card-header">
-                  <div className="reservation-status pending">
-                    <span className="status-icon">⏳</span>
-                    En attente
-                  </div>
-                  <div className="reservation-id">#RES-2025-002</div>
+              {reservationsError && (
+                <div className="alert alert-error">
+                  <i className="fas fa-exclamation-circle"></i> {reservationsError}
                 </div>
-                
-                <div className="card-content">
-                  <div className="reservation-details">
-                    <h3>Centre d'Ifrane</h3>
-                    <div className="detail-row">
-                      <span className="detail-label">Dates:</span>
-                      <span className="detail-value">10 - 15 Mars 2025</span>
-                    </div>
-                    <div className="detail-row">
-                      <span className="detail-label">Durée:</span>
-                      <span className="detail-value">5 nuits</span>
-                    </div>
-                    <div className="detail-row">
-                      <span className="detail-label">Personnes:</span>
-                      <span className="detail-value">4 personnes</span>
-                    </div>
-                    <div className="detail-row">
-                      <span className="detail-label">Logement:</span>
-                      <span className="detail-value">Suite Familiale</span>
-                    </div>
-                  </div>
-                  
-                  <div className="card-actions">
-                    <button className="btn-outline">Voir détails</button>
-                    <button className="btn-outline">Modifier</button>
-                    <button className="btn-danger">Annuler</button>
-                  </div>
-                </div>
-              </div>
+              )}
               
-              <div className="reservation-card completed">
-                <div className="card-header">
-                  <div className="reservation-status completed">
-                    <span className="status-icon">✓</span>
-                    Terminée
-                  </div>
-                  <div className="reservation-id">#RES-2024-089</div>
+              {reservationsLoading ? (
+                <div className="loading-container">
+                  <div className="loading-spinner"></div>
+                  <p>Chargement des réservations...</p>
                 </div>
-                
-                <div className="card-content">
-                  <div className="reservation-details">
-                    <h3>Centre de Merzouga</h3>
-                    <div className="detail-row">
-                      <span className="detail-label">Dates:</span>
-                      <span className="detail-value">5 - 12 Décembre 2024</span>
+              ) : user ? (
+                <>
+                  {filteredReservations.map((reservation) => (
+                    <div key={reservation.id} className={`reservation-card ${reservation.statut.toLowerCase().replace('_', '-')}`}>
+                      <div className="card-header">
+                        <div className={`reservation-status ${reservation.statut.toLowerCase().replace('_', '-')}`}>
+                          {reservation.statut === 'CONFIRMEE' && 'Confirmée'}
+                          {reservation.statut === 'EN_ATTENTE_PAIEMENT' && 'En attente'}
+                          {reservation.statut === 'ANNULEE' && 'Annulée'}
+                        </div>
+                        <div className="reservation-id">#{reservation.id}</div>
+                      </div>
+                      
+                      <div className="card-content">
+                        <div className="reservation-details">
+                          <h3>{reservation.centre?.nom || 'Centre non spécifié'}</h3>
+                          <div className="detail-row">
+                            <span className="detail-label">Dates:</span>
+                            <span className="detail-value">
+                              {new Date(reservation.dateDebut).toLocaleDateString('fr-FR')} - {new Date(reservation.dateFin).toLocaleDateString('fr-FR')}
+                            </span>
+                          </div>
+                          <div className="detail-row">
+                            <span className="detail-label">Durée:</span>
+                            <span className="detail-value">
+                              {Math.ceil((new Date(reservation.dateFin) - new Date(reservation.dateDebut)) / (1000 * 60 * 60 * 24))} nuits
+                            </span>
+                          </div>
+                          <div className="detail-row">
+                            <span className="detail-label">Personnes:</span>
+                            <span className="detail-value">{reservation.nombrePersonnes} personne{reservation.nombrePersonnes > 1 ? 's' : ''}</span>
+                          </div>
+                          <div className="detail-row">
+                            <span className="detail-label">Logement:</span>
+                            <span className="detail-value">{reservation.typeLogement?.nom || 'Type non spécifié'}</span>
+                          </div>
+                          {reservation.prixTotal && (
+                            <div className="detail-row">
+                              <span className="detail-label">Prix:</span>
+                              <span className="detail-value">{reservation.prixTotal} MAD</span>
+                            </div>
+                          )}
+                        </div>
+                        
+                        {/* Expandable detailed information */}
+                        {expandedReservations.has(reservation.id) && (
+                          <div className="card-expanded-content">
+                            <div className="expanded-details">
+                              <h4>Informations détaillées</h4>
+                              
+                              <div className="detail-section">
+                                <h5>Informations personnelles</h5>
+                                <div className="detail-row">
+                                  <span className="detail-label">CIN:</span>
+                                  <span className="detail-value">{reservation.cin || 'Non spécifié'}</span>
+                                </div>
+                                <div className="detail-row">
+                                  <span className="detail-label">Téléphone:</span>
+                                  <span className="detail-value">{reservation.telephone || 'Non spécifié'}</span>
+                                </div>
+                                <div className="detail-row">
+                                  <span className="detail-label">Email:</span>
+                                  <span className="detail-value">{reservation.email || 'Non spécifié'}</span>
+                                </div>
+                                <div className="detail-row">
+                                  <span className="detail-label">Matricule:</span>
+                                  <span className="detail-value">{reservation.matricule || 'Non spécifié'}</span>
+                                </div>
+                              </div>
+
+                              <div className="detail-section">
+                                <h5>Détails du séjour</h5>
+                                <div className="detail-row">
+                                  <span className="detail-label">Date de début:</span>
+                                  <span className="detail-value">
+                                    {new Date(reservation.dateDebut).toLocaleDateString('fr-FR', {
+                                      weekday: 'long',
+                                      year: 'numeric',
+                                      month: 'long',
+                                      day: 'numeric'
+                                    })}
+                                  </span>
+                                </div>
+                                <div className="detail-row">
+                                  <span className="detail-label">Date de fin:</span>
+                                  <span className="detail-value">
+                                    {new Date(reservation.dateFin).toLocaleDateString('fr-FR', {
+                                      weekday: 'long',
+                                      year: 'numeric',
+                                      month: 'long',
+                                      day: 'numeric'
+                                    })}
+                                  </span>
+                                </div>
+                                <div className="detail-row">
+                                  <span className="detail-label">Date de réservation:</span>
+                                  <span className="detail-value">
+                                    {reservation.dateReservation ? 
+                                      new Date(reservation.dateReservation).toLocaleDateString('fr-FR') : 
+                                      'Non spécifié'
+                                    }
+                                  </span>
+                                </div>
+                              </div>
+
+                              <div className="detail-section">
+                                <h5>Informations du centre</h5>
+                                <div className="detail-row">
+                                  <span className="detail-label">Nom du centre:</span>
+                                  <span className="detail-value">{reservation.centre?.nom || 'Non spécifié'}</span>
+                                </div>
+                                <div className="detail-row">
+                                  <span className="detail-label">Adresse:</span>
+                                  <span className="detail-value">{reservation.centre?.adresse || 'Non spécifié'}</span>
+                                </div>
+                                <div className="detail-row">
+                                  <span className="detail-label">Téléphone:</span>
+                                  <span className="detail-value">{reservation.centre?.telephone || 'Non spécifié'}</span>
+                                </div>
+                              </div>
+
+                              <div className="detail-section">
+                                <h5>Type de logement</h5>
+                                <div className="detail-row">
+                                  <span className="detail-label">Type:</span>
+                                  <span className="detail-value">{reservation.typeLogement?.nom || 'Non spécifié'}</span>
+                                </div>
+                                <div className="detail-row">
+                                  <span className="detail-label">Capacité:</span>
+                                  <span className="detail-value">{reservation.typeLogement?.capacite || 'Non spécifié'} personnes</span>
+                                </div>
+                                <div className="detail-row">
+                                  <span className="detail-label">Prix par nuit:</span>
+                                  <span className="detail-value">{reservation.typeLogement?.prixParNuit || 'Non spécifié'} MAD</span>
+                                </div>
+                              </div>
+
+                              {reservation.commentaires && (
+                                <div className="detail-section">
+                                  <h5>Commentaires</h5>
+                                  <div className="commentaires-content">
+                                    {reservation.commentaires}
+                                  </div>
+                                </div>
+                              )}
+
+                              {reservation.personnesAccompagnement && reservation.personnesAccompagnement.length > 0 && (
+                                <div className="detail-section">
+                                  <h5>Personnes accompagnantes</h5>
+                                  {reservation.personnesAccompagnement.map((personne, index) => (
+                                    <div key={index} className="accompagnant-item">
+                                      <div className="detail-row">
+                                        <span className="detail-label">Nom:</span>
+                                        <span className="detail-value">{personne.nom || 'Non spécifié'}</span>
+                                      </div>
+                                      <div className="detail-row">
+                                        <span className="detail-label">Prénom:</span>
+                                        <span className="detail-value">{personne.prenom || 'Non spécifié'}</span>
+                                      </div>
+                                      <div className="detail-row">
+                                        <span className="detail-label">CIN:</span>
+                                        <span className="detail-value">{personne.cin || 'Non spécifié'}</span>
+                                      </div>
+                                      <div className="detail-row">
+                                        <span className="detail-label">Lien de parenté:</span>
+                                        <span className="detail-value">{personne.lienParente || 'Non spécifié'}</span>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                        
+                        <div className="card-actions">
+                          <button 
+                            className="btn-outline"
+                            onClick={() => toggleReservationExpansion(reservation.id)}
+                          >
+                            {expandedReservations.has(reservation.id) ? 'Masquer détails' : 'Voir détails'}
+                          </button>
+                          {reservation.statut === 'ANNULEE' ? (
+                            <button 
+                              className="btn-primary"
+                              onClick={handleReserverANouveau}
+                            >
+                              Réserver à nouveau
+                            </button>
+                          ) : (
+                            <>
+                              <button 
+                                className="btn-outline"
+                                onClick={() => handleModifierReservation(reservation.id)}
+                              >
+                                Modifier
+                              </button>
+                              <button 
+                                className="btn-danger"
+                                onClick={() => handleAnnulerReservation(reservation.id)}
+                              >
+                                Annuler
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                    <div className="detail-row">
-                      <span className="detail-label">Durée:</span>
-                      <span className="detail-value">7 nuits</span>
-                    </div>
-                    <div className="detail-row">
-                      <span className="detail-label">Personnes:</span>
-                      <span className="detail-value">1 personne</span>
-                    </div>
-                    <div className="detail-row">
-                      <span className="detail-label">Logement:</span>
-                      <span className="detail-value">Chambre Standard</span>
-                    </div>
-                  </div>
+                  ))}
                   
-                  <div className="card-actions">
-                    <button className="btn-outline">Voir détails</button>
-                    <button className="btn-primary">Réserver à nouveau</button>
-                  </div>
+                  {filteredReservations.length === 0 && !reservationsLoading && (
+                    <div className="empty-state">
+                      <p>Aucune réservation trouvée pour ce filtre.</p>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="empty-state">
+                  <p>Vous devez être connecté pour voir vos réservations.</p>
                 </div>
-              </div>
+              )}
             </div>
           </section>
         )
@@ -722,23 +1125,59 @@ function Home() {
                 </div>
                 <div className="profile-details">
                   <h3>Informations personnelles</h3>
-                  <div className="form-group">
-                    <label>Nom d'utilisateur</label>
-                    <input type="text" value={user?.username || ''} readOnly />
-                  </div>
-                  <div className="form-group">
-                    <label>Email</label>
-                    <input type="email" placeholder="votre.email@example.com" />
-                  </div>
-                  <div className="form-group">
-                    <label>Téléphone</label>
-                    <input type="tel" placeholder="+212 6XX XXX XXX" />
-                  </div>
-                  <div className="form-group">
-                    <label>Rôle</label>
-                    <input type="text" value={user?.role || ''} readOnly />
-                  </div>
-                  <button className="btn-primary">Mettre à jour</button>
+                  
+                  {profileError && (
+                    <div className="alert alert-error">
+                      <i className="fas fa-exclamation-circle"></i> {profileError}
+                    </div>
+                  )}
+                  
+                  {profileSuccess && (
+                    <div className="alert alert-success">
+                      <i className="fas fa-check-circle"></i> {profileSuccess}
+                    </div>
+                  )}
+                  
+                  <form onSubmit={handleProfileUpdate}>
+                    <div className="form-group">
+                      <label>Nom d'utilisateur</label>
+                      <input type="text" value={user?.username || ''} readOnly />
+                    </div>
+                    <div className="form-group">
+                      <label>Email</label>
+                      <input 
+                        type="email" 
+                        name="email"
+                        value={profileData.email}
+                        onChange={handleProfileInputChange}
+                        placeholder="votre.email@example.com" 
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Téléphone</label>
+                      <input 
+                        type="tel" 
+                        name="telephone"
+                        value={profileData.telephone}
+                        onChange={handleProfileInputChange}
+                        placeholder="+212 6XX XXX XXX" 
+                      />
+                    </div>
+                    <button 
+                      type="submit" 
+                      className="btn-primary"
+                      disabled={profileLoading}
+                    >
+                      {profileLoading ? (
+                        <>
+                          <i className="fas fa-spinner fa-spin"></i>
+                          Mise à jour...
+                        </>
+                      ) : (
+                        'Mettre à jour'
+                      )}
+                    </button>
+                  </form>
                 </div>
               </div>
             </div>
@@ -748,40 +1187,35 @@ function Home() {
       case 'admin-centres':
         return (
           <section className="content-section">
-            <h2>Gestion des Centres</h2>
-            <p>Interface d'administration des centres en cours de développement...</p>
+            <AdminCentres />
           </section>
         )
       
       case 'admin-users':
         return (
           <section className="content-section">
-            <h2>Gestion des Utilisateurs</h2>
-            <p>Interface d'administration des utilisateurs en cours de développement...</p>
+            <AdminUsers />
           </section>
         )
       
       case 'admin-reservations':
         return (
           <section className="content-section">
-            <h2>Toutes les Réservations</h2>
-            <p>Interface d'administration des réservations en cours de développement...</p>
+            <AdminReservations />
           </section>
         )
       
       case 'admin-actualites':
         return (
           <section className="content-section">
-            <h2>Gestion des Actualités</h2>
-            <p>Interface d'administration des actualités en cours de développement...</p>
+            <AdminActualites />
           </section>
         )
       
       case 'admin-codes':
         return (
           <section className="content-section">
-            <h2>Gestion des Codes OTP</h2>
-            <p>Interface d'administration des codes OTP en cours de développement...</p>
+            <AdminGenerateCode />
           </section>
         )
       

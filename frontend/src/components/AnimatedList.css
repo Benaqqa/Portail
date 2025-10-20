@@ -1,0 +1,240 @@
+@import '../colors.css';
+
+.scroll-list-container {
+  position: relative;
+  height: 400px;
+  max-height: 400px;
+  overflow: hidden;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+}
+
+.scroll-list {
+  height: 100%;
+  overflow-y: auto;
+  padding: 20px 30px 20px 20px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-color) #f1f5f9;
+}
+
+.scroll-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scroll-list::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.scroll-list::-webkit-scrollbar-thumb {
+  background: var(--primary-color);
+  border-radius: 3px;
+}
+
+.scroll-list::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-dark);
+}
+
+.scroll-list.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scroll-list.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.item {
+  padding: 15px 20px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  background: #f8fafc;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.item:hover {
+  background: #f1f5f9;
+  border-color: var(--primary-light);
+  box-shadow: 0 2px 10px rgba(52, 136, 201, 0.1);
+}
+
+.item.selected {
+  background: linear-gradient(135deg, rgba(52, 136, 201, 0.1) 0%, rgba(52, 136, 201, 0.05) 100%);
+  border-color: var(--primary-color);
+  box-shadow: 0 4px 15px rgba(52, 136, 201, 0.2);
+}
+
+.item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.item-text {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.4;
+  transition: color 0.3s ease;
+  flex: 1;
+}
+
+.expand-icon {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  transition: color 0.3s ease;
+  margin-left: 10px;
+}
+
+.item:hover .item-text {
+  color: var(--primary-color);
+}
+
+.item:hover .expand-icon {
+  color: var(--primary-color);
+}
+
+.item.selected .item-text {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.item.expanded .item-text {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.item.expanded .expand-icon {
+  color: var(--primary-color);
+}
+
+.expanded-content {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #e2e8f0;
+  overflow: hidden;
+}
+
+.expanded-content h4 {
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.expanded-content p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+
+.expanded-content .centre-detail {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.expanded-content .centre-detail i {
+  color: var(--primary-color);
+  width: 16px;
+}
+
+.expanded-content .centre-rating {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.expanded-content .rating-stars {
+  display: flex;
+  gap: 2px;
+}
+
+.expanded-content .star {
+  font-size: 1rem;
+  color: #ddd;
+}
+
+.expanded-content .star.filled {
+  color: #ffc107;
+}
+
+.expanded-content .rating-value {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Gradient overlays */
+.top-gradient,
+.bottom-gradient {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 20px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.top-gradient {
+  top: 0;
+  background: linear-gradient(to bottom, white, transparent);
+}
+
+.bottom-gradient {
+  bottom: 0;
+  background: linear-gradient(to top, white, transparent);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .scroll-list-container {
+    height: 300px;
+    max-height: 300px;
+  }
+  
+  .item {
+    padding: 12px 16px;
+    margin-bottom: 6px;
+  }
+  
+  .item-text {
+    font-size: 0.9rem;
+  }
+  
+  .scroll-list {
+    padding: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .scroll-list-container {
+    height: 250px;
+    max-height: 250px;
+  }
+  
+  .item {
+    padding: 10px 12px;
+    margin-bottom: 4px;
+  }
+  
+  .item-text {
+    font-size: 0.85rem;
+  }
+  
+  .scroll-list {
+    padding: 10px;
+  }
+}

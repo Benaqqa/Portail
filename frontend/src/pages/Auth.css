@@ -85,6 +85,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s;
+  margin-top: 10px;
 }
 
 .btn-submit:hover:not(:disabled) {
@@ -224,7 +225,7 @@
 
 .first-login-btn {
   background: linear-gradient(135deg, var(--accent-color) 0%, #f59e0b 100%);
-  color: white;
+  color: #856504;
   padding: 12px 25px;
   border: none;
   border-radius: 20px;
@@ -234,11 +235,14 @@
   transition: all 0.3s ease;
   box-shadow: 0 2px 10px rgba(249, 115, 22, 0.3);
   width: 100%;
+  margin-top: 15px;
 }
 
 .first-login-btn:hover {
   transform: translateY(-1px);
   box-shadow: 0 4px 15px rgba(249, 115, 22, 0.4);
+  background: linear-gradient(135deg, var(--accent-color) 0%, #f59e0b 100%) !important;
+  color: #856504 !important;
 }
 
 /* Alert styles */
